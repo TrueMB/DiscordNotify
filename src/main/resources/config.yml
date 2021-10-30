@@ -1,0 +1,216 @@
+#ALL CHANGES NEEDS A RESTART TO TAKE AFFECT
+#
+#Remember to change the config and copy it in every Server/plugin/DiscordNotify/ folder,
+#to ensure, that every server got all the informations, that it needs
+#
+#Your MySQL Connection Settings
+#If you got problems to establish a Connection, try disabling the "useSSL".
+Database:
+     host: 'ipaddress'
+     port: 3306
+     useSSL: true
+     user: 'admin'
+     password: 'S€CR3T'
+     database: 'Database'
+# False <- to disable a Feature
+FeaturesEnabled:
+     Inactivity: false
+     PlayerJoinLeave: true
+     PlayerDeath: false
+     Chat: false
+     Staff: true
+     RoleSync: false
+Options:
+     useMetrics: true
+     DiscordBot:
+         #Please enter the Name of the Bot, that you defined in the config.toml of Spicord
+         Name: 'default' 
+     DateFormat:
+         Date: dd.MM.yyyy
+         Time: HH:mm:ss
+     Inactivity:
+         #Checking, if players are inactive (in Minutes)
+         CheckTimer: 60
+         InactivForDays: 4
+         useEmbedMessage: true
+     PlayerJoinLeave:
+         useEmbedMessage: false
+     PlayerDeath:
+         useEmbedMessage: false
+     Chat:
+         useEmbedMessage: false
+         #Should the Discord Message send to the Minecraft Server?
+         syncDiscord: true
+         #Allows the command /dchat to join or leave the Discord Chat in Minecraft
+         enableSplittedChat: false
+         bypassPrefix:
+            - '?'
+     Staff:
+         useEmbedMessage: false
+         #Should the Discord Message send to the Minecraft Server?
+         syncDiscord: true
+         bypassPrefix:
+            - '?'
+     PlayerInfo:
+         useEmbedMessage: true
+     Verification:
+         #This Role is needed on the Discord Server, to identify already authenticated Users
+         discordRole: 'verified'
+         #If a User gets Verfied it will change the Nickname on the Discord to the Minecraft Name
+         changeNickname: false
+         #Disables the spamming of Verification Requests. Amount are seconds
+         delayForNewRequest: 500
+     RoleSync:
+         #Uses the Ingame Group Names. If false, it only synces the given groups
+         useIngameGroupNames: true
+         #You can add as many entrys you need. The Key is the Minecraft Group and the Value the Discord Group Name
+         #Please use lower case for the key (minecraft group)
+         customGroupSync:
+             default: 'default'
+             mcowner: 'discord-owner'
+Permissions:
+     StaffChat: 'dn.staff'
+#Channel Ids: https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-
+Channel:
+     Inactivity: -1
+     PlayerJoinLeave: -1
+     PlayerDeath: -1
+     Chat: -1
+     #Should be a seperated Channel from the chat, because players can send message back to the server, 
+     #but the system wouldnt know, if it is a chat or staff message
+     Staff: -1
+Messages:
+     prefix: '&7[&5Discord&fNotify&7]'
+     perm: '&cYou dont have enough Permissions!'
+     console: 'Sorry, only works Ingame.'
+     botNotReady: '&4ERROR. &cThe Discord BOT is not ready.'
+     playerDoesntExists: '&4ERROR. &cThis Player doesnt exists.'
+     notANumber: '&4ERROR. &cThe Input is not a number.'
+     notABoolean: '&4ERROR. &cPlease use as a value &fTrue/False'
+     disabledFeature: '&4The Feature is disabled.'
+     notAMaterial: '&4ERROR. &cThis Material doesnt exists.'
+     discordChatMessage: '&f%Tag%&7: &f%Message%'
+     staffEnable: '&aEnabled the Staff Chat'
+     staffDisable: '&cDisabled the Staff Chat'
+     discordChatDisable: '&cDisabled the Discord Chat.'
+     discordChatEnable: '&aEnabled the Discord Chat.'
+     staffHelp: '&cPlease use &f/staff <message>'
+     discordStaffMessage: '&7[&4S&7] &f%Tag%&7: &f%Message%'
+     minecraftStaffMessage: '&7[&4S&7] &f%Message%'
+     verification:
+         unlinked: '&6You deleted your Verification.'
+         denied: '&6You denied the Verification Request.'
+         accept: '&6You are now verfied!'
+         notVerified: '&cYou are not Verified.'
+         nothingToDeny: '&6You got no Verification Sessian at the moment.'
+         sessionTimeOut: '&6Your Session run out. Please try the Verification again on the Discord Server!'
+         otherReasonVerification: '&6Your Discord or Minecraft Account got already verfied for some other Reason.'
+         help: '&6Please use &f/verify <accept/deny> &6for Verification or &f/verify unlink &6to remove a Discord Account.'
+         requestClickMessage:
+             message: '&f%User% &6wants to link with your Minecraft Account.'
+             accept: '&7[&aAccept&7]'
+             acceptHover: '&6Accept the Discord Verification.'
+             space: ' &7- '
+             deny: '&7[&cDeny&7]'
+             denyHover: '&6Deny the Discord Verification.'
+DiscordMessages:
+     InactivityMessage: '**%Player%** was inactiv for more than %InactivDays% Days'
+     PlayerJoinMessage: '**%Player%** joined the server.'
+     PlayerLeaveMessage: '**%Player%** left the server.'
+     PlayerDeathMessage: '%DeathMessage%'
+     ChatMessage: '%Player%: %Message%'
+     StaffMessage: '%Player%: %Message%'
+     PlayerInfoHelp: 'Please use %Prefix%playerinfo <IngameName>'
+     PlayerInfo: '%Player%''s UUID is %UUID%'
+     verification:
+         cooldown: 'You got a cooldown. Please try in %Sec% Sec again.'
+         discordAlreadyAuthenticated: 'You are already authenticated. Please use **%Prefix%verify unlink** to reset the linking.'
+         minecraftAlreadyAuthenticated: 'Your Minecraft Account is already authenticated. Please use **/verify unlink** Ingame to reset the linking.'
+         request: 'Please look Ingame for the Verifications Message and click on *accept*.'
+         playerOffline: 'You need to be Ingame.'
+         notVerified: 'You are not Verified.'
+         unlinked: 'You deleted your Verification.'
+         alreadyInProgress: 'Someone is already trying to link with this Minecraft Account.'
+         notAPlayer: 'The Player doesnt exists!'
+         wrongCommand: 'Please use **/verify <IngameName>**'
+#ColorTypes -> https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
+#PictureTypes -> AVATAR, HELM, CUBE, BODY, BUST, SKIN
+DiscordEmbedMessages:
+     InactivityEmbed:
+         Title: '**%Player%** was inactiv for more than %InactivDays% Days'
+         Description: '**%Player%** was last seen: %LastSeen% (Not Online for: %OfflinetimeDays% Days)'
+         #TITLE : TEXT
+         Fields:
+            - 'User UUID : %uuid%'
+            - 'User Name : %Player%'
+            - 'Location : %Location%'
+            - 'IP : %IP%'
+            - 'Playtime : %PlaytimeDays% Days'
+            - 'Offlinetime : %OfflinetimeDays% Days'
+         Author: '---------------------[ Inactivity ]------------------------'
+         #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
+         Color: 'RED'
+         WithPicture: true
+         PictureType: HELM
+     PlayerJoinEmbed:
+         Title: '**%Player%** joined the server.'
+         Description: ''
+         Fields: {}
+         Author: '---------------------[ Connected ]------------------------'
+         #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
+         Color: 'GREEN'
+         WithPicture: true
+         PictureType: AVATAR
+     PlayerLeaveEmbed:
+         Title: '**%Player%** left the server.'
+         Description: ''
+         Fields: {}
+         Author: '---------------------[ Disconnected ]------------------------'
+         #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
+         Color: 'RED'
+         WithPicture: false
+         PictureType: AVATAR
+     DeathEmbed:
+         Title: '**%Player%** died.'
+         Description: '%DeathMessage%'
+         Fields: {}
+         Author: 'Death'
+         #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
+         Color: 'GREEN'
+         WithPicture: true
+         PictureType: BUST
+     ChatEmbed:
+         Title: '**%Player%** wrote:'
+         Description: '%Message%'
+         Fields: {}
+         Author: 'Chat'
+         #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
+         Color: 'WHITE'
+         WithPicture: true
+         PictureType: BUST
+     StaffEmbed:
+         Title: '**%Player%** wrote:'
+         Description: '%Message%'
+         Fields: {}
+         Author: 'STAFF'
+         Color: 'WHITE'
+         WithPicture: true
+         PictureType: BUST
+     PlayerInfoEmbed:
+         Title: '**%Player%** Information'
+         Description: ''
+         Fields:
+            - 'User UUID : %uuid%'
+            - 'User Name : %Player%'
+            - 'Location : %Location%'
+            - 'IP : %IP%'
+            - 'Playtime : %Playtime%'
+            - 'Offlinetime : %Offlinetime%'
+            - 'Last Played: %LastSeen%'
+         Author: 'PLAYERINFO'
+         Color: 'WHITE'
+         WithPicture: true
+         PictureType: BODY
+     
+ #Do NOT touch
+ConfigVersion: 6

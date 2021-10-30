@@ -1,0 +1,6 @@
+name: ${project.name}
+author: TrueMB
+version: ${project.version}
+api-version: 1.16
+main: me.truemb.disnotify.spigot.main.Main
+softdepend: [Vault, Spicord]
