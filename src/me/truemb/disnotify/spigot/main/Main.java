@@ -2,6 +2,7 @@ package me.truemb.disnotify.spigot.main;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
-import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
+import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spicord.Spicord;
@@ -163,19 +164,30 @@ public class Main extends JavaPlugin{
 		
 		//Enable only if Spicord runs on the SubServer, otherwise is the command already enabled on the bungeecord Proxy
 		if(!isBungeeCordSubServer) {
-			MC_StaffCommand staffCommand = new MC_StaffCommand(this.getDiscordManager(), this.getConfigCache(), staffChatDisabled);
-			((CraftServer) this.getServer()).getCommandMap().register("staff", staffCommand);
-			List<String> staffAliases = new ArrayList<>();
-			staffAliases.add("s");
-			staffCommand.setAliases(staffAliases);
-			
-			MC_VerifyCommand verifyCommand = new MC_VerifyCommand(this.getDiscordManager(), this.getConfigCache(), this.getPluginInformations(), this.getVerifyManager(), this.getVerifySQL(), this.getPermissionsAPI());
-			((CraftServer) this.getServer()).getCommandMap().register("verify", verifyCommand);
-			
 
-			if(this.manageFile().getBoolean("Options.Chat.enableSplittedChat")) {
-				MC_DChatCommand dchatCmd = new MC_DChatCommand(this.getConfigCache(), discordChatEnabled);
-				((CraftServer) this.getServer()).getCommandMap().register("dchat", dchatCmd);
+			try{
+			    Field commandMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+			    commandMapField.setAccessible(true);
+			    CommandMap commandMap = (CommandMap) commandMapField.get(Bukkit.getServer());
+
+				
+				MC_StaffCommand staffCommand = new MC_StaffCommand(this.getDiscordManager(), this.getConfigCache(), staffChatDisabled);
+				commandMap.register("staff", staffCommand);
+				List<String> staffAliases = new ArrayList<>();
+				staffAliases.add("s");
+				staffCommand.setAliases(staffAliases);
+				
+				MC_VerifyCommand verifyCommand = new MC_VerifyCommand(this.getDiscordManager(), this.getConfigCache(), this.getPluginInformations(), this.getVerifyManager(), this.getVerifySQL(), this.getPermissionsAPI());
+				commandMap.register("verify", verifyCommand);
+				
+
+				if(this.manageFile().getBoolean("Options.Chat.enableSplittedChat")) {
+					MC_DChatCommand dchatCmd = new MC_DChatCommand(this.getConfigCache(), discordChatEnabled);
+					commandMap.register("dchat", dchatCmd);
+				}
+			    
+			}catch(Exception exception){
+			    exception.printStackTrace();
 			}
 		}
 		
