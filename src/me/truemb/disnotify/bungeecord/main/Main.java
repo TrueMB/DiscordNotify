@@ -71,7 +71,7 @@ public class Main extends Plugin{
 	public HashMap<UUID, Long> joinTime = new HashMap<UUID, Long>();
 	
 	//CONFIG
-	public static final int configVersion = 6;
+	public static final int configVersion = 7;
 	private File file;
 	private Configuration config;
 	
@@ -110,7 +110,7 @@ public class Main extends Plugin{
 			return; //DATABASE MISSING
 		
 		//SPICORD
-		this.discordMGR = new DiscordManager(this.getConfigCache(), this.getPluginInformations(), this.getOfflineInformationManager(), this.getVerifyManager(), this.getVerifySQL(), this.getDelayManger(), staffChatDisabled, discordChatEnabled);
+		this.discordMGR = new DiscordManager(this.getConfigCache(), this.permsAPI, this.getPluginInformations(), this.getOfflineInformationManager(), this.getVerifyManager(), this.getVerifySQL(), this.getDelayManger(), staffChatDisabled, discordChatEnabled);
 		
 		//LISTENER
 		if(this.configCache.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
@@ -205,7 +205,7 @@ public class Main extends Plugin{
 		try {
 			this.sql = new AsyncMySQL(this.getLogger(), host, port, user, password, database, useSSL);
 			this.offlineInfoSQL = new OfflineInformationsSQL(this.getAsyncMySql(), this.getOfflineInformationManager());
-			this.verifySQL = new VerifySQL(this.getAsyncMySql(), this.getVerifyManager(), this.getConfigCache(), this.getPluginInformations());
+			this.verifySQL = new VerifySQL(this.getAsyncMySql(), this.getVerifyManager(), this.getConfigCache(), this.getPluginInformations(), this.getPermissionsAPI());
 			
 			ProxyServer.getInstance().getScheduler().schedule(this, new Runnable() {
 				

@@ -23,8 +23,12 @@ public class LuckPermsAPI {
 	
 	private LuckPerms luckPerms;
 	private Permission permission;
+	private PluginInformations pluginInfo;
+	
+	//TODO CATCH NULL GROUPS
 	
 	public LuckPermsAPI(PluginInformations pluginInfo) {
+		this.pluginInfo = pluginInfo;
 		
 		try {
 			LuckPerms api = LuckPermsProvider.get();
@@ -59,6 +63,12 @@ public class LuckPermsAPI {
 	
 	public void addGroup(UUID uuid, String groupS) {
 		Group group = this.getLuckPerms().getGroupManager().getGroup(groupS);
+		
+		if(group == null) {
+			this.pluginInfo.getLogger().warning("Couldnt find the group: '" + groupS + "' to add it.");;
+			return;
+		}
+		
 		User user = this.getLuckPerms().getUserManager().getUser(uuid);
 		InheritanceNode node = InheritanceNode.builder(groupS).build();
 		user.data().add(node);
@@ -68,6 +78,12 @@ public class LuckPermsAPI {
 	
 	public void removeGroup(UUID uuid, String groupS) {
 		Group group = this.getLuckPerms().getGroupManager().getGroup(groupS);
+		
+		if(group == null) {
+			this.pluginInfo.getLogger().warning("Couldnt find the group: '" + groupS + "' to remove it.");;
+			return;
+		}
+		
 		User user = this.getLuckPerms().getUserManager().getUser(uuid);
 		InheritanceNode node = InheritanceNode.builder(groupS).build();
 		user.data().remove(node);

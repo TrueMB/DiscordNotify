@@ -22,6 +22,7 @@ import me.truemb.disnotify.enums.MinotarTypes;
 import me.truemb.disnotify.manager.DelayManager;
 import me.truemb.disnotify.manager.OfflineInformationManager;
 import me.truemb.disnotify.manager.VerifyManager;
+import me.truemb.disnotify.spigot.utils.PermissionsAPI;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -35,6 +36,7 @@ public class DiscordManager {
 	private DiscordBot discordBot = null;
 
 	private ConfigCacheHandler configCache;
+	private PermissionsAPI permsAPI;
 	private PluginInformations pluginInfo;
 	private OfflineInformationManager offlineInfo;
 	private VerifyManager verifyManager;
@@ -52,8 +54,9 @@ public class DiscordManager {
 	private HashMap<UUID, Boolean> staffHash;
 	private HashMap<UUID, Boolean> discordChatHash;
 	
-	public DiscordManager(ConfigCacheHandler configCache, PluginInformations pluginInfo, OfflineInformationManager offlineInfo, VerifyManager verifyManager, VerifySQL verifySQL,DelayManager delayManager, HashMap<UUID, Boolean> staffHash, HashMap<UUID, Boolean> discordChatHash) {
+	public DiscordManager(ConfigCacheHandler configCache, PermissionsAPI permsAPI, PluginInformations pluginInfo, OfflineInformationManager offlineInfo, VerifyManager verifyManager, VerifySQL verifySQL,DelayManager delayManager, HashMap<UUID, Boolean> staffHash, HashMap<UUID, Boolean> discordChatHash) {
 		this.configCache = configCache;
+		this.permsAPI = permsAPI;
 		this.pluginInfo = pluginInfo;
 		this.offlineInfo = offlineInfo;
 		this.verifyManager = verifyManager;
@@ -75,7 +78,7 @@ public class DiscordManager {
     	
     	//ADDONS NEEDS TO BE SET UP IN SPICORD
 	    this.playerInfoAddon = new DC_PlayerInfoCommand(this, this.configCache, this.offlineInfo, this.pluginInfo);
-	    this.verifyAddon = new DC_VerifyCommand(this.pluginInfo, this, this.verifyManager, this.delayManager, this.configCache, this.verifySQL);
+	    this.verifyAddon = new DC_VerifyCommand(this.pluginInfo, this.permsAPI, this, this.verifyManager, this.delayManager, this.configCache, this.verifySQL);
 	    	
 	    SpicordLoader.addStartupListener(spicord -> {
 	    	

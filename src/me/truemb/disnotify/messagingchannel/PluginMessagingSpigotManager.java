@@ -9,6 +9,7 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
+import me.truemb.disnotify.enums.GroupAction;
 import me.truemb.disnotify.enums.InformationType;
 import me.truemb.disnotify.spigot.main.Main;
 
@@ -56,6 +57,21 @@ public class PluginMessagingSpigotManager implements PluginMessageListener {
 				String value = in.readUTF();
 				this.instance.getOfflineInformationManager().setInformation(uuid, type, value);
 			}
+		}else if (subChannel.equalsIgnoreCase("GROUP_ACTION")) {
+			
+			UUID targetUUID = UUID.fromString(in.readUTF());
+			GroupAction action = GroupAction.valueOf(in.readUTF().toUpperCase());
+			String groupS = in.readUTF();
+			
+			String[] groups = groupS.split(", ");
+			
+			for(String group : groups) {
+				if(action == GroupAction.ADD)
+					this.instance.getPermissionsAPI().addGroup(targetUUID, group);
+				else if(action == GroupAction.REMOVE)
+					this.instance.getPermissionsAPI().removeGroup(targetUUID, group);
+			}
+		
 		}
 
 	}
@@ -111,7 +127,7 @@ public class PluginMessagingSpigotManager implements PluginMessageListener {
 		for(String group : groups) {
 			groupS += ", " + group;
 		}
-		groupS = groupS.substring(0, groupS.length() - 2);
+		groupS = groupS.substring(2, groupS.length());
 
 		out.writeUTF("GET_GROUPS_ANSWER");
 		out.writeUTF(groupS);

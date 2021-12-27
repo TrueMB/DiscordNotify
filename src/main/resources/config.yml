@@ -56,6 +56,9 @@ Options:
      Verification:
          #This Role is needed on the Discord Server, to identify already authenticated Users
          discordRole: 'verified'
+         #This Rank is for authenticated Users after the verification. Its not needed. (leave it blank or enter the name of the group)
+         #Use "s:groupname" for Spigot Server Groups or "b:groupname" for bungeecord
+         minecraftRank: ''
          #If a User gets Verfied it will change the Nickname on the Discord to the Minecraft Name
          changeNickname: false
          #Disables the spamming of Verification Requests. Amount are seconds
@@ -213,4 +216,4 @@ DiscordEmbedMessages:
          PictureType: BODY
      
  #Do NOT touch
-ConfigVersion: 6
+ConfigVersion: 7

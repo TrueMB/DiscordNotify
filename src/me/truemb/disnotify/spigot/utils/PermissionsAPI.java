@@ -30,12 +30,11 @@ public class PermissionsAPI {
 			pluginInfo.getLogger().warning("LuckPerms wasn't found. Using Vault and DiscordNotify as a Bridge.");
 			
 		}else {
+			if(org.bukkit.Bukkit.getPluginManager().getPlugin("LuckPerms") != null) {
+				this.luckPermsAPI = new LuckPermsAPI(this.pluginInfo);
+				return;
+			}
 			if(!this.setupPermissions()) { //IF VAULT DIDNT FIND IT, TRY LUCKPERMS
-				if(org.bukkit.Bukkit.getPluginManager().getPlugin("LuckPerms") != null) {
-					this.luckPermsAPI = new LuckPermsAPI(this.pluginInfo);
-					return;
-				}
-
 				pluginInfo.getLogger().warning("No Permission System was found. (optional - Needed for verify)");
 			}
 		}

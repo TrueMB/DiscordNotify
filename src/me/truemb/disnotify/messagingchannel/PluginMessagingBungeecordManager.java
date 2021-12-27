@@ -9,6 +9,7 @@ import com.google.common.io.ByteStreams;
 
 import me.truemb.disnotify.bungeecord.main.Main;
 import me.truemb.disnotify.enums.FeatureType;
+import me.truemb.disnotify.enums.GroupAction;
 import me.truemb.disnotify.enums.InformationType;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -20,23 +21,23 @@ import net.md_5.bungee.event.EventHandler;
 public class PluginMessagingBungeecordManager implements Listener {
 
 	private Main instance;
-	private String channel;
+	private static String channel;
 
 	// THIS IS THE BUNGEECOR SIDE. BUNGEECORD RECEIVES INFORMATION FROM MINECRAFT
 	// SERVER
 
 	public PluginMessagingBungeecordManager(Main plugin) {
-		this.channel = "discord:notify";
+		PluginMessagingBungeecordManager.channel = "discord:notify";
 		this.instance = plugin;
 
-		this.instance.getProxy().registerChannel(this.channel);
+		this.instance.getProxy().registerChannel(PluginMessagingBungeecordManager.channel);
 		this.instance.getProxy().getPluginManager().registerListener(this.instance, this);
 	}
 
 	@EventHandler
 	public void onPluginMessageReceived(PluginMessageEvent event) {
 		
-		if (!event.getTag().equalsIgnoreCase(this.channel))
+		if (!event.getTag().equalsIgnoreCase(PluginMessagingBungeecordManager.channel))
 			return;
 		
 		ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
@@ -106,7 +107,32 @@ public class PluginMessagingBungeecordManager implements Listener {
 		if(server == null)
 			return;
 		
-		server.sendData(this.channel, out.toByteArray());
+		server.sendData(channel, out.toByteArray());
+	}
+	
+	public static void sendGroupAction(ProxiedPlayer player, GroupAction action, String[] groups) {
+	    
+	    String groupS = "";
+		for(String group : groups) {
+			groupS += ", " + group;
+		}
+		groupS = groupS.substring(2, groupS.length());
+		
+	    ByteArrayDataOutput out = ByteStreams.newDataOutput();
+	    out.writeUTF("GROUP_ACTION"); // the channel could be whatever you want
+		out.writeUTF(player.getUniqueId().toString());
+		
+	    out.writeUTF(action.toString()); // the channel could be whatever you want
+		out.writeUTF(groupS);
+	 
+	    // we send the data to the server
+	    // using ServerInfo the packet is being queued if there are no players in the server
+	    // using only the server to send data the packet will be lost if no players are in it
+		ServerInfo server = player.getServer().getInfo();
+		if(server == null)
+			return;
+		
+		server.sendData(channel, out.toByteArray());
 	}
 
 	public void sendInformationUpdate(ProxiedPlayer player, InformationType type, String value) {
@@ -128,7 +154,7 @@ public class PluginMessagingBungeecordManager implements Listener {
 			return;
 		
 		
-		serverInfo.sendData(this.channel, out.toByteArray());
+		serverInfo.sendData(channel, out.toByteArray());
 	}
 	
 	public void sendInformationUpdate(ProxiedPlayer player, InformationType type, long value) {
@@ -143,6 +169,6 @@ public class PluginMessagingBungeecordManager implements Listener {
 		if(server == null)
 			return;
 		
-		server.sendData(this.channel, out.toByteArray());
+		server.sendData(channel, out.toByteArray());
 	}
 }

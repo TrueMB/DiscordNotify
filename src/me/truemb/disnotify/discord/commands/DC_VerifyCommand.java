@@ -10,8 +10,12 @@ import org.spicord.bot.command.DiscordBotCommand;
 
 import me.truemb.disnotify.database.VerifySQL;
 import me.truemb.disnotify.enums.DelayType;
+import me.truemb.disnotify.enums.FeatureType;
+import me.truemb.disnotify.enums.GroupAction;
 import me.truemb.disnotify.manager.DelayManager;
 import me.truemb.disnotify.manager.VerifyManager;
+import me.truemb.disnotify.messagingchannel.PluginMessagingBungeecordManager;
+import me.truemb.disnotify.spigot.utils.PermissionsAPI;
 import me.truemb.disnotify.utils.ConfigCacheHandler;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.DisnotifyTools;
@@ -24,14 +28,16 @@ import net.dv8tion.jda.api.exceptions.HierarchyException;
 public class DC_VerifyCommand extends SimpleAddon {
 	
 	private DiscordManager discordManager;
+	private PermissionsAPI permsAPI;
 	private VerifyManager verifyManager;
 	private DelayManager delayManager;
 	private PluginInformations pluginInfo;
 	private ConfigCacheHandler configCache;
 	private VerifySQL verifySQL;
 	
-    public DC_VerifyCommand(PluginInformations pluginInfo, DiscordManager discordManager, VerifyManager verifyManager, DelayManager delayManager, ConfigCacheHandler configCache, VerifySQL verifySQL) {
+    public DC_VerifyCommand(PluginInformations pluginInfo, PermissionsAPI permsAPI, DiscordManager discordManager, VerifyManager verifyManager, DelayManager delayManager, ConfigCacheHandler configCache, VerifySQL verifySQL) {
         super("Disnotify Verify", "disnotify::verify", "TrueMB", pluginInfo.getPluginVersion(), new String[] { "verify" });
+        this.permsAPI = permsAPI;
         this.discordManager = discordManager;
         this.verifyManager = verifyManager;
         this.delayManager = delayManager;
@@ -84,6 +90,27 @@ public class DC_VerifyCommand extends SimpleAddon {
     	    				}
     	    				
     	    				DisnotifyTools.resetRoles(mcuuid, member, this.configCache, this.verifyManager, this.discordManager);
+    	    				
+    	    				String verifyGroupS = configCache.getOptionString(FeatureType.Verification.toString() +  ".minecraftRank");
+    	    				
+    	    				if(verifyGroupS != null && !verifyGroupS.equalsIgnoreCase("")) {
+    	    					
+    	    					String[] array = verifyGroupS.split(":");
+    	    				
+    	    					if(array.length == 2) {
+    	    						String minecraftRank = array[1];
+
+    	    						if(this.pluginInfo.isBungeeCord() && array[0].equalsIgnoreCase("s") || this.permsAPI.usePluginBridge) {
+    	    							String[] groups = { minecraftRank };
+    	    							PluginMessagingBungeecordManager.sendGroupAction(net.md_5.bungee.api.ProxyServer.getInstance().getPlayer(mcuuid), GroupAction.REMOVE, groups);
+    	    						}else {
+    	    							this.permsAPI.removeGroup(mcuuid, minecraftRank);
+    	    						}
+    	    						
+    	    					}else {
+    	    						this.pluginInfo.getLogger().warning("Something went wrong with removing the Verificationsgroup on Minecraft!");
+    	    					}
+    	    				}
     						
     	    				this.verifyManager.removeVerified(mcuuid);
     	    				this.verifySQL.deleteVerification(disUUID);

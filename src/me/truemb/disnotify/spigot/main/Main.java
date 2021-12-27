@@ -76,7 +76,7 @@ public class Main extends JavaPlugin{
 	public boolean placeholderSupport = false;
 	
 	//CONFIG
-	private static final int configVersion = 6;
+	private static final int configVersion = 7;
 	private File file;
 	private UTF8YamlConfiguration config;
 	
@@ -126,7 +126,7 @@ public class Main extends JavaPlugin{
 		
 		//SPICORD
 		if(!isBungeeCordSubServer) {
-			this.discordMGR = new DiscordManager(this.getConfigCache(), this.getPluginInformations(), this.getOfflineInformationManager(), this.getVerifyManager(), this.getVerifySQL(), this.getDelayManger(), staffChatDisabled, discordChatEnabled);
+			this.discordMGR = new DiscordManager(this.getConfigCache(), this.permsAPI, this.getPluginInformations(), this.getOfflineInformationManager(), this.getVerifyManager(), this.getVerifySQL(), this.getDelayManger(), staffChatDisabled, discordChatEnabled);
 
 			//REGISTER BOT
 			Bukkit.getScheduler().runTaskLaterAsynchronously(this, new Runnable() {
@@ -353,7 +353,7 @@ public class Main extends JavaPlugin{
 		try {
 			this.sql = new AsyncMySQL(this.getLogger(), host, port, user, password, database, useSSL);
 			this.offlineInfoSQL = new OfflineInformationsSQL(this.getAsyncMySql(), this.getOfflineInformationManager());
-			this.verifySQL = new VerifySQL(this.getAsyncMySql(), this.getVerifyManager(), this.getConfigCache(), this.getPluginInformations());
+			this.verifySQL = new VerifySQL(this.getAsyncMySql(), this.getVerifyManager(), this.getConfigCache(), this.getPluginInformations(), this.getPermissionsAPI());
 			
 			Bukkit.getScheduler().runTaskLaterAsynchronously(this, new Runnable() {
 				

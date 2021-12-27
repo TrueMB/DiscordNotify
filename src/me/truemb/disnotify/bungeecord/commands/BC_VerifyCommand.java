@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 
 import me.truemb.disnotify.database.VerifySQL;
+import me.truemb.disnotify.enums.FeatureType;
+import me.truemb.disnotify.enums.GroupAction;
 import me.truemb.disnotify.manager.VerifyManager;
 import me.truemb.disnotify.messagingchannel.PluginMessagingBungeecordManager;
 import me.truemb.disnotify.spigot.utils.PermissionsAPI;
@@ -95,6 +97,27 @@ public class BC_VerifyCommand extends Command{
 				
 				//RESET ROLES
 				DisnotifyTools.resetRoles(uuid, member, this.configCache, this.verifyManager, this.discordManager);
+				
+				String verifyGroupS = configCache.getOptionString(FeatureType.Verification.toString() +  ".minecraftRank");
+				
+				if(verifyGroupS != null && !verifyGroupS.equalsIgnoreCase("")) {
+					
+					String[] array = verifyGroupS.split(":");
+				
+					if(array.length == 2) {
+						String minecraftRank = array[1];
+
+						if(this.pluginInfo.isBungeeCord() && array[0].equalsIgnoreCase("s") || this.permsAPI.usePluginBridge) {
+							String[] groups = { minecraftRank };
+							PluginMessagingBungeecordManager.sendGroupAction(net.md_5.bungee.api.ProxyServer.getInstance().getPlayer(uuid), GroupAction.REMOVE, groups);
+						}else {
+							this.permsAPI.removeGroup(uuid, minecraftRank);
+						}
+						
+					}else {
+						this.pluginInfo.getLogger().warning("Something went wrong with removing the Verificationsgroup on Minecraft!");
+					}
+				}
 				
 				this.verifyManager.removeVerified(uuid);
 				this.verifySQL.deleteVerification(uuid);

@@ -11,7 +11,11 @@ import java.util.function.Consumer;
 import org.spicord.bot.command.DiscordBotCommand;
 
 import me.truemb.disnotify.enums.DelayType;
+import me.truemb.disnotify.enums.FeatureType;
+import me.truemb.disnotify.enums.GroupAction;
 import me.truemb.disnotify.manager.VerifyManager;
+import me.truemb.disnotify.messagingchannel.PluginMessagingBungeecordManager;
+import me.truemb.disnotify.spigot.utils.PermissionsAPI;
 import me.truemb.disnotify.utils.ConfigCacheHandler;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.DisnotifyTools;
@@ -30,14 +34,16 @@ public class VerifySQL {
 	private VerifyManager verifyManager;
 	private ConfigCacheHandler configCache;
 	private PluginInformations pluginInformations;
+	private PermissionsAPI permsAPI;
 	
 	private String table = "disnotify_verify";
 	
-	public VerifySQL(AsyncMySQL asyncMysql, VerifyManager verifyManager, ConfigCacheHandler configCache, PluginInformations pluginInformations){
+	public VerifySQL(AsyncMySQL asyncMysql, VerifyManager verifyManager, ConfigCacheHandler configCache, PluginInformations pluginInformations, PermissionsAPI permsAPI){
 		this.asyncMysql = asyncMysql;
 		this.verifyManager = verifyManager;
 		this.configCache = configCache;
 		this.pluginInformations = pluginInformations;
+		this.permsAPI = permsAPI;
 		
 		this.asyncMysql.queryUpdate("CREATE TABLE IF NOT EXISTS " + this.table + " (mcuuid VARCHAR(60) PRIMARY KEY, ingamename VARCHAR(18), disuuid BIGINT UNIQUE KEY, roles TEXT, lastchange TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)");
 	}
@@ -145,7 +151,7 @@ public class VerifySQL {
 					if(member == null)
 						member = discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).complete();
 
-					String verfiedGroupS = configCache.getOptionString("Verification.discordRole");
+					String verfiedGroupS = configCache.getOptionString(FeatureType.Verification.toString() +  ".discordRole");
 					List<Role> verifyRoles = discordManager.getDiscordBot().getJda().getRolesByName(verfiedGroupS, true);
 					if(verifyRoles.size() <= 0)
 						return;
@@ -154,11 +160,31 @@ public class VerifySQL {
 					verifyRole.getGuild().addRoleToMember(member, verifyRole).complete();
 
 					//NICKNAME
-					if(configCache.getOptionBoolean("Verification.changeNickname")) {
+					if(configCache.getOptionBoolean(FeatureType.Verification.toString() +  ".changeNickname")) {
 						try {
-							member.modifyNickname(ingameName).complete();
+							member.modifyNickname(ingameName).queue();
 						}catch(HierarchyException ex) {
 							pluginInformations.getLogger().warning("User " + member.getUser().getAsTag() + " has higher rights, than the BOT! Cant change the Nickname.");
+						}
+					}
+					String verifyGroupS = configCache.getOptionString(FeatureType.Verification.toString() +  ".minecraftRank");
+					
+					if(verifyGroupS != null && !verifyGroupS.equalsIgnoreCase("")) {
+						
+						String[] array = verifyGroupS.split(":");
+					
+						if(array.length == 2) {
+							String minecraftRank = array[1];
+						
+							if(pluginInformations.isBungeeCord() && array[0].equalsIgnoreCase("s") || verifySQL.permsAPI.usePluginBridge) {
+								String[] groups = { minecraftRank };
+								PluginMessagingBungeecordManager.sendGroupAction(net.md_5.bungee.api.ProxyServer.getInstance().getPlayer(uuid), GroupAction.ADD, groups);
+							}else {
+								verifySQL.permsAPI.addGroup(uuid, minecraftRank);
+							}
+							
+						}else {
+							pluginInformations.getLogger().warning("Something went wrong with adding the Verificationsgroup on Minecraft!");
 						}
 					}
 					
