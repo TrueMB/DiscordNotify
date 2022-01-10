@@ -123,8 +123,12 @@ public class Main extends Plugin{
 				
 				discordMGR.prepareDiscordBot();
 				
-				if(discordMGR.isDiscordBotHooked() || discordMGR.getDiscordBot().getStatus() == BotStatus.OFFLINE)
+				if(discordMGR.isDiscordBotHooked())
 					ProxyServer.getInstance().getScheduler().cancel(discordMGR.getHookSchedulerId());
+				else if(discordMGR.getDiscordBot().getStatus() == BotStatus.OFFLINE) {
+					ProxyServer.getInstance().getScheduler().cancel(discordMGR.getHookSchedulerId());
+					getLogger().warning("Couldnt connect to the Bot. Is the Bot Offline?");
+				}
 				
 			}
 		}, 1, 1, TimeUnit.SECONDS).getId();

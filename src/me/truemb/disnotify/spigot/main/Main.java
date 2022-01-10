@@ -45,7 +45,6 @@ import me.truemb.disnotify.utils.ConfigCacheHandler;
 import me.truemb.disnotify.utils.ConfigUpdater;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.PluginInformations;
-import net.md_5.bungee.api.ProxyServer;
 
 public class Main extends JavaPlugin{
 	
@@ -142,8 +141,12 @@ public class Main extends JavaPlugin{
 					
 					discordMGR.prepareDiscordBot();
 					
-					if(discordMGR.isDiscordBotHooked() || discordMGR.getDiscordBot().getStatus() == BotStatus.OFFLINE)
-						ProxyServer.getInstance().getScheduler().cancel(discordMGR.getHookSchedulerId());
+					if(discordMGR.isDiscordBotHooked())
+						Bukkit.getScheduler().cancelTask(discordMGR.getHookSchedulerId());
+					else if(discordMGR.getDiscordBot().getStatus() == BotStatus.OFFLINE) {
+						Bukkit.getScheduler().cancelTask(discordMGR.getHookSchedulerId());
+						getLogger().warning("Couldnt connect to the Bot. Is the Bot Offline?");
+					}
 					
 				}
 			}, 20, 20).getTaskId();
