@@ -168,7 +168,6 @@ public class DC_VerifyCommand extends SimpleAddon {
     
 	@Override
 	public void onShutdown(DiscordBot bot) {
-		super.onShutdown(bot);
 		this.pluginInfo.getLogger().info("Disabling the Verify Command.");
 	}
 

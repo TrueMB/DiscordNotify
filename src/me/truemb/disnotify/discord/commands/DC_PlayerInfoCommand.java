@@ -117,7 +117,6 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 
 	@Override
 	public void onShutdown(DiscordBot bot) {
-		super.onShutdown(bot);
 		this.pluginInfo.getLogger().info("Disabling the PlayerInfo Command.");
 	}
 }
