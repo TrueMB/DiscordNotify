@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.spicord.Spicord;
+import org.spicord.bot.DiscordBot.BotStatus;
 
 import me.truemb.disnotify.bungeecord.commands.BC_DChatCommand;
 import me.truemb.disnotify.bungeecord.commands.BC_StaffCommand;
@@ -111,6 +111,24 @@ public class Main extends Plugin{
 		
 		//SPICORD
 		this.discordMGR = new DiscordManager(this.getConfigCache(), this.permsAPI, this.getPluginInformations(), this.getOfflineInformationManager(), this.getVerifyManager(), this.getVerifySQL(), this.getDelayManger(), staffChatDisabled, discordChatEnabled);
+		this.discordMGR.registerAddons(this.manageFile().getString("Options.DiscordBot.Name"));
+
+		int id = ProxyServer.getInstance().getScheduler().schedule(this, new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				if(discordMGR.getDiscordBot() == null)
+					return;
+				
+				discordMGR.prepareDiscordBot();
+				
+				if(discordMGR.isDiscordBotHooked() || discordMGR.getDiscordBot().getStatus() == BotStatus.OFFLINE)
+					ProxyServer.getInstance().getScheduler().cancel(discordMGR.getHookSchedulerId());
+				
+			}
+		}, 1, 1, TimeUnit.SECONDS).getId();
+		discordMGR.setHookSchedulerId(id);
 		
 		//LISTENER
 		if(this.configCache.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
@@ -141,18 +159,7 @@ public class Main extends Plugin{
 		
 		BC_VerifyCommand verifyCmd = new BC_VerifyCommand(this.getDiscordManager(), this.getConfigCache(), this.getPluginInformations(), this.getVerifyManager(), this.getVerifySQL(), this.getMessagingManager(), this.getPermissionsAPI());
 		ProxyServer.getInstance().getPluginManager().registerCommand(this, verifyCmd);
-		
-		//REGISTER BOT
-		ProxyServer.getInstance().getScheduler().schedule(this, new Runnable() {
-			
-			@Override
-			public void run() {
-				if(getDiscordManager().getDiscordBot() == null)
-					getDiscordManager().prepareDiscordBot(Spicord.getInstance().getBotByName(manageFile().getString("Options.DiscordBot.Name")));
-			}
-		}, 12, TimeUnit.SECONDS);
-		
-		
+				
 		//If Server gets reloaded, it sets the current time again
 		for(ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
 			UUID uuid = all.getUniqueId();

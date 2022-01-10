@@ -29,11 +29,9 @@ import net.dv8tion.jda.api.entities.User;
 
 public class DiscordManager {
 	
-	//DOWNLOAD PICTURE TO PREVENT DISCORD CACHE
-	//FIXED NEVER PLAYED VALUE
-	//TODO CONFIG NEEDS TO REMOVE hours FROM playerinfo embed
-	
 	private DiscordBot discordBot = null;
+	private boolean discordBotHooked = false;
+	private int hookSchedulerId = -1; //IS THE SCHEDULER ID, WHICH HOOKS INTO THE DISCORD BOT
 
 	private ConfigCacheHandler configCache;
 	private PermissionsAPI permsAPI;
@@ -65,12 +63,10 @@ public class DiscordManager {
 		
 		this.staffHash = staffHash;
 		this.discordChatHash = discordChatHash;
-		
-		this.registerAddons();
 	}
 
 	//DISCORD
-	private void registerAddons() {
+	public void registerAddons(String botname) {
 		
 		//ADDONS
     	if(Spicord.getInstance() == null || Spicord.getInstance().getAddonManager() == null)
@@ -82,34 +78,24 @@ public class DiscordManager {
 	    	
 	    SpicordLoader.addStartupListener(spicord -> {
 	    	
+	    	DiscordBot bot = spicord.getBotByName(botname);
+	    	
+	    	if(bot == null) {
+        		this.pluginInfo.getLogger().warning("Couldnt get Bot of the name: " + botname + ". (Did you change the botname in the config?)");
+        		return;
+	    	}
+	    	
+    		setDiscordBot(bot);
+    		
+	    	//REGISTER ADDONS
 	    	spicord.getAddonManager().registerAddon(this.playerInfoAddon);
 	    	spicord.getAddonManager().registerAddon(this.verifyAddon);
-	    	
 	    });
-	}
-	
-	public void prepareDiscordBot(DiscordBot bot) {
-        if(this.getDiscordBot() == null) {
-        	
-        	//CHECK IF BOT IS CONNECTED TO A GUILD
-        	if(bot.getJda().getGuilds().size() <= 0) {
-        		this.pluginInfo.getLogger().warning("Discord Bot is not Connected with a Server.");
-        		return;
-        	}
-        	
-        	//SET THE BOT
-        	this.setDiscordBot(bot);
-
-        	//REGISTER LISTENER
-    	    this.chatListener = new DC_ChatListener(this.configCache, this.pluginInfo, this.staffHash, this.discordChatHash);
-            this.getDiscordBot().getJda().addEventListener(this.chatListener);
-        	
-    		this.pluginInfo.getLogger().info("Connected with Discord BOT.");
-        }
+	    
 	}
 	
 	public void disconnectDiscordBot() {
-        if(this.getDiscordBot() != null) {
+        if(this.getDiscordBot() != null && this.getDiscordBot().isReady()) {
         	
         	//ADDONS
         	if(Spicord.getInstance().getAddonManager().isRegistered(this.playerInfoAddon))
@@ -132,6 +118,29 @@ public class DiscordManager {
 		this.discordBot = bot;
 	}
 	
+	public void prepareDiscordBot() {
+			
+		if(this.discordBot == null || !this.discordBot.isReady())
+	    	return;
+			
+		//Discord bot is reachable. If it now crashes, then there went something else wrong, which is not fixable without user interaction.
+		this.discordBotHooked = true;
+		
+	    //CHECK IF BOT IS CONNECTED TO A GUILD
+	    if(this.discordBot.getJda().getGuilds().size() <= 0) {
+	    	this.pluginInfo.getLogger().warning("Discord Bot is not Connected with a Server.");
+	    	return;
+	    }
+	
+	    //REGISTER LISTENER
+		this.chatListener = new DC_ChatListener(this.configCache, this.pluginInfo, this.staffHash, this.discordChatHash);
+	    this.getDiscordBot().getJda().addEventListener(this.chatListener);
+	    	
+		this.pluginInfo.getLogger().info("Connected with Discord BOT.");
+		
+	}
+	
+	//GETS THE DISCORD BOT
 	public DiscordBot getDiscordBot(){
 		return this.discordBot;
 	}
@@ -276,6 +285,18 @@ public class DiscordManager {
 		}
 		
 		return message;
+	}
+
+	public boolean isDiscordBotHooked() {
+		return discordBotHooked;
+	}
+
+	public int getHookSchedulerId() {
+		return hookSchedulerId;
+	}
+
+	public void setHookSchedulerId(int hookSchedulerId) {
+		this.hookSchedulerId = hookSchedulerId;
 	}
 	
 }

@@ -19,7 +19,7 @@ import org.bukkit.Statistic;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.spicord.Spicord;
+import org.spicord.bot.DiscordBot.BotStatus;
 
 import de.jeff_media.updatechecker.UpdateChecker;
 import de.jeff_media.updatechecker.UserAgentBuilder;
@@ -45,6 +45,7 @@ import me.truemb.disnotify.utils.ConfigCacheHandler;
 import me.truemb.disnotify.utils.ConfigUpdater;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.PluginInformations;
+import net.md_5.bungee.api.ProxyServer;
 
 public class Main extends JavaPlugin{
 	
@@ -128,15 +129,25 @@ public class Main extends JavaPlugin{
 		if(!isBungeeCordSubServer) {
 			this.discordMGR = new DiscordManager(this.getConfigCache(), this.permsAPI, this.getPluginInformations(), this.getOfflineInformationManager(), this.getVerifyManager(), this.getVerifySQL(), this.getDelayManger(), staffChatDisabled, discordChatEnabled);
 
-			//REGISTER BOT
-			Bukkit.getScheduler().runTaskLaterAsynchronously(this, new Runnable() {
+			String botname = this.manageFile().getString("Options.DiscordBot.Name");
+			this.discordMGR.registerAddons(botname);
+			
+			int id = Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
 				
 				@Override
 				public void run() {
-					if(getDiscordManager().getDiscordBot() == null)
-						getDiscordManager().prepareDiscordBot(Spicord.getInstance().getBotByName(manageFile().getString("Options.DiscordBot.Name")));
+					
+					if(discordMGR.getDiscordBot() == null)
+						return;
+					
+					discordMGR.prepareDiscordBot();
+					
+					if(discordMGR.isDiscordBotHooked() || discordMGR.getDiscordBot().getStatus() == BotStatus.OFFLINE)
+						ProxyServer.getInstance().getScheduler().cancel(discordMGR.getHookSchedulerId());
+					
 				}
-			}, 20 * 12);
+			}, 20, 20).getTaskId();
+			discordMGR.setHookSchedulerId(id);
 		}
 		
 		//LISTENER
