@@ -69,11 +69,11 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 					//IF NOT BUNGEE SYSTEM
 					org.bukkit.OfflinePlayer player = org.bukkit.Bukkit.getOfflinePlayer(uuid);
 					lastplayed = player.isOnline() ? System.currentTimeMillis() : player.getLastPlayed();
-					playtimeHours = (double) player.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE) / 20 / 60;
+					playtimeHours = (double) player.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE) / 20 / 60 / 60;
 					offlinetimeHours = (double) (System.currentTimeMillis() - player.getLastPlayed()) / 1000 / 60 / 60;
 				}else {
 					lastplayed = net.md_5.bungee.api.ProxyServer.getInstance().getPlayer(uuid) != null ? System.currentTimeMillis() : this.offlineInfoManager.getInformationLong(uuid, InformationType.LastConnection);
-					playtimeHours = (double) this.offlineInfoManager.getInformationLong(uuid, InformationType.Playtime) / 1000 / 60;
+					playtimeHours = (double) this.offlineInfoManager.getInformationLong(uuid, InformationType.Playtime) / 20 / 60 / 60;
 					offlinetimeHours = (double) (System.currentTimeMillis() - this.offlineInfoManager.getInformationLong(uuid, InformationType.LastConnection)) / 1000 / 60 / 60;
 				}
 				
