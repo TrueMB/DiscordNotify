@@ -3,20 +3,19 @@ package me.truemb.disnotify.bungeecord.commands;
 import java.util.HashMap;
 import java.util.UUID;
 
-import me.truemb.disnotify.utils.ConfigCacheHandler;
+import me.truemb.disnotify.manager.ConfigManager;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
 public class BC_DChatCommand extends Command{
 
-	private ConfigCacheHandler configCache;
+	private ConfigManager configManager;
 	private HashMap<UUID, Boolean> discordChatEnabled;
 	
-	public BC_DChatCommand(ConfigCacheHandler configCache, HashMap<UUID, Boolean> discordChatEnabled) {
+	public BC_DChatCommand(ConfigManager configManager, HashMap<UUID, Boolean> discordChatEnabled) {
 		super("dchat");
-		this.configCache = configCache;
+		this.configManager = configManager;
 		this.discordChatEnabled = discordChatEnabled;
 	}
 
@@ -24,7 +23,7 @@ public class BC_DChatCommand extends Command{
 	public void execute(CommandSender sender, String[] args) {
 
 		if (!(sender instanceof ProxiedPlayer)) {
-			sender.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("console", false)));
+			sender.sendMessage(this.configManager.getMessageAsTextComponent("console", false));
 			return;
 		}
 
@@ -34,13 +33,13 @@ public class BC_DChatCommand extends Command{
 		if(!this.discordChatEnabled.containsKey(uuid) || !this.discordChatEnabled.get(uuid)) {
 			
 			this.discordChatEnabled.put(uuid, true);
-			p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("discordChatEnable", true)));
+			p.sendMessage(this.configManager.getMessageAsTextComponent("discordChatEnable", true));
 			return;
 			
 		}else {
 			
 			this.discordChatEnabled.put(uuid, false);
-			p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("discordChatDisable", true)));
+			p.sendMessage(this.configManager.getMessageAsTextComponent("discordChatDisable", true));
 			return;
 			
 		}

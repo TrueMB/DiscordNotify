@@ -51,13 +51,13 @@ public class PluginMessagingBungeecordManager implements Listener {
 			
 			if (subChannel.equalsIgnoreCase("DEATH")) {
 				
-				long channelId = this.instance.getConfigCache().getChannelId(FeatureType.PlayerDeath);
+				long channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerDeath);
 				String deathMessage = in.readUTF();
 
 				HashMap<String, String> placeholder = new HashMap<>();
 				placeholder.put("DeathMessage", deathMessage);
 				
-				if(this.instance.getConfigCache().useEmbedMessage(FeatureType.PlayerDeath)) {
+				if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerDeath)) {
 					this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "DeathEmbed", placeholder);
 				}else {
 					this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerDeathMessage", placeholder);

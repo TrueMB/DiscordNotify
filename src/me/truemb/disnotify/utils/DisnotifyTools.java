@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 
 import me.truemb.disnotify.database.VerifySQL;
 import me.truemb.disnotify.enums.FeatureType;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.manager.VerifyManager;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -25,9 +26,9 @@ public class DisnotifyTools {
 	}
 
 	//CHECK FOR UPDATES
-	public static void checkForRolesUpdate(UUID uuid, Member member, ConfigCacheHandler configCache, VerifyManager verifyManager, VerifySQL verifySQL, DiscordManager discordManager, String[] currentGroupList) {
+	public static void checkForRolesUpdate(UUID uuid, Member member, ConfigManager configManager, VerifyManager verifyManager, VerifySQL verifySQL, DiscordManager discordManager, String[] currentGroupList) {
 
-		if(!configCache.isFeatureEnabled(FeatureType.RoleSync))
+		if(!configManager.isFeatureEnabled(FeatureType.RoleSync))
 			return;
 		
 		boolean changesWereMade = false;
@@ -38,10 +39,10 @@ public class DisnotifyTools {
 
 		for(String group : currentGroupList) {
 			List<Role> roles = new ArrayList<>();
-			if(configCache.getOptionBoolean("RoleSync.useIngameGroupNames"))
+			if(configManager.getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
 				roles = discordManager.getDiscordBot().getJda().getRolesByName(group, true);
 			else {
-				String groupConfig = configCache.getOptionString("RoleSync.customGroupSync." + group.toLowerCase());
+				String groupConfig = configManager.getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group.toLowerCase());
 				
 				if(groupConfig == null)
 					continue;
@@ -73,10 +74,10 @@ public class DisnotifyTools {
 			}
 			if(!isInGroup) {
 				List<Role> roles = new ArrayList<>();
-				if(configCache.getOptionBoolean("RoleSync.useIngameGroupNames"))
+				if(configManager.getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
 					roles = discordManager.getDiscordBot().getJda().getRolesByName(backupRoles, true);
 				else {
-					String groupConfig = configCache.getOptionString("RoleSync.customGroupSync." + backupRoles.toLowerCase());
+					String groupConfig = configManager.getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + backupRoles.toLowerCase());
 					
 					if(groupConfig == null)
 						continue;
@@ -101,9 +102,9 @@ public class DisnotifyTools {
 			verifySQL.updateRoles(uuid, rolesBackup);
 	}
 
-	public static void resetRoles(UUID uuid, Member member, ConfigCacheHandler configCache, VerifyManager verifyManager, DiscordManager discordManager) {
+	public static void resetRoles(UUID uuid, Member member, ConfigManager configManager, VerifyManager verifyManager, DiscordManager discordManager) {
 
-		if(!configCache.isFeatureEnabled(FeatureType.RoleSync))
+		if(!configManager.isFeatureEnabled(FeatureType.RoleSync))
 			return;
 
 		List<String> rolesBackup = verifyManager.getBackupRoles(uuid);
@@ -112,10 +113,10 @@ public class DisnotifyTools {
 		
 		for(String backupRoles : rolesBackup) {
 			List<Role> roles = new ArrayList<>();
-			if(configCache.getOptionBoolean("RoleSync.useIngameGroupNames"))
+			if(configManager.getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
 				roles = discordManager.getDiscordBot().getJda().getRolesByName(backupRoles, true);
 			else {
-				String groupConfig = configCache.getOptionString("RoleSync.customGroupSync." + backupRoles.toLowerCase());
+				String groupConfig = configManager.getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + backupRoles.toLowerCase());
 				
 				if(groupConfig == null)
 					continue;

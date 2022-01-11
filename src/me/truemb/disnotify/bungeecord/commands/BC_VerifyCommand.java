@@ -6,10 +6,10 @@ import java.util.UUID;
 import me.truemb.disnotify.database.VerifySQL;
 import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.enums.GroupAction;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.manager.VerifyManager;
 import me.truemb.disnotify.messagingchannel.PluginMessagingBungeecordManager;
 import me.truemb.disnotify.spigot.utils.PermissionsAPI;
-import me.truemb.disnotify.utils.ConfigCacheHandler;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.DisnotifyTools;
 import me.truemb.disnotify.utils.PluginInformations;
@@ -17,13 +17,12 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 
 public class BC_VerifyCommand extends Command{
 
-	private ConfigCacheHandler configCache;
+	private ConfigManager configManager;
 	private PluginInformations pluginInfo;
 	private DiscordManager discordManager;
 	private VerifyManager verifyManager;
@@ -31,10 +30,10 @@ public class BC_VerifyCommand extends Command{
 	private PluginMessagingBungeecordManager messagingManager;
 	private PermissionsAPI permsAPI;
 	
-	public BC_VerifyCommand(DiscordManager discordManager, ConfigCacheHandler configCache, PluginInformations pluginInfo, VerifyManager verifyManager, VerifySQL verifySQL, PluginMessagingBungeecordManager messagingManager, PermissionsAPI permsAPI) {
+	public BC_VerifyCommand(DiscordManager discordManager, ConfigManager configManager, PluginInformations pluginInfo, VerifyManager verifyManager, VerifySQL verifySQL, PluginMessagingBungeecordManager messagingManager, PermissionsAPI permsAPI) {
 		super("verify");
 		
-		this.configCache = configCache;
+		this.configManager = configManager;
 		this.pluginInfo = pluginInfo;
 		this.discordManager = discordManager;
 		this.verifyManager = verifyManager;
@@ -47,7 +46,7 @@ public class BC_VerifyCommand extends Command{
 	public void execute(CommandSender sender, String[] args) {
 
 		if (!(sender instanceof ProxiedPlayer)) {
-			sender.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("console", false)));
+			sender.sendMessage(this.configManager.getMessageAsTextComponent("console", false));
 			return;
 		}
 
@@ -55,7 +54,7 @@ public class BC_VerifyCommand extends Command{
 		UUID uuid = p.getUniqueId();
 
 		if(!this.discordManager.isAddonEnabled("disnotify::verify")) {
-			p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("disabledFeature", true)));
+			p.sendMessage(this.configManager.getMessageAsTextComponent("disabledFeature", true));
 			return;
 		}
 		
@@ -64,12 +63,12 @@ public class BC_VerifyCommand extends Command{
 			if(args[0].equalsIgnoreCase("unlink")) {
 				
 				if(!verifyManager.isVerified(uuid)) {
-					p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("verification.notVerified", true)));
+					p.sendMessage(this.configManager.getMessageAsTextComponent("verification.notVerified", true));
 					return;
 				}
 				
 				if(this.discordManager.getDiscordBot() == null) {
-					p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("verification.botNotReady", true)));
+					p.sendMessage(this.configManager.getMessageAsTextComponent("verification.botNotReady", true));
 					return;
 				}
 				
@@ -80,14 +79,14 @@ public class BC_VerifyCommand extends Command{
 					member = this.discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).complete();
 				
 				//REMOVE VERIFY ROLE
-				List<Role> verifyRoles = this.discordManager.getDiscordBot().getJda().getRolesByName(this.configCache.getOptionString("Verification.discordRole"), true);
+				List<Role> verifyRoles = this.discordManager.getDiscordBot().getJda().getRolesByName(this.configManager.getConfig().getString("Options." + FeatureType.Verification.toString() +  ".discordRole"), true);
 				if(verifyRoles.size() > 0) {
     				Role verifyRole = verifyRoles.get(0);
     				verifyRole.getGuild().removeRoleFromMember(member, verifyRole).complete();
 				}
 				
 				//NICKNAME
-				if(this.configCache.getOptionBoolean("Verification.changeNickname")) {
+				if(this.configManager.getConfig().getBoolean("Options." + FeatureType.Verification.toString() +  ".changeNickname")) {
 					try {
 						member.modifyNickname(null).complete();
 					}catch(HierarchyException ex) {
@@ -96,9 +95,9 @@ public class BC_VerifyCommand extends Command{
 				}
 				
 				//RESET ROLES
-				DisnotifyTools.resetRoles(uuid, member, this.configCache, this.verifyManager, this.discordManager);
+				DisnotifyTools.resetRoles(uuid, member, this.configManager, this.verifyManager, this.discordManager);
 				
-				String verifyGroupS = configCache.getOptionString(FeatureType.Verification.toString() +  ".minecraftRank");
+				String verifyGroupS = this.configManager.getConfig().getString("Options." + FeatureType.Verification.toString() +  ".minecraftRank");
 				
 				if(verifyGroupS != null && !verifyGroupS.equalsIgnoreCase("")) {
 					
@@ -121,13 +120,13 @@ public class BC_VerifyCommand extends Command{
 				
 				this.verifyManager.removeVerified(uuid);
 				this.verifySQL.deleteVerification(uuid);
-				p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("verification.unlinked", true)));
+				p.sendMessage(this.configManager.getMessageAsTextComponent("verification.unlinked", true));
 				return;
 				
 			}else if(args[0].equalsIgnoreCase("accept")) {
 
 				if(!this.verifyManager.isVerficationInProgress(uuid)) {
-					p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("verification.sessionTimeOut", true)));
+					p.sendMessage(this.configManager.getMessageAsTextComponent("verification.sessionTimeOut", true));
 					return;
 				}
 				
@@ -145,20 +144,20 @@ public class BC_VerifyCommand extends Command{
 			}else if(args[0].equalsIgnoreCase("deny")) {
 
 				if(!this.verifyManager.isVerficationInProgress(uuid)) {
-					p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("verification.nothingToDeny", true)));
+					p.sendMessage(this.configManager.getMessageAsTextComponent("verification.nothingToDeny", true));
 					return;
 				}
 				
 				//DENING REQUEST
 				this.verifyManager.clearVerficationProgress(uuid);
 				
-				p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("verification.denied", true)));
+				p.sendMessage(this.configManager.getMessageAsTextComponent("verification.denied", true));
 				return;
 				
 			}
 		}
 
-		p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("verification.help", true)));
+		p.sendMessage(this.configManager.getMessageAsTextComponent("verification.help", true));
 		return;
 		
 	}

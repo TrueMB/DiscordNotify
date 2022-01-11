@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import me.truemb.disnotify.enums.FeatureType;
-import me.truemb.disnotify.utils.ConfigCacheHandler;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.utils.DiscordManager;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -14,13 +14,13 @@ import net.md_5.bungee.api.plugin.Command;
 
 public class BC_StaffCommand extends Command{
 
-	private ConfigCacheHandler configCache;
+	private ConfigManager configManager;
 	private DiscordManager discordManager;
     public HashMap<UUID, Boolean> staffChatDisabled;
 	
-	public BC_StaffCommand(DiscordManager discordManager, ConfigCacheHandler configCache, HashMap<UUID, Boolean> staffHash) {
+	public BC_StaffCommand(DiscordManager discordManager, ConfigManager configManager, HashMap<UUID, Boolean> staffHash) {
 		super("staff");
-		this.configCache = configCache;
+		this.configManager = configManager;
 		this.discordManager = discordManager;
 		this.staffChatDisabled = staffHash;
 	}
@@ -29,36 +29,36 @@ public class BC_StaffCommand extends Command{
 	public void execute(CommandSender sender, String[] args) {
 
 		if (!(sender instanceof ProxiedPlayer)) {
-			sender.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("console", false)));
+			sender.sendMessage(this.configManager.getMessageAsTextComponent("console", false));
 			return;
 		}
 
 		ProxiedPlayer p = (ProxiedPlayer) sender;
 		UUID uuid = p.getUniqueId();
 		
-		if(!this.configCache.isFeatureEnabled(FeatureType.Staff)) {
-			p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("disabledFeature", true)));
+		if(!this.configManager.isFeatureEnabled(FeatureType.Staff)) {
+			p.sendMessage(this.configManager.getMessageAsTextComponent("disabledFeature", true));
 			return;
 		}
 
-		if(!p.hasPermission(this.configCache.getPermission("StaffChat"))) {
-			p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("perm", false)));
+		if(!p.hasPermission(this.configManager.getConfig().getString("Permissions.StaffChat"))) {
+			p.sendMessage(this.configManager.getMessageAsTextComponent("perm", false));
 			return;
 		}
 		
 		if(args.length == 1) {
 			if(args[0].equalsIgnoreCase("on")) {
 				this.staffChatDisabled.put(uuid, false);
-				p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("staffEnable", true)));
+				p.sendMessage(this.configManager.getMessageAsTextComponent("staffEnable", true));
 				return;
 				
 			}else if(args[0].equalsIgnoreCase("off")) {
 				this.staffChatDisabled.put(uuid, true);
-				p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("staffDisable", true)));
+				p.sendMessage(this.configManager.getMessageAsTextComponent("staffDisable", true));
 				return;
 			}
 		}else if(args.length < 1) {
-			p.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("staffHelp", true)));
+			p.sendMessage(this.configManager.getMessageAsTextComponent("staffHelp", true));
 			return;
 		}
 		
@@ -71,20 +71,20 @@ public class BC_StaffCommand extends Command{
 		//ALL PLAYERS INGAME
 		for(ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
 			UUID uuidAll = all.getUniqueId();
-			if(all.hasPermission(this.configCache.getPermission("StaffChat"))) {
+			if(all.hasPermission(this.configManager.getConfig().getString("Permissions.StaffChat"))) {
 				if(p.equals(all) || !this.staffChatDisabled.containsKey(uuidAll) || !this.staffChatDisabled.get(uuidAll)) {
-					all.sendMessage(new TextComponent(this.configCache.getMinecraftMessage("minecraftStaffMessage", true).replace("%Message%", message)));
+					all.sendMessage(new TextComponent(this.configManager.getMinecraftMessage("minecraftStaffMessage", true).replaceAll("(?i)%" + "%Message%" + "%", message)));
 				}
 			}
 		}
 		
 		//DISCORD STAFF MESSAGE
-		long channelId = this.configCache.getChannelId(FeatureType.Staff);
+		long channelId = this.configManager.getChannelID(FeatureType.Staff);
 		HashMap<String, String> placeholder = new HashMap<>();
 		placeholder.put("Message", message);
 		placeholder.put("Player", p.getName());
 		placeholder.put("UUID", uuid.toString());
-		if(this.configCache.useEmbedMessage(FeatureType.Staff)) {
+		if(this.configManager.useEmbedMessage(FeatureType.Staff)) {
 			this.discordManager.sendEmbedMessage(channelId, uuid, "StaffEmbed", placeholder);
 		}else {
 			this.discordManager.sendDiscordMessage(channelId, "StaffMessage", placeholder);

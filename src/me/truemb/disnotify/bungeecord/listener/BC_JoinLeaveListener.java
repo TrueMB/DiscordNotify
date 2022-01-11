@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import me.truemb.disnotify.enums.FeatureType;
-import me.truemb.disnotify.utils.ConfigCacheHandler;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.utils.DiscordManager;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
@@ -15,11 +15,11 @@ import net.md_5.bungee.event.EventHandler;
 public class BC_JoinLeaveListener implements Listener{
 
 	private DiscordManager discordManager;
-	private ConfigCacheHandler configCache;
+	private ConfigManager configManager;
 
-	public BC_JoinLeaveListener(DiscordManager discordManager, ConfigCacheHandler configCache) {
+	public BC_JoinLeaveListener(DiscordManager discordManager, ConfigManager configManager) {
 		this.discordManager = discordManager;
-		this.configCache = configCache;
+		this.configManager = configManager;
 	}
 	
 	@EventHandler
@@ -28,13 +28,13 @@ public class BC_JoinLeaveListener implements Listener{
 		UUID uuid = p.getUniqueId();
 		
 		//DISCORD JOIN MESSAGE
-		if(this.configCache.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
-			long channelId = this.configCache.getChannelId(FeatureType.PlayerJoinLeave);
+		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
+			long channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
 			HashMap<String, String> placeholder = new HashMap<>();
 			placeholder.put("Player", p.getName());
 			placeholder.put("UUID", uuid.toString());
 			
-			if(this.configCache.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
+			if(this.configManager.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
 				this.discordManager.sendEmbedMessage(channelId, uuid, "PlayerJoinEmbed", placeholder);
 			}else {
 				this.discordManager.sendDiscordMessage(channelId, "PlayerJoinMessage", placeholder);
@@ -48,13 +48,13 @@ public class BC_JoinLeaveListener implements Listener{
 		UUID uuid = p.getUniqueId();
 		
 		//DISCORD LEAVE MESSAGE
-		if(this.configCache.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
-			long channelId = this.configCache.getChannelId(FeatureType.PlayerJoinLeave);
+		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
+			long channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
 			HashMap<String, String> placeholder = new HashMap<>();
 			placeholder.put("Player", p.getName());
 			placeholder.put("UUID", uuid.toString());
 			
-			if(this.configCache.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
+			if(this.configManager.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
 				this.discordManager.sendEmbedMessage(channelId, uuid, "PlayerLeaveEmbed", placeholder);
 			}else {
 				this.discordManager.sendDiscordMessage(channelId, "PlayerLeaveMessage", placeholder);

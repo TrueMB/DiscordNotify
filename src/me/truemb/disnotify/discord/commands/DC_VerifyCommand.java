@@ -12,11 +12,11 @@ import me.truemb.disnotify.database.VerifySQL;
 import me.truemb.disnotify.enums.DelayType;
 import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.enums.GroupAction;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.manager.DelayManager;
 import me.truemb.disnotify.manager.VerifyManager;
 import me.truemb.disnotify.messagingchannel.PluginMessagingBungeecordManager;
 import me.truemb.disnotify.spigot.utils.PermissionsAPI;
-import me.truemb.disnotify.utils.ConfigCacheHandler;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.DisnotifyTools;
 import me.truemb.disnotify.utils.PlayerManager;
@@ -32,17 +32,17 @@ public class DC_VerifyCommand extends SimpleAddon {
 	private VerifyManager verifyManager;
 	private DelayManager delayManager;
 	private PluginInformations pluginInfo;
-	private ConfigCacheHandler configCache;
+	private ConfigManager configManager;
 	private VerifySQL verifySQL;
 	
-    public DC_VerifyCommand(PluginInformations pluginInfo, PermissionsAPI permsAPI, DiscordManager discordManager, VerifyManager verifyManager, DelayManager delayManager, ConfigCacheHandler configCache, VerifySQL verifySQL) {
+    public DC_VerifyCommand(PluginInformations pluginInfo, PermissionsAPI permsAPI, DiscordManager discordManager, VerifyManager verifyManager, DelayManager delayManager, ConfigManager configManager, VerifySQL verifySQL) {
         super("Disnotify Verify", "disnotify::verify", "TrueMB", pluginInfo.getPluginVersion(), new String[] { "verify" });
         this.permsAPI = permsAPI;
         this.discordManager = discordManager;
         this.verifyManager = verifyManager;
         this.delayManager = delayManager;
         this.pluginInfo = pluginInfo;
-        this.configCache = configCache;
+        this.configManager = configManager;
         this.verifySQL = verifySQL;
     }
     
@@ -64,7 +64,7 @@ public class DC_VerifyCommand extends SimpleAddon {
     	}
 
     	for(Role role : member.getRoles()){
-    		if(role.getName().equalsIgnoreCase(this.configCache.getOptionString("Verification.discordRole"))) {
+    		if(role.getName().equalsIgnoreCase(this.configManager.getConfig().getString("Options." + FeatureType.Verification.toString() + ".discordRole"))) {
     			
     	    	if(args[0].equalsIgnoreCase("unlink")) {
     	    		//UNLINK FROM DISCORD
@@ -74,14 +74,14 @@ public class DC_VerifyCommand extends SimpleAddon {
     	    			if(mcuuid != null) {
 
     	    				//REMOVE VERIFY ROLE
-    	    				List<Role> verifyRoles = this.discordManager.getDiscordBot().getJda().getRolesByName(this.configCache.getOptionString("Verification.discordRole"), true);
+    	    				List<Role> verifyRoles = this.discordManager.getDiscordBot().getJda().getRolesByName(this.configManager.getConfig().getString("Options." + FeatureType.Verification.toString() + ".discordRole"), true);
     	    				if(verifyRoles.size() > 0) {
 	    	    				Role verifyRole = verifyRoles.get(0);
 	    	    				verifyRole.getGuild().removeRoleFromMember(member, verifyRole).complete();
     	    				}
     	    				
     	    				//NICKNAME
-    	    				if(this.configCache.getOptionBoolean("Verification.changeNickname")) {
+    	    				if(this.configManager.getConfig().getBoolean("Options." + FeatureType.Verification.toString() + ".changeNickname")) {
     	    					try {
     	    						member.modifyNickname(null).complete();
     	    					}catch(HierarchyException ex) {
@@ -89,9 +89,9 @@ public class DC_VerifyCommand extends SimpleAddon {
     	    					}
     	    				}
     	    				
-    	    				DisnotifyTools.resetRoles(mcuuid, member, this.configCache, this.verifyManager, this.discordManager);
+    	    				DisnotifyTools.resetRoles(mcuuid, member, this.configManager, this.verifyManager, this.discordManager);
     	    				
-    	    				String verifyGroupS = configCache.getOptionString(FeatureType.Verification.toString() +  ".minecraftRank");
+    	    				String verifyGroupS = this.configManager.getConfig().getString("Options." + FeatureType.Verification.toString() + ".minecraftRank");
     	    				
     	    				if(verifyGroupS != null && !verifyGroupS.equalsIgnoreCase("")) {
     	    					
@@ -162,7 +162,7 @@ public class DC_VerifyCommand extends SimpleAddon {
 				return;
 			}
 			
-			int delaySec = this.configCache.getOptionInt("Verification.delayForNewRequest");
+			int delaySec = this.configManager.getConfig().getInt("Options." + FeatureType.Verification.toString() + ".delayForNewRequest");
 			
 			this.delayManager.setDelay(disUUID, DelayType.VERIFY, System.currentTimeMillis() + delaySec * 1000);
 			this.verifySQL.checkIfAlreadyVerified(discordManager, command, member, uuid);

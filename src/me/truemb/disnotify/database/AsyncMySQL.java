@@ -10,6 +10,8 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
+import me.truemb.disnotify.manager.ConfigManager;
+
 public class AsyncMySQL {
 	
 	//https://www.youtube.com/watch?v=dHjp0pRhGhk
@@ -17,7 +19,14 @@ public class AsyncMySQL {
 	private ExecutorService executor;
 	private MySQL sql;
 
-	public AsyncMySQL(Logger logger, String host, int port, String user, String password, String database, boolean useSSL) throws Exception {
+	public AsyncMySQL(Logger logger, ConfigManager configManager) throws Exception {
+		
+		String host = configManager.getConfig().getString("Database.host");
+		int port = configManager.getConfig().getInt("Database.port");
+		boolean useSSL = configManager.getConfig().getBoolean("Database.useSSL");
+		String user = configManager.getConfig().getString("Database.user");
+		String password = configManager.getConfig().getString("Database.password");
+		String database = configManager.getConfig().getString("Database.database");
 		
 		if (host.equalsIgnoreCase("ipaddress")) {
 			

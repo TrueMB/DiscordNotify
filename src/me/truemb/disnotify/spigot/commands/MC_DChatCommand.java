@@ -7,16 +7,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 
-import me.truemb.disnotify.utils.ConfigCacheHandler;
+import me.truemb.disnotify.manager.ConfigManager;
 
 public class MC_DChatCommand extends BukkitCommand{
 
-	private ConfigCacheHandler configCache;
+	private ConfigManager configManager;
 	private HashMap<UUID, Boolean> discordChatEnabled;
 	
-	public MC_DChatCommand(ConfigCacheHandler configCache, HashMap<UUID, Boolean> discordChatEnabled) {
+	public MC_DChatCommand(ConfigManager configManager, HashMap<UUID, Boolean> discordChatEnabled) {
 		super("dchat");
-		this.configCache = configCache;
+		this.configManager = configManager;
 		this.discordChatEnabled = discordChatEnabled;
 	}
 
@@ -24,7 +24,7 @@ public class MC_DChatCommand extends BukkitCommand{
 	public boolean execute(CommandSender sender, String commandLabel, String[] args) {
 
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(this.configCache.getMinecraftMessage("console", false));
+			sender.sendMessage(this.configManager.getMinecraftMessage("console", false));
 			return true;
 		}
 
@@ -34,13 +34,13 @@ public class MC_DChatCommand extends BukkitCommand{
 		if(!this.discordChatEnabled.containsKey(uuid) || !this.discordChatEnabled.get(uuid)) {
 			
 			this.discordChatEnabled.put(uuid, true);
-			p.sendMessage(this.configCache.getMinecraftMessage("discordChatEnable", true));
+			p.sendMessage(this.configManager.getMinecraftMessage("discordChatEnable", true));
 			return true;
 			
 		}else {
 			
 			this.discordChatEnabled.put(uuid, false);
-			p.sendMessage(this.configCache.getMinecraftMessage("discordChatDisable", true));
+			p.sendMessage(this.configManager.getMinecraftMessage("discordChatDisable", true));
 			return true;
 			
 		}

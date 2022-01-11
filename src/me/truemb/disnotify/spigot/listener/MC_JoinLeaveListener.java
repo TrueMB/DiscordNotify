@@ -14,10 +14,10 @@ import me.truemb.disnotify.database.OfflineInformationsSQL;
 import me.truemb.disnotify.database.VerifySQL;
 import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.enums.InformationType;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.manager.VerifyManager;
 import me.truemb.disnotify.messagingchannel.PluginMessagingSpigotManager;
 import me.truemb.disnotify.spigot.utils.PermissionsAPI;
-import me.truemb.disnotify.utils.ConfigCacheHandler;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.DisnotifyTools;
 import me.truemb.disnotify.utils.PluginInformations;
@@ -28,17 +28,17 @@ public class MC_JoinLeaveListener implements Listener{
 	private DiscordManager discordManager;
 	private PluginInformations pluginInfo;
 	private VerifyManager verifyManager;
-	private ConfigCacheHandler configCache;
+	private ConfigManager configManager;
 	private PluginMessagingSpigotManager messagingManager;
 	private OfflineInformationsSQL offlineInfoSQL;
 	private VerifySQL verifySQL;
 	private PermissionsAPI permsAPI;
 
-	public MC_JoinLeaveListener(DiscordManager discordManager, PluginInformations pluginInfo, VerifyManager verifyManager, VerifySQL verifySQL, ConfigCacheHandler configCache, PluginMessagingSpigotManager messagingManager, OfflineInformationsSQL offlineInfoSQL, PermissionsAPI permsAPI) {
+	public MC_JoinLeaveListener(DiscordManager discordManager, PluginInformations pluginInfo, VerifyManager verifyManager, VerifySQL verifySQL, ConfigManager configManager, PluginMessagingSpigotManager messagingManager, OfflineInformationsSQL offlineInfoSQL, PermissionsAPI permsAPI) {
 		this.discordManager = discordManager;
 		this.pluginInfo = pluginInfo;
 		this.verifyManager = verifyManager;
-		this.configCache = configCache;
+		this.configManager = configManager;
 		this.messagingManager = messagingManager;
 		this.offlineInfoSQL = offlineInfoSQL;
 		this.verifySQL = verifySQL;
@@ -68,14 +68,14 @@ public class MC_JoinLeaveListener implements Listener{
 		}
 		
 		//DISCORD JOIN MESSAGE
-		if(this.configCache.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
-			long channelId = this.configCache.getChannelId(FeatureType.PlayerJoinLeave);
+		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
+			long channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
 			
 			HashMap<String, String> placeholder = new HashMap<>();
 			placeholder.put("Player", p.getName());
 			placeholder.put("uuid", uuid.toString());
 			
-			if(this.configCache.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
+			if(this.configManager.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
 				this.discordManager.sendEmbedMessage(channelId, uuid, "PlayerJoinEmbed", placeholder);
 			}else {
 				this.discordManager.sendDiscordMessage(channelId, "PlayerJoinMessage", placeholder);
@@ -96,7 +96,7 @@ public class MC_JoinLeaveListener implements Listener{
 			member = this.discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).complete();
 
 		String[] currentGroupList = this.permsAPI.getGroups(uuid);
-		DisnotifyTools.checkForRolesUpdate(uuid, member, this.configCache, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
+		DisnotifyTools.checkForRolesUpdate(uuid, member, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
 	}
 
 	@EventHandler
@@ -125,10 +125,10 @@ public class MC_JoinLeaveListener implements Listener{
 		placeholder.put("uuid", uuid.toString());
 		
 		//DISCORD LEAVE MESSAGE
-		if(this.configCache.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
-			long channelId = this.configCache.getChannelId(FeatureType.PlayerJoinLeave);
+		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
+			long channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
 			
-			if(this.configCache.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
+			if(this.configManager.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
 				this.discordManager.sendEmbedMessage(channelId, uuid, "PlayerLeaveEmbed", placeholder);
 			}else {
 				this.discordManager.sendDiscordMessage(channelId, "PlayerLeaveMessage", placeholder);

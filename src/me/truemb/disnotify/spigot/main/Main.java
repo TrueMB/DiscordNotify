@@ -7,12 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Statistic;
@@ -28,6 +24,7 @@ import me.truemb.disnotify.database.OfflineInformationsSQL;
 import me.truemb.disnotify.database.VerifySQL;
 import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.enums.InformationType;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.manager.DelayManager;
 import me.truemb.disnotify.manager.OfflineInformationManager;
 import me.truemb.disnotify.manager.VerifyManager;
@@ -40,9 +37,6 @@ import me.truemb.disnotify.spigot.listener.MC_ChatListener;
 import me.truemb.disnotify.spigot.listener.MC_DeathListener;
 import me.truemb.disnotify.spigot.listener.MC_JoinLeaveListener;
 import me.truemb.disnotify.spigot.utils.PermissionsAPI;
-import me.truemb.disnotify.spigot.utils.UTF8YamlConfiguration;
-import me.truemb.disnotify.utils.ConfigCacheHandler;
-import me.truemb.disnotify.utils.ConfigUpdater;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.PluginInformations;
 
@@ -56,7 +50,6 @@ public class Main extends JavaPlugin{
 	//DISCORD BOT
 	private DiscordManager discordMGR;
 	
-	private ConfigCacheHandler configCache;
 	private PermissionsAPI permsAPI;
 	
     private static final int SPIGOT_RESOURCE_ID = 94230;
@@ -71,21 +64,12 @@ public class Main extends JavaPlugin{
     private DelayManager delayManger;
     private VerifyManager verifyManager;
     private PluginMessagingSpigotManager messagingManager;
+	private ConfigManager configManager;
 	
 	private int inactivityCheckerRunn = -1;
 	public boolean placeholderSupport = false;
-	
-	//CONFIG
-	private static final int configVersion = 7;
-	private File file;
-	private UTF8YamlConfiguration config;
-	
-	//PLAYERINFO COMMAND ONLY FOR SPECIFIC USERS
 			
 	//SPIGOT MAIN CLASS
-	
-	//todo 
-	//Does Config Cache still needs to be cached? Could use the YAML API
 	
 	@Override
 	public void onEnable() {
@@ -98,9 +82,7 @@ public class Main extends JavaPlugin{
 		boolean isBungeeCordSubServer = spigotCfg.getBoolean("settings.bungeecord");
 		
 		//FILES
-		this.manageFile(); //LOAD CONFIG FILE
-		
-		this.loadConfigCache();
+		this.configManager = new ConfigManager(this.getLogger(), this.getResource("config.yml"), this.getDataFolder()); //LOADS CONFIG
 		
 		//Bungeecord Messaging Channel
 		this.messagingManager = new PluginMessagingSpigotManager(this);
@@ -126,9 +108,9 @@ public class Main extends JavaPlugin{
 		
 		//SPICORD
 		if(!isBungeeCordSubServer) {
-			this.discordMGR = new DiscordManager(this.getConfigCache(), this.permsAPI, this.getPluginInformations(), this.getOfflineInformationManager(), this.getVerifyManager(), this.getVerifySQL(), this.getDelayManger(), staffChatDisabled, discordChatEnabled);
+			this.discordMGR = new DiscordManager(this.getConfigManager(), this.permsAPI, this.getPluginInformations(), this.getOfflineInformationManager(), this.getVerifyManager(), this.getVerifySQL(), this.getDelayManger(), staffChatDisabled, discordChatEnabled);
 
-			String botname = this.manageFile().getString("Options.DiscordBot.Name");
+			String botname = this.getConfigManager().getConfig().getString("Options.DiscordBot.Name");
 			this.discordMGR.registerAddons(botname);
 			
 			int id = Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
@@ -155,19 +137,19 @@ public class Main extends JavaPlugin{
 		
 		//LISTENER
 		//BUNGEECORD GETS MANAGED IN THE CLASS
-		MC_JoinLeaveListener joinQuitListener = new MC_JoinLeaveListener(this.getDiscordManager(), this.getPluginInformations(), this.getVerifyManager(), this.getVerifySQL(), this.getConfigCache(), this.getMessagingManager(), this.getOfflineInformationsSQL(), this.getPermissionsAPI());
+		MC_JoinLeaveListener joinQuitListener = new MC_JoinLeaveListener(this.getDiscordManager(), this.getPluginInformations(), this.getVerifyManager(), this.getVerifySQL(), this.getConfigManager(), this.getMessagingManager(), this.getOfflineInformationsSQL(), this.getPermissionsAPI());
 		this.getServer().getPluginManager().registerEvents(joinQuitListener, this);
 
 		//SEND PLUGINMESSAGE, IF BUNGEECORD
-		if(this.configCache.isFeatureEnabled(FeatureType.PlayerDeath)) {
+		if(this.getConfigManager().isFeatureEnabled(FeatureType.PlayerDeath)) {
 			MC_DeathListener deathListener = new MC_DeathListener(this);
 			this.getServer().getPluginManager().registerEvents(deathListener, this);
 		}
 		
 		//NO NEED FOR THIS CLASS, IF BUNGEECORD
 		if(!isBungeeCordSubServer) {
-			if(this.configCache.isFeatureEnabled(FeatureType.Chat)) {
-				MC_ChatListener chatListener = new MC_ChatListener(this.getDiscordManager(), this.getConfigCache(), discordChatEnabled);
+			if(this.getConfigManager().isFeatureEnabled(FeatureType.Chat)) {
+				MC_ChatListener chatListener = new MC_ChatListener(this.getDiscordManager(), this.getConfigManager(), discordChatEnabled);
 				this.getServer().getPluginManager().registerEvents(chatListener, this);
 			}
 		}
@@ -185,18 +167,18 @@ public class Main extends JavaPlugin{
 			    CommandMap commandMap = (CommandMap) commandMapField.get(Bukkit.getServer());
 
 				
-				MC_StaffCommand staffCommand = new MC_StaffCommand(this.getDiscordManager(), this.getConfigCache(), staffChatDisabled);
+				MC_StaffCommand staffCommand = new MC_StaffCommand(this.getDiscordManager(), this.getConfigManager(), staffChatDisabled);
 				commandMap.register("staff", staffCommand);
 				List<String> staffAliases = new ArrayList<>();
 				staffAliases.add("s");
 				staffCommand.setAliases(staffAliases);
 				
-				MC_VerifyCommand verifyCommand = new MC_VerifyCommand(this.getDiscordManager(), this.getConfigCache(), this.getPluginInformations(), this.getVerifyManager(), this.getVerifySQL(), this.getPermissionsAPI());
+				MC_VerifyCommand verifyCommand = new MC_VerifyCommand(this.getDiscordManager(), this.getConfigManager(), this.getPluginInformations(), this.getVerifyManager(), this.getVerifySQL(), this.getPermissionsAPI());
 				commandMap.register("verify", verifyCommand);
 				
 
-				if(this.manageFile().getBoolean("Options.Chat.enableSplittedChat")) {
-					MC_DChatCommand dchatCmd = new MC_DChatCommand(this.getConfigCache(), discordChatEnabled);
+				if(this.getConfigManager().getConfig().getBoolean("Options.Chat.enableSplittedChat")) {
+					MC_DChatCommand dchatCmd = new MC_DChatCommand(this.getConfigManager(), discordChatEnabled);
 					commandMap.register("dchat", dchatCmd);
 				}
 			    
@@ -208,7 +190,7 @@ public class Main extends JavaPlugin{
 		
 		
 		//METRICS ANALYTICS
-		if(this.manageFile().getBoolean("Options.useMetrics"))
+		if(this.getConfigManager().getConfig().getBoolean("Options.useMetrics"))
 			new Metrics(this, BSTATS_PLUGIN_ID);
 		
 		//CHECK FOR UPDATE
@@ -217,8 +199,8 @@ public class Main extends JavaPlugin{
 		
 		//RUNNABLES
 		if(!isBungeeCordSubServer)
-			if(this.configCache.isFeatureEnabled(FeatureType.Inactivity))
-				this.inactivityCheckerRunn = Bukkit.getScheduler().runTaskTimerAsynchronously(this, new MC_InactivityChecker(this.getDiscordManager(), this.getPluginInformations(), this.getConfigCache(), this.getOfflineInformationsSQL()), 20 * 15, 20 * 60 * this.manageFile().getInt("Options.Inactivity.CheckTimer")).getTaskId();
+			if(this.getConfigManager().isFeatureEnabled(FeatureType.Inactivity))
+				this.inactivityCheckerRunn = Bukkit.getScheduler().runTaskTimerAsynchronously(this, new MC_InactivityChecker(this.getDiscordManager(), this.getPluginInformations(), this.getConfigManager(), this.getOfflineInformationsSQL()), 20 * 15, 20 * 60 * this.getConfigManager().getConfig().getInt("Options.Inactivity.CheckTimer")).getTaskId();
 		
 	}
 	
@@ -241,68 +223,6 @@ public class Main extends JavaPlugin{
 		Bukkit.getScheduler().cancelTask(this.inactivityCheckerRunn);
 		if(this.getDiscordManager() != null)
 			this.getDiscordManager().disconnectDiscordBot();
-	}
-	
-	private void loadConfigCache() {
-		this.configCache = new ConfigCacheHandler();
-		
-		//OPTIONS
-		this.manageFile().getConfigurationSection("Options").getKeys(true).forEach(optionPath -> {
-			if(this.manageFile().isList("Options." + optionPath)) {
-				List<String> list = this.manageFile().getStringList("Options." + optionPath);
-				this.configCache.addList("Options." + optionPath, list);
-			}else {
-				String value = this.manageFile().getString("Options." + optionPath);
-				if(value != null)
-					this.configCache.addOption("Options." + optionPath, value);
-			}
-		});
-		
-		//ENABLED FEATURES
-		this.manageFile().getConfigurationSection("FeaturesEnabled").getKeys(false).forEach(featuresPath -> {
-			FeatureType feature = FeatureType.valueOf(featuresPath);
-			boolean isEnabled = this.manageFile().getBoolean("FeaturesEnabled." + featuresPath);
-			this.configCache.setFeatureEnabled(feature, isEnabled);
-		});
-		
-		//PERMISSIONS
-		this.manageFile().getConfigurationSection("Permissions").getKeys(false).forEach(permissionPath -> {
-			String permission = this.manageFile().getString("Permissions." + permissionPath);
-			this.configCache.addPermission("Permissions." + permissionPath, permission);
-		});
-		
-		//CHANNEL IDS
-		this.manageFile().getConfigurationSection("Channel").getKeys(false).forEach(channelPath -> {
-			FeatureType feature = FeatureType.valueOf(channelPath);
-			long channelId = this.manageFile().getLong("Channel." + channelPath);
-			this.configCache.setChannelId(feature, channelId);
-		});
-
-		//MINECRAFT MESSAGES
-		this.manageFile().getConfigurationSection("Messages").getKeys(true).forEach(messagePath -> {
-			String message = this.manageFile().getString("Messages." + messagePath);
-			if(message != null)
-				this.configCache.addMinecraftMessage("Messages." + messagePath, ChatColor.translateAlternateColorCodes('&', this.translateHexColorCodes(message)));
-		});
-		
-		//DISCORD MESSAGES
-		this.manageFile().getConfigurationSection("DiscordMessages").getKeys(true).forEach(messagePath -> {
-			String message = this.manageFile().getString("DiscordMessages." + messagePath);
-			if(message != null)
-				this.configCache.addDiscordMessage("DiscordMessages." + messagePath, message);
-		});
-		
-		//DISCORD EMBED MESSAGES
-		this.manageFile().getConfigurationSection("DiscordEmbedMessages").getKeys(true).forEach(messagePath -> {
-			if(this.manageFile().isList("DiscordEmbedMessages." + messagePath)) {
-				List<String> list = this.manageFile().getStringList("DiscordEmbedMessages." + messagePath);
-				this.configCache.addList("DiscordEmbedMessages." + messagePath, list);
-			}else {
-				String value = this.manageFile().getString("DiscordEmbedMessages." + messagePath);
-				if(value != null)
-					this.configCache.addEmbedString("DiscordEmbedMessages." + messagePath, value);
-			}
-		});
 	}
 	
 	//THIS METHODE ONLY RUNS ONCE AND AFTER DATABASE CONNECTION
@@ -354,20 +274,13 @@ public class Main extends JavaPlugin{
 	//MySQL
 	private void startMySql() {
 		this.getLogger().info("{MySQL}  starting MySQL . . .");
-
-		String host = this.getConfig().getString("Database.host");
-		int port = this.getConfig().getInt("Database.port");
-		String user = this.getConfig().getString("Database.user");
-		String password = this.getConfig().getString("Database.password");
-		String database = this.getConfig().getString("Database.database");
-		boolean useSSL = this.getConfig().getBoolean("Database.useSSL");
 		
 		Main plugin = this;
 		
 		try {
-			this.sql = new AsyncMySQL(this.getLogger(), host, port, user, password, database, useSSL);
+			this.sql = new AsyncMySQL(this.getLogger(), this.getConfigManager());
 			this.offlineInfoSQL = new OfflineInformationsSQL(this.getAsyncMySql(), this.getOfflineInformationManager());
-			this.verifySQL = new VerifySQL(this.getAsyncMySql(), this.getVerifyManager(), this.getConfigCache(), this.getPluginInformations(), this.getPermissionsAPI());
+			this.verifySQL = new VerifySQL(this.getAsyncMySql(), this.getVerifyManager(), this.getConfigManager(), this.getPluginInformations(), this.getPermissionsAPI());
 			
 			Bukkit.getScheduler().runTaskLaterAsynchronously(this, new Runnable() {
 				
@@ -395,55 +308,6 @@ public class Main extends JavaPlugin{
 			this.getLogger().warning("{MySQL}  Failed to start MySql (" + e.getMessage() + ")");
 			Bukkit.getPluginManager().disablePlugin(this); //DISABLE PLUGIN, SINCE IT NEEDS THE DATABASE
 		}
-	}
-	
-	public String translateHexColorCodes(String message){
-		
-        final Pattern hexPattern = Pattern.compile("#[a-fA-F0-9]{6}");
-        Matcher matcher = hexPattern.matcher(message);
-        while (matcher.find()) {
-            String color = message.substring(matcher.start(), matcher.end());
-            message = message.replace(color, net.md_5.bungee.api.ChatColor.of(color) + "");
-            matcher = hexPattern.matcher(message);
-        }
-        return ChatColor.translateAlternateColorCodes('&', message);
-    }
-
-	//CONFIG
-	public UTF8YamlConfiguration manageFile() {
-		File configFile = this.getConfigFile();
-		String filename = "config.yml";
-		
-		if(configFile == null)
-			this.file = configFile = new File(this.getDataFolder().getPath(), filename);
-		
-		if (!configFile.exists())
-			this.saveResource(filename, true);
-		
-		if(this.config == null) {
-			
-			//TO GET THE CONFIG VERSION
-			this.config = new UTF8YamlConfiguration(configFile);
-			
-			//UPDATE
-			if(!this.config.isSet("ConfigVersion") || this.config.getInt("ConfigVersion") < configVersion) {
-				this.getLogger().info("Updating Config!");
-				try {
-					ConfigUpdater.update(this.getResource(filename), configFile, new ArrayList<>());
-					this.reloadConfig();
-					this.config = new UTF8YamlConfiguration(configFile);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			
-		}
-		
-		return this.config;
-	}
-
-	private File getConfigFile() {
-		return this.file;
 	}
 	
 	//GET METHODES
@@ -483,8 +347,8 @@ public class Main extends JavaPlugin{
 		return this.delayManger;
 	}
 
-	public ConfigCacheHandler getConfigCache() {
-		return this.configCache;
+	public ConfigManager getConfigManager() {
+		return this.configManager;
 	}
 
 	public PluginMessagingSpigotManager getMessagingManager() {

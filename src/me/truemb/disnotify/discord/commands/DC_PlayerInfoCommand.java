@@ -11,24 +11,25 @@ import org.spicord.bot.command.DiscordBotCommand;
 
 import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.enums.InformationType;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.manager.OfflineInformationManager;
-import me.truemb.disnotify.utils.ConfigCacheHandler;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.PlayerManager;
 import me.truemb.disnotify.utils.PluginInformations;
+import me.truemb.disnotify.utils.TimeFormatter;
 import net.dv8tion.jda.api.entities.Member;
 
 public class DC_PlayerInfoCommand extends SimpleAddon {
 
 	private DiscordManager discordManager;
-	private ConfigCacheHandler configCache;
+	private ConfigManager configManager;
 	private OfflineInformationManager offlineInfoManager;
 	private PluginInformations pluginInfo;
 	
-    public DC_PlayerInfoCommand(DiscordManager discordManager, ConfigCacheHandler configCache, OfflineInformationManager offlineInfoManager, PluginInformations pluginInfo) {
+    public DC_PlayerInfoCommand(DiscordManager discordManager, ConfigManager configManager, OfflineInformationManager offlineInfoManager, PluginInformations pluginInfo) {
         super("Disnotify PlayerInfo", "disnotify::playerinfo", "TrueMB", pluginInfo.getPluginVersion(), new String[] { "playerinfo", "pi" });
         this.discordManager = discordManager;
-        this.configCache = configCache;
+        this.configManager = configManager;
         this.offlineInfoManager = offlineInfoManager;
         this.pluginInfo = pluginInfo;
     }
@@ -54,7 +55,7 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 					return;
 				}
 
-				SimpleDateFormat sdf = new SimpleDateFormat(configCache.getOptionString("DateFormat.Date") + " " + configCache.getOptionString("DateFormat.Time"));
+				SimpleDateFormat sdf = new SimpleDateFormat(this.configManager.getConfig().getString("Options.DateFormat.Date") + " " + this.configManager.getConfig().getString("Options.DateFormat.Time"));
 
 				String username = ingameNameOrUUID.length() <= 16 ? ingameNameOrUUID : null;
 				if(username == null)
@@ -62,19 +63,19 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 				
 				//MORE SPECIFIC INFORMATIONS
 				long lastplayed;
-				double playtimeHours;
-				double offlinetimeHours;
+				long playtimeSec;
+				long offlinetimeSec;
 				
 				if(!pluginInfo.isBungeeCordSubServer() && !pluginInfo.isBungeeCord()) {
 					//IF NOT BUNGEE SYSTEM
 					org.bukkit.OfflinePlayer player = org.bukkit.Bukkit.getOfflinePlayer(uuid);
 					lastplayed = player.isOnline() ? System.currentTimeMillis() : player.getLastPlayed();
-					playtimeHours = (double) player.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE) / 20 / 60 / 60;
-					offlinetimeHours = (double) (System.currentTimeMillis() - player.getLastPlayed()) / 1000 / 60 / 60;
+					playtimeSec = player.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE) / 20;
+					offlinetimeSec = (System.currentTimeMillis() - player.getLastPlayed()) / 1000;
 				}else {
 					lastplayed = net.md_5.bungee.api.ProxyServer.getInstance().getPlayer(uuid) != null ? System.currentTimeMillis() : this.offlineInfoManager.getInformationLong(uuid, InformationType.LastConnection);
-					playtimeHours = (double) this.offlineInfoManager.getInformationLong(uuid, InformationType.Playtime) / 20 / 60 / 60;
-					offlinetimeHours = (double) (System.currentTimeMillis() - this.offlineInfoManager.getInformationLong(uuid, InformationType.LastConnection)) / 1000 / 60 / 60;
+					playtimeSec = this.offlineInfoManager.getInformationLong(uuid, InformationType.Playtime) / 20;
+					offlinetimeSec = (System.currentTimeMillis() - this.offlineInfoManager.getInformationLong(uuid, InformationType.LastConnection)) / 1000;
 				}
 				
 				String location = offlineInfoManager.getInformationString(uuid, InformationType.Location);
@@ -91,16 +92,16 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 				placeholder.put("IP", ip);
 				
 				if(lastplayed > 0) {
-					placeholder.put("Playtime", String.format("%,.2f", playtimeHours) + "h");
-					placeholder.put("Offlinetime", String.format("%,.2f", offlinetimeHours) + "h");
+					placeholder.put("Playtime", TimeFormatter.formatDate(playtimeSec, this.configManager));
+					placeholder.put("Offlinetime", TimeFormatter.formatDate(offlinetimeSec, this.configManager));
 					placeholder.put("LastSeen", sdf.format(new Date(lastplayed)) + "h");
 				}else {
-					placeholder.put("Playtime", "0h");
-					placeholder.put("Offlinetime", "0h");
+					placeholder.put("Playtime", "unknown");
+					placeholder.put("Offlinetime", "unknown");
 					placeholder.put("LastSeen", "never");
 				}
 
-				if(configCache.useEmbedMessage(FeatureType.PlayerInfo)) {
+				if(configManager.useEmbedMessage(FeatureType.PlayerInfo)) {
 					this.discordManager.sendEmbedMessage(command.getChannel().getIdLong(), uuid, "PlayerInfoEmbed", placeholder);
 		    		//command.reply(discordManager.getEmbedMessage(uuid, "PlayerInfoEmbed", placeholder).build());
 				}else {

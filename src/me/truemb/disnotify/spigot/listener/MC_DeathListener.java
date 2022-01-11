@@ -35,14 +35,14 @@ public class MC_DeathListener implements Listener{
 		}
 		
 		//DISCORD DEATH MESSAGE
-		long channelId = this.instance.getConfigCache().getChannelId(FeatureType.PlayerDeath);
+		long channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerDeath);
 		
 		HashMap<String, String> placeholder = new HashMap<>();
 		placeholder.put("Player", p.getName());
 		placeholder.put("UUID", p.getUniqueId().toString());
 		placeholder.put("DeathMessage", deathMessage);
 		
-		if(this.instance.getConfigCache().useEmbedMessage(FeatureType.PlayerDeath)) {
+		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerDeath)) {
 			this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "DeathEmbed", placeholder);
 		}else {
 			this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerDeathMessage", placeholder);

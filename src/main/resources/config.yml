@@ -28,6 +28,15 @@ Options:
   DateFormat:
     Date: dd.MM.yyyy
     Time: HH:mm:ss
+    #Used for example Playertime or Offlinetime
+    Counter:
+      #%days% <- Shows Days Format; %hours% <- Shows Hours Format; %minutes% ...; %seconds% <- ...;
+      #This will be shown later in f.e. the embed player info message
+      Format: '%days% %hours% %minutes%'
+      Days: '%amount% Days'
+      Hours: '%amount% Hours'
+      Minutes: '%amount% Min'
+      Seconds: '%amount% Seconds'
   Inactivity:
     #Checking, if players are inactive (in Minutes)
     CheckTimer: 60
@@ -216,4 +225,4 @@ DiscordEmbedMessages:
     PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 7
+ConfigVersion: 8

@@ -10,19 +10,19 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import me.truemb.disnotify.enums.FeatureType;
-import me.truemb.disnotify.utils.ConfigCacheHandler;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.utils.DiscordManager;
 
 public class MC_ChatListener implements Listener{
 
 	private DiscordManager discordManager;
-	private ConfigCacheHandler configCache;
+	private ConfigManager configManager;
 	
 	private HashMap<UUID, Boolean> discordChatEnabled;
 
-	public MC_ChatListener(DiscordManager discordManager, ConfigCacheHandler configCache, HashMap<UUID, Boolean> discordChatEnabled) {
+	public MC_ChatListener(DiscordManager discordManager, ConfigManager configManager, HashMap<UUID, Boolean> discordChatEnabled) {
 		this.discordManager = discordManager;
-		this.configCache = configCache;
+		this.configManager = configManager;
 		
 		this.discordChatEnabled = discordChatEnabled;
 	}
@@ -36,12 +36,12 @@ public class MC_ChatListener implements Listener{
 			return;
 
 		//Check if extra Chat is enabled for ChatSyncing
-		if(this.configCache.getOptionBoolean("Chat.enableSplittedChat"))
+		if(this.configManager.getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat"))
 			if(!this.discordChatEnabled.containsKey(uuid) || !this.discordChatEnabled.get(uuid))
 				return;
 		
 		//DISCORD CHAT MESSAGE
-		long channelId = this.configCache.getChannelId(FeatureType.Chat);
+		long channelId = this.configManager.getChannelID(FeatureType.Chat);
 			
 		HashMap<String, String> placeholder = new HashMap<>();
 		placeholder.put("Message", e.getMessage());
@@ -49,7 +49,7 @@ public class MC_ChatListener implements Listener{
 		placeholder.put("UUID", uuid.toString());
 		placeholder.put("server", "");
 			
-		if(this.configCache.useEmbedMessage(FeatureType.Chat)) {
+		if(this.configManager.useEmbedMessage(FeatureType.Chat)) {
 			this.discordManager.sendEmbedMessage(channelId, uuid, "ChatEmbed", placeholder);
 		}else {
 			this.discordManager.sendDiscordMessage(channelId, "ChatMessage", placeholder);

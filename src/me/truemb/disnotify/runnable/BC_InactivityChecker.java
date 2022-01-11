@@ -18,7 +18,7 @@ import me.truemb.disnotify.database.OfflineInformationsSQL;
 import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.enums.InformationType;
 import me.truemb.disnotify.enums.MinotarTypes;
-import me.truemb.disnotify.utils.ConfigCacheHandler;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.PlayerManager;
 import me.truemb.disnotify.utils.PluginInformations;
@@ -32,28 +32,28 @@ public class BC_InactivityChecker implements Runnable{
 	private OfflineInformationsSQL offlineInfoSQL;
 	private DiscordManager discordManager;
 	private PluginInformations pluginInfo;
-	private ConfigCacheHandler configCache;
+	private ConfigManager configManager;
 	
 	private String table = "disnotify_offlineData";
 	
-	public BC_InactivityChecker(DiscordManager discordManager, PluginInformations pluginInfo, ConfigCacheHandler configCache, AsyncMySQL asyncMySQL, OfflineInformationsSQL offlineInfoSQL) {
+	public BC_InactivityChecker(DiscordManager discordManager, PluginInformations pluginInfo, ConfigManager configManager, AsyncMySQL asyncMySQL, OfflineInformationsSQL offlineInfoSQL) {
 		this.discordManager = discordManager;
 		this.pluginInfo = pluginInfo;
 		this.asyncMySQL = asyncMySQL;
 		this.offlineInfoSQL = offlineInfoSQL;
-		this.configCache = configCache;
+		this.configManager = configManager;
 	}
 	
 	@Override
 	public void run() {
 
-		SimpleDateFormat sdf = new SimpleDateFormat(this.configCache.getOptionString("DateFormat.Date") + " " + this.configCache.getOptionString("DateFormat.Time"));
+		SimpleDateFormat sdf = new SimpleDateFormat(this.configManager.getConfig().getString("Options.DateFormat.Date") + " " + this.configManager.getConfig().getString("Options.DateFormat.Time"));
 				
-		long channelId = this.configCache.getChannelId(FeatureType.Inactivity);
+		long channelId = this.configManager.getChannelID(FeatureType.Inactivity);
 		if(channelId < 0)
 			return;
 		
-		long inactivityLimit = System.currentTimeMillis() - this.configCache.getOptionInt("Inactivity.InactivForDays") * 24 * 60 * 60 * 1000;
+		long inactivityLimit = System.currentTimeMillis() - this.configManager.getConfig().getInt("Options." + FeatureType.Inactivity.toString() + ".InactivForDays") * 24 * 60 * 60 * 1000;
 		
 		this.asyncMySQL.prepareStatement("SELECT * FROM " + this.table + " WHERE " + InformationType.LastConnection.toString() + "<'" + String.valueOf(inactivityLimit) + "'"
 			+ " AND (" + InformationType.Inactivity.toString() + " IS NULL OR " + InformationType.Inactivity.toString() + "='false');", new Consumer<ResultSet>() {
@@ -90,7 +90,7 @@ public class BC_InactivityChecker implements Runnable{
 						HashMap<String, String> placeholder = new HashMap<>();
 						placeholder.put("Player", PlayerManager.getName(uuid.toString()));
 						placeholder.put("UUID", uuid.toString());
-						placeholder.put("InactivDays", String.valueOf(configCache.getOptionInt("Inactivity.InactivForDays")));
+						placeholder.put("InactivDays", String.valueOf(configManager.getConfig().getInt("Options." + FeatureType.Inactivity.toString() + ".InactivForDays")));
 						placeholder.put("Server", server);
 						placeholder.put("Location", location);
 						placeholder.put("IP", ip);
@@ -100,7 +100,7 @@ public class BC_InactivityChecker implements Runnable{
 						placeholder.put("OfflinetimeDays", String.format("%,.2f", offlinetimeHours / 24));
 						placeholder.put("LastSeen", sdf.format(date));
 							
-						if(!configCache.getOptionBoolean("Inactivity.useEmbedMessage")) {
+						if(!configManager.useEmbedMessage(FeatureType.Inactivity)) {
 							discordManager.sendDiscordMessage(channelId, "InactivityMessage", placeholder);
 						}else {
 							//EMBED
@@ -115,7 +115,7 @@ public class BC_InactivityChecker implements Runnable{
 						    }
 
 							//https://minotar.net/ <- Player Heads
-							String minotarTypeS = configCache.getEmbedString(path + ".PictureType");
+							String minotarTypeS = configManager.getConfig().getString("DiscordEmbedMessages." + path + ".PictureType");
 							MinotarTypes minotarType = MinotarTypes.BUST;
 							try {
 								minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
@@ -125,7 +125,7 @@ public class BC_InactivityChecker implements Runnable{
 
 							InputStream file = null;
 							String filename = minotarType.toString().toLowerCase() + "_" + uuid.toString() + ".jpg";
-							if(configCache.getEmbedBoolean(path + ".WithPicture")) {
+							if(configManager.getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithPicture")) {
 								eb.setImage("attachment://" + filename);
 
 								try {

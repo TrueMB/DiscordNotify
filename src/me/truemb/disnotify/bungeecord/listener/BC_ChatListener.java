@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import me.truemb.disnotify.enums.FeatureType;
-import me.truemb.disnotify.utils.ConfigCacheHandler;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.utils.DiscordManager;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
@@ -14,12 +14,12 @@ import net.md_5.bungee.event.EventHandler;
 public class BC_ChatListener implements Listener{
 
 	private DiscordManager discordManager;
-	private ConfigCacheHandler configCache;
+	private ConfigManager configManager;
 	
 	private HashMap<UUID, Boolean> discordChatEnabled;
 
-	public BC_ChatListener(DiscordManager discordManager, ConfigCacheHandler configCache, HashMap<UUID, Boolean> discordChatEnabled) {
-		this.configCache = configCache;
+	public BC_ChatListener(DiscordManager discordManager, ConfigManager configManager, HashMap<UUID, Boolean> discordChatEnabled) {
+		this.configManager = configManager;
 		this.discordManager = discordManager;
 		
 		this.discordChatEnabled = discordChatEnabled;
@@ -41,12 +41,12 @@ public class BC_ChatListener implements Listener{
 			return;
 		
 		//Check if extra Chat is enabled for ChatSyncing
-		if(this.configCache.getOptionBoolean("Chat.enableSplittedChat"))
+		if(this.configManager.getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat"))
 			if(!this.discordChatEnabled.containsKey(uuid) || !this.discordChatEnabled.get(uuid))
 				return;
 		
 		//DISCORD DEATH MESSAGE
-		long channelId = this.configCache.getChannelId(FeatureType.Chat);
+		long channelId = this.configManager.getChannelID(FeatureType.Chat);
 			
 		HashMap<String, String> placeholder = new HashMap<>();
 		placeholder.put("Message", e.getMessage());
@@ -54,7 +54,7 @@ public class BC_ChatListener implements Listener{
 		placeholder.put("UUID", uuid.toString());
 		placeholder.put("server", p.getServer().getInfo().getName());
 		
-		if(this.configCache.useEmbedMessage(FeatureType.Chat)) {
+		if(this.configManager.useEmbedMessage(FeatureType.Chat)) {
 			this.discordManager.sendEmbedMessage(channelId, uuid, "ChatEmbed", placeholder);
 		}else {
 			this.discordManager.sendDiscordMessage(channelId, "ChatMessage", placeholder);

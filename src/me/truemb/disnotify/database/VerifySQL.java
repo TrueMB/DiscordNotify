@@ -13,10 +13,10 @@ import org.spicord.bot.command.DiscordBotCommand;
 import me.truemb.disnotify.enums.DelayType;
 import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.enums.GroupAction;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.manager.VerifyManager;
 import me.truemb.disnotify.messagingchannel.PluginMessagingBungeecordManager;
 import me.truemb.disnotify.spigot.utils.PermissionsAPI;
-import me.truemb.disnotify.utils.ConfigCacheHandler;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.DisnotifyTools;
 import me.truemb.disnotify.utils.PluginInformations;
@@ -32,16 +32,16 @@ public class VerifySQL {
 
 	private AsyncMySQL asyncMysql;
 	private VerifyManager verifyManager;
-	private ConfigCacheHandler configCache;
+	private ConfigManager configManager;
 	private PluginInformations pluginInformations;
 	private PermissionsAPI permsAPI;
 	
 	private String table = "disnotify_verify";
 	
-	public VerifySQL(AsyncMySQL asyncMysql, VerifyManager verifyManager, ConfigCacheHandler configCache, PluginInformations pluginInformations, PermissionsAPI permsAPI){
+	public VerifySQL(AsyncMySQL asyncMysql, VerifyManager verifyManager, ConfigManager configManager, PluginInformations pluginInformations, PermissionsAPI permsAPI){
 		this.asyncMysql = asyncMysql;
 		this.verifyManager = verifyManager;
-		this.configCache = configCache;
+		this.configManager = configManager;
 		this.pluginInformations = pluginInformations;
 		this.permsAPI = permsAPI;
 		
@@ -94,23 +94,23 @@ public class VerifySQL {
 
 					//UPDATING CACHE
 					
-					verifyManager.getDelayManager().setDelay(member.getIdLong(), DelayType.VERIFY, System.currentTimeMillis() + configCache.getOptionInt("Verification.delayForNewRequest") * 1000);
+					verifyManager.getDelayManager().setDelay(member.getIdLong(), DelayType.VERIFY, System.currentTimeMillis() + configManager.getConfig().getInt("Options." + FeatureType.Verification.toString() + ".delayForNewRequest") * 1000);
 					
 					//REQUESTING
 					verifyManager.setVerficationProgress(mcuuid, member.getIdLong());
 			    	cmd.reply(discordManager.getDiscordMessage("verification.request", placeholder));
 			    	
 			    	//MINECRAFT CLICK MESSAGE
-			    	TextComponent mainComponent = new TextComponent(configCache.getMinecraftMessage("verification.requestClickMessage.message", false).replaceAll("(?i)%user%", member.getUser().getAsTag()) + "\n");
+			    	TextComponent mainComponent = new TextComponent(configManager.getMinecraftMessage("verification.requestClickMessage.message", false).replaceAll("(?i)%user%", member.getUser().getAsTag()) + "\n");
 			    	
-			    	TextComponent acceptComponent = new TextComponent(configCache.getMinecraftMessage("verification.requestClickMessage.accept", false));
-			    	acceptComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(configCache.getMinecraftMessage("verification.requestClickMessage.acceptHover", false))));
+			    	TextComponent acceptComponent = configManager.getMessageAsTextComponent("verification.requestClickMessage.accept", false);
+			    	acceptComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(configManager.getMinecraftMessage("verification.requestClickMessage.acceptHover", false))));
 			    	acceptComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/verify accept"));
 
-			    	TextComponent spaceComponent = new TextComponent(configCache.getMinecraftMessage("verification.requestClickMessage.space", false));
+			    	TextComponent spaceComponent = configManager.getMessageAsTextComponent("verification.requestClickMessage.space", false);
 			    	
-			    	TextComponent denyComponent = new TextComponent(configCache.getMinecraftMessage("verification.requestClickMessage.deny", false));
-			    	denyComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(configCache.getMinecraftMessage("verification.requestClickMessage.denyHover", false))));
+			    	TextComponent denyComponent = configManager.getMessageAsTextComponent("verification.requestClickMessage.deny", false);
+			    	denyComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(configManager.getMinecraftMessage("verification.requestClickMessage.denyHover", false))));
 			    	denyComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/verify deny"));
 			    	
 			    	mainComponent.addExtra(acceptComponent);
@@ -138,7 +138,7 @@ public class VerifySQL {
 					
 					while (rs.next()) {
 						//SOMETHING GOT AUTHENTICATED
-				    	DisnotifyTools.sendMessage(pluginInformations.isBungeeCord(), uuid, new TextComponent(discordManager.getPlaceholderString(configCache.getMinecraftMessage("verification.otherReasonVerification", true), null)));
+				    	DisnotifyTools.sendMessage(pluginInformations.isBungeeCord(), uuid, new TextComponent(discordManager.getPlaceholderString(configManager.getMinecraftMessage("verification.otherReasonVerification", true), null)));
 						return;
 					}
 					
@@ -151,7 +151,7 @@ public class VerifySQL {
 					if(member == null)
 						member = discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).complete();
 
-					String verfiedGroupS = configCache.getOptionString(FeatureType.Verification.toString() +  ".discordRole");
+					String verfiedGroupS = configManager.getConfig().getString("Options." + FeatureType.Verification.toString() +  ".discordRole");
 					List<Role> verifyRoles = discordManager.getDiscordBot().getJda().getRolesByName(verfiedGroupS, true);
 					if(verifyRoles.size() <= 0)
 						return;
@@ -160,14 +160,14 @@ public class VerifySQL {
 					verifyRole.getGuild().addRoleToMember(member, verifyRole).complete();
 
 					//NICKNAME
-					if(configCache.getOptionBoolean(FeatureType.Verification.toString() +  ".changeNickname")) {
+					if(configManager.getConfig().getBoolean("Options." + FeatureType.Verification.toString() +  ".changeNickname")) {
 						try {
 							member.modifyNickname(ingameName).queue();
 						}catch(HierarchyException ex) {
 							pluginInformations.getLogger().warning("User " + member.getUser().getAsTag() + " has higher rights, than the BOT! Cant change the Nickname.");
 						}
 					}
-					String verifyGroupS = configCache.getOptionString(FeatureType.Verification.toString() +  ".minecraftRank");
+					String verifyGroupS = configManager.getConfig().getString("Options." + FeatureType.Verification.toString() +  ".minecraftRank");
 					
 					if(verifyGroupS != null && !verifyGroupS.equalsIgnoreCase("")) {
 						
@@ -189,8 +189,8 @@ public class VerifySQL {
 					}
 					
 					//FIRST TIME
-					DisnotifyTools.checkForRolesUpdate(uuid, member, configCache, verifyManager, verifySQL, discordManager, currentGroupList);
-			    	DisnotifyTools.sendMessage(pluginInformations.isBungeeCord(), uuid, new TextComponent(discordManager.getPlaceholderString(configCache.getMinecraftMessage("verification.accept", true), null)));
+					DisnotifyTools.checkForRolesUpdate(uuid, member, configManager, verifyManager, verifySQL, discordManager, currentGroupList);
+			    	DisnotifyTools.sendMessage(pluginInformations.isBungeeCord(), uuid, new TextComponent(discordManager.getPlaceholderString(configManager.getMinecraftMessage("verification.accept", true), null)));
 					return;
 				} catch (SQLException e) {
 					e.printStackTrace();
