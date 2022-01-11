@@ -21,6 +21,7 @@ import me.truemb.disnotify.enums.MinotarTypes;
 import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.PluginInformations;
+import me.truemb.disnotify.utils.TimeFormatter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 
@@ -61,8 +62,8 @@ public class MC_InactivityChecker implements Runnable{
 				continue;
 			
 			//MORE SPECIFIC INFORMATIONS
-			double playtimeHours = (double) player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20 / 60;
-			double offlinetimeHours = (double) (System.currentTimeMillis() - player.getLastPlayed()) / 1000 / 60 / 60;
+			long playtimeSec = player.getStatistic(Statistic.PLAY_ONE_MINUTE) / 20;
+			long offlinetimeSec = (System.currentTimeMillis() - player.getLastPlayed()) / 1000;
 			
 			String location = this.offlineInfoSQL.getOfflineInfoManager().getInformationString(uuid, InformationType.Location);
 			if(location == null) location = "unknown";
@@ -75,10 +76,8 @@ public class MC_InactivityChecker implements Runnable{
 			placeholder.put("InactivDays", String.valueOf(this.configManager.getConfig().getInt("Options." + FeatureType.Inactivity.toString() + ".InactivForDays")));
 			placeholder.put("Location", location);
 			placeholder.put("IP", ip);
-			placeholder.put("Playtime", String.format("%,.2f", playtimeHours));
-			placeholder.put("Offlinetime", String.format("%,.2f", offlinetimeHours));
-			placeholder.put("PlaytimeDays", String.format("%,.2f", playtimeHours / 24));
-			placeholder.put("OfflinetimeDays", String.format("%,.2f", offlinetimeHours / 24));
+			placeholder.put("Playtime", TimeFormatter.formatDate(playtimeSec, this.configManager));
+			placeholder.put("Offlinetime", TimeFormatter.formatDate(offlinetimeSec, this.configManager));
 			placeholder.put("LastSeen", sdf.format(date));
 			
 			if(!this.configManager.useEmbedMessage(FeatureType.Inactivity)) {

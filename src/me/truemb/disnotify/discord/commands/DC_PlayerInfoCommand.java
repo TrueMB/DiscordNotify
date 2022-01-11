@@ -103,7 +103,7 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 				if(lastplayed > 0) {
 					placeholder.put("Playtime", TimeFormatter.formatDate(playtimeSec, this.configManager));
 					placeholder.put("Offlinetime", TimeFormatter.formatDate(offlinetimeSec, this.configManager));
-					placeholder.put("LastSeen", sdf.format(new Date(lastplayed)) + "h");
+					placeholder.put("LastSeen", sdf.format(new Date(lastplayed)));
 				}else {
 					placeholder.put("Playtime", "unknown");
 					placeholder.put("Offlinetime", "unknown");
