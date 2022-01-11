@@ -131,7 +131,7 @@ public class DisnotifyTools {
 
 		verifyManager.removeBackupRoles(uuid);
 	}
-	
+
 	public static void sendMessage(boolean isBungeecord, UUID uuid, BaseComponent text) {
 
     	if(isBungeecord) {

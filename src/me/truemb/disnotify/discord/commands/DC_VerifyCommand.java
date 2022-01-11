@@ -137,7 +137,12 @@ public class DC_VerifyCommand extends SimpleAddon {
 		}
 
 		new Thread(() -> {
-			UUID uuid = PlayerManager.getUUIDOffline(args[0]); //NEEDS SOME TIME
+			
+			UUID uuid = null;
+			if(this.discordManager.isOnlineMode())
+				uuid = PlayerManager.getUUIDOffline(args[0]); //NEEDS SOME TIME
+			else
+				uuid = PlayerManager.generateOfflineUUID(args[0]);
 				
 			//PLAYER DOESNT EXISTS
 			if(uuid == null) {

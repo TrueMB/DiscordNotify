@@ -52,6 +52,9 @@ public class DiscordManager {
 	private HashMap<UUID, Boolean> staffHash;
 	private HashMap<UUID, Boolean> discordChatHash;
 	
+	private boolean onlineMode;
+	
+	@SuppressWarnings("deprecation") //FOR ONLINE MODE BUNGEECORD
 	public DiscordManager(ConfigCacheHandler configCache, PermissionsAPI permsAPI, PluginInformations pluginInfo, OfflineInformationManager offlineInfo, VerifyManager verifyManager, VerifySQL verifySQL,DelayManager delayManager, HashMap<UUID, Boolean> staffHash, HashMap<UUID, Boolean> discordChatHash) {
 		this.configCache = configCache;
 		this.permsAPI = permsAPI;
@@ -63,6 +66,13 @@ public class DiscordManager {
 		
 		this.staffHash = staffHash;
 		this.discordChatHash = discordChatHash;
+
+		//ONLINE MODE NEEDED FOR SPICORD STUFF. THATSWHY IT IS HERE
+		if(pluginInfo.isBungeeCord()) {
+			this.onlineMode = net.md_5.bungee.api.ProxyServer.getInstance().getConfig().isOnlineMode();
+		}else {
+			this.onlineMode = org.bukkit.Bukkit.getOnlineMode();
+		}
 	}
 
 	//DISCORD
@@ -297,6 +307,10 @@ public class DiscordManager {
 
 	public void setHookSchedulerId(int hookSchedulerId) {
 		this.hookSchedulerId = hookSchedulerId;
+	}
+
+	public boolean isOnlineMode() {
+		return onlineMode;
 	}
 	
 }

@@ -7,18 +7,26 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.UUID;
 
+import com.google.common.base.Charsets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class PlayerManager {
+	
+	/***
+	 * 
+	 * @return The UUID of a Minecraft Account, if online mode is false
+	 */
+	public static UUID generateOfflineUUID(String name) {
+		return UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(Charsets.UTF_8));
+	}
 
 	public static UUID getUUIDOffline(String playerName) {
 		String url = "https://api.mojang.com/users/profiles/minecraft/" + playerName;
 		try {
 			JsonObject json = getJson(url);
-			getName(json.get("id").getAsString());
 			String uuidS = json.get("id").getAsString();
 			return UUID.fromString(uuidS.substring(0, 8) + "-" + uuidS.substring(8, 12) + "-" + uuidS.substring(12, 16) + "-" + uuidS.substring(16, 20) + "-" + uuidS.substring(20, 32));
 		} catch (IOException e) {
