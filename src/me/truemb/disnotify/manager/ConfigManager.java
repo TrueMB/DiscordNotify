@@ -18,7 +18,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class ConfigManager {
 
-	private static final int configVersion = 8;
+	private static final int configVersion = 9;
 	
 	private File configFile;
 	private YamlConfiguration config;

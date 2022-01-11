@@ -38,10 +38,19 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
     
     @Override
     public void onCommand(DiscordBotCommand command, String[] args) {
+    	
     	Member member = command.getSender();
+    	long channelID = command.getChannel().getIdLong();
+    	
     	HashMap<String, String> placeholder = new HashMap<>();
     	placeholder.put("Prefix", command.getPrefix());
     	placeholder.put("Tag", member.getUser().getAsTag());
+
+    	
+    	long commandAllowedChannelID = this.configManager.getConfig().getLong("Options." + FeatureType.PlayerInfo.toString() + ".discordCommandOnlyInChannel");
+    	
+    	if(commandAllowedChannelID != -1 && commandAllowedChannelID != channelID)
+    		return;
     	
     	if(args.length == 1) {
 

@@ -53,10 +53,16 @@ public class DC_VerifyCommand extends SimpleAddon {
     	Member member = command.getSender();
     	
     	long disUUID = member.getUser().getIdLong();
+    	long channelID = command.getChannel().getIdLong();
     	
     	HashMap<String, String> placeholder = new HashMap<>();
     	placeholder.put("Prefix", command.getPrefix());
     	placeholder.put("Tag", member.getUser().getAsTag());
+    	
+    	long commandAllowedChannelID = this.configManager.getConfig().getLong("Options." + FeatureType.Verification.toString() + ".discordCommandOnlyInChannel");
+    	
+    	if(commandAllowedChannelID != -1 && commandAllowedChannelID != channelID)
+    		return;
     	
     	if(args.length != 1) {
     		command.reply(this.discordManager.getDiscordMessage("verification.wrongCommand", placeholder));

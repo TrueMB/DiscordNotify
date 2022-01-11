@@ -62,6 +62,8 @@ Options:
       - '?'
   PlayerInfo:
     useEmbedMessage: true
+    #-1 to enable the command for every channel. Otherwise the channel ID
+    discordCommandOnlyInChannel: -1
   Verification:
     #This Role is needed on the Discord Server, to identify already authenticated Users
     discordRole: 'verified'
@@ -72,6 +74,8 @@ Options:
     changeNickname: false
     #Disables the spamming of Verification Requests. Amount are seconds
     delayForNewRequest: 500
+    #-1 to enable the command for every channel. Otherwise the channel ID
+    discordCommandOnlyInChannel: -1
   RoleSync:
     #Uses the Ingame Group Names. If false, it only synces the given groups
     useIngameGroupNames: true
@@ -225,4 +229,4 @@ DiscordEmbedMessages:
     PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 8
+ConfigVersion: 9
