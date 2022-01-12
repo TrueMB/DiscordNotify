@@ -161,8 +161,8 @@ DiscordEmbedMessages:
       - 'User Name : %Player%'
       - 'Location : %Location%'
       - 'IP : %IP%'
-      - 'Playtime : %PlaytimeDays% Days'
-      - 'Offlinetime : %OfflinetimeDays% Days'
+      - 'Playtime : %Playtime%'
+      - 'Offlinetime : %Offlinetime%'
     Author: '---------------------[ Inactivity ]------------------------'
     #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
     Color: 'RED'

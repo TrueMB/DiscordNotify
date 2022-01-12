@@ -3,6 +3,7 @@ package me.truemb.disnotify.utils;
 import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Instant;
@@ -246,7 +247,15 @@ public class DiscordManager {
 			}
 		}
 		
-		eb.setColor(Color.getColor(this.configManager.getConfig().getString("DiscordEmbedMessages." + path + ".Color").toUpperCase()));
+		Color color;
+		try {
+		    Field field = Color.class.getField(this.configManager.getConfig().getString("DiscordEmbedMessages." + path + ".Color").toUpperCase());
+		    color = (Color)field.get(null);
+		} catch (Exception e) {
+		    color = null; // Not defined
+		}
+				
+		eb.setColor(color);
 		eb.setTimestamp(Instant.now());
 		
 		return eb;
