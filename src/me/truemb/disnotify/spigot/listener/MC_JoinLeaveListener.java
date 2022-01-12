@@ -66,6 +66,10 @@ public class MC_JoinLeaveListener implements Listener{
 			this.offlineInfoSQL.getOfflineInfoManager().setInformation(uuid, InformationType.Inactivity, "false");
 			this.messagingManager.sendInformationUpdate(p, InformationType.Inactivity, "false");
 		}
+
+		//DISCORD BOT IS NOT READY
+		if(this.discordManager.getDiscordBot() == null || this.discordManager.getDiscordBot().getJda() == null || this.discordManager.getDiscordBot().getJda().getGuilds().size() <= 0)
+			return;
 		
 		//DISCORD JOIN MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
@@ -81,10 +85,6 @@ public class MC_JoinLeaveListener implements Listener{
 				this.discordManager.sendDiscordMessage(channelId, "PlayerJoinMessage", placeholder);
 			}
 		}
-
-		//DISCORD BOT IS NOT READY FOR CHECKS
-		if(this.discordManager.getDiscordBot() == null)
-			return;
 		
 		if(!this.verifyManager.isVerified(uuid))
 			return;
@@ -92,9 +92,15 @@ public class MC_JoinLeaveListener implements Listener{
 		long disuuid = this.verifyManager.getVerfiedWith(uuid);
 		
 		Member member = this.discordManager.getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
-		if(member == null)
-			member = this.discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).complete();
+		if(member == null) {
+			this.discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
 
+				String[] currentGroupList = this.permsAPI.getGroups(uuid);
+				DisnotifyTools.checkForRolesUpdate(uuid, mem, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
+				
+			});
+		}
+		
 		String[] currentGroupList = this.permsAPI.getGroups(uuid);
 		DisnotifyTools.checkForRolesUpdate(uuid, member, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
 	}

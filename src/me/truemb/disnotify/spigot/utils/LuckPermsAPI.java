@@ -25,8 +25,6 @@ public class LuckPermsAPI {
 	private Permission permission;
 	private PluginInformations pluginInfo;
 	
-	//TODO CATCH NULL GROUPS
-	
 	public LuckPermsAPI(PluginInformations pluginInfo) {
 		this.pluginInfo = pluginInfo;
 		
@@ -70,6 +68,12 @@ public class LuckPermsAPI {
 		}
 		
 		User user = this.getLuckPerms().getUserManager().getUser(uuid);
+		
+		if(user == null) {
+			this.pluginInfo.getLogger().warning("Couldnt find the user with the UUID: '" + uuid.toString() + "'.");;
+			return;
+		}
+		
 		InheritanceNode node = InheritanceNode.builder(groupS).build();
 		user.data().add(node);
 		this.getLuckPerms().getUserManager().saveUser(user);
@@ -85,6 +89,12 @@ public class LuckPermsAPI {
 		}
 		
 		User user = this.getLuckPerms().getUserManager().getUser(uuid);
+		
+		if(user == null) {
+			this.pluginInfo.getLogger().warning("Couldnt find the user with the UUID: '" + uuid.toString() + "'.");;
+			return;
+		}
+		
 		InheritanceNode node = InheritanceNode.builder(groupS).build();
 		user.data().remove(node);
 		this.getLuckPerms().getUserManager().saveUser(user);
@@ -102,6 +112,11 @@ public class LuckPermsAPI {
 	public boolean hasPermission(UUID uuid, String permission) {
 		ContextManager cm = this.getLuckPerms().getContextManager();
 		User user = this.getLuckPerms().getUserManager().getUser(uuid);
+		
+		if(user == null) {
+			this.pluginInfo.getLogger().warning("Couldnt find the user with the UUID: '" + uuid.toString() + "'.");;
+			return false;
+		}
 			
 		QueryOptions queryOptions = cm.getQueryOptions(user).orElse(cm.getStaticQueryOptions());
 		CachedPermissionData permissionData = user.getCachedData().getPermissionData(queryOptions);
@@ -111,6 +126,12 @@ public class LuckPermsAPI {
 	public boolean addPlayerPermission(UUID uuid, String permission) {
 
 		User user = this.getLuckPerms().getUserManager().getUser(uuid);
+		
+		if(user == null) {
+			this.pluginInfo.getLogger().warning("Couldnt find the user with the UUID: '" + uuid.toString() + "'.");;
+			return false;
+		}
+		
 		this.getLuckPerms().getUserManager().saveUser(user);
 		DataMutateResult result = user.data().add(Node.builder(permission).build());
 		this.getLuckPerms().getUserManager().saveUser(user);

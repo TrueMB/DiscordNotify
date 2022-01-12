@@ -35,8 +35,6 @@ public class BC_InactivityChecker implements Runnable{
 	private PluginInformations pluginInfo;
 	private ConfigManager configManager;
 	
-	private String table = "disnotify_offlineData";
-	
 	public BC_InactivityChecker(DiscordManager discordManager, PluginInformations pluginInfo, ConfigManager configManager, AsyncMySQL asyncMySQL, OfflineInformationsSQL offlineInfoSQL) {
 		this.discordManager = discordManager;
 		this.pluginInfo = pluginInfo;
@@ -56,7 +54,7 @@ public class BC_InactivityChecker implements Runnable{
 		
 		long inactivityLimit = System.currentTimeMillis() - this.configManager.getConfig().getInt("Options." + FeatureType.Inactivity.toString() + ".InactivForDays") * 24 * 60 * 60 * 1000;
 		
-		this.asyncMySQL.prepareStatement("SELECT * FROM " + this.table + " WHERE " + InformationType.LastConnection.toString() + "<'" + String.valueOf(inactivityLimit) + "'"
+		this.asyncMySQL.prepareStatement("SELECT * FROM " + OfflineInformationsSQL.table + " WHERE " + InformationType.LastConnection.toString() + "<'" + String.valueOf(inactivityLimit) + "'"
 			+ " AND (" + InformationType.Inactivity.toString() + " IS NULL OR " + InformationType.Inactivity.toString() + "='false');", new Consumer<ResultSet>() {
 			
 			
