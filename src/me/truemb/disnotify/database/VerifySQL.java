@@ -161,12 +161,15 @@ public class VerifySQL {
 
 					//NICKNAME
 					if(configManager.getConfig().getBoolean("Options." + FeatureType.Verification.toString() +  ".changeNickname")) {
+						String nickname = configManager.getConfig().getString("Options." + FeatureType.Verification.toString() +  ".formatNickname").replaceAll("(?i)%" + "user" + "%", ingameName);
+
 						try {
-							member.modifyNickname(ingameName).queue();
+							member.modifyNickname(nickname).queue();
 						}catch(HierarchyException ex) {
 							pluginInformations.getLogger().warning("User " + member.getUser().getAsTag() + " has higher rights, than the BOT! Cant change the Nickname.");
 						}
 					}
+					
 					String verifyGroupS = configManager.getConfig().getString("Options." + FeatureType.Verification.toString() +  ".minecraftRank");
 					
 					if(verifyGroupS != null && !verifyGroupS.equalsIgnoreCase("")) {

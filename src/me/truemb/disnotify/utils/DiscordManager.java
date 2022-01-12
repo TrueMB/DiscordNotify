@@ -162,43 +162,47 @@ public class DiscordManager {
     		this.pluginInfo.getLogger().warning("Discord BOT is not ready.");
 			return;
 		}
-		
-		TextChannel channel = this.getDiscordBot().getJda().getTextChannelById(channelId);
-		
-		if(this.getDiscordBot() == null) {
-    		this.pluginInfo.getLogger().warning("The Channel with the ID: " + channelId + " doesn't exists.");
-			return;
-		}
-		
-		EmbedBuilder eb = this.getEmbedMessage(uuid, path, placeholder);
-		
-		//PICTURE ADDING TO MESSAGE
-		String minotarTypeS = this.configManager.getConfig().getString("DiscordEmbedMessages." + path + ".PictureType");
-		MinotarTypes minotarType = MinotarTypes.BUST;
-		try {
-			minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
-		}catch(Exception ex) { /* NOTING */ }
-		
-		InputStream file = null;
-		String filename = minotarType.toString().toLowerCase() + "_" + uuid.toString() + ".jpg";
-		
-		if(this.configManager.getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithPicture")) {
-			eb.setImage("attachment://" + filename);
 
-			try {
-				URL url = new URL("https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString());
-				URLConnection urlConn = url.openConnection();
-				file = urlConn.getInputStream();
-			}catch (IOException e) {
-				e.printStackTrace();
+		new Thread(() -> {
+			
+			TextChannel channel = this.getDiscordBot().getJda().getTextChannelById(channelId);
+			
+			if(this.getDiscordBot() == null) {
+	    		this.pluginInfo.getLogger().warning("The Channel with the ID: " + channelId + " doesn't exists.");
+				return;
 			}
-		}
-		//===========
-		
-		if(file != null)
-			channel.sendMessage(eb.build()).addFile(file, filename).queue();
-		else
-			channel.sendMessage(eb.build()).queue();
+			
+			EmbedBuilder eb = this.getEmbedMessage(uuid, path, placeholder);
+			
+			//PICTURE ADDING TO MESSAGE
+			String minotarTypeS = this.configManager.getConfig().getString("DiscordEmbedMessages." + path + ".PictureType");
+			MinotarTypes minotarType = MinotarTypes.BUST;
+			try {
+				minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+			}catch(Exception ex) { /* NOTING */ }
+			
+			InputStream file = null;
+			String filename = minotarType.toString().toLowerCase() + "_" + uuid.toString() + ".jpg";
+			
+			if(this.configManager.getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithPicture")) {
+				eb.setImage("attachment://" + filename);
+	
+				try {
+					URL url = new URL("https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString());
+					URLConnection urlConn = url.openConnection();
+					file = urlConn.getInputStream();
+				}catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			//===========
+			
+			if(file != null)
+				channel.sendMessage(eb.build()).addFile(file, filename).queue();
+			else
+				channel.sendMessage(eb.build()).queue();
+			
+		}).start();
 	}
 	
 	public boolean isAddonEnabled(String addonName) {

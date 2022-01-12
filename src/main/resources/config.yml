@@ -72,6 +72,8 @@ Options:
     minecraftRank: ''
     #If a User gets Verfied it will change the Nickname on the Discord to the Minecraft Name
     changeNickname: false
+    #Format how the nickname should be on Discord. %user% <- ingameName
+    formatNickname: '%user%'
     #Disables the spamming of Verification Requests. Amount are seconds
     delayForNewRequest: 500
     #-1 to enable the command for every channel. Otherwise the channel ID
