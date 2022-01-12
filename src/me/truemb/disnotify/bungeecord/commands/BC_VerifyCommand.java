@@ -66,8 +66,8 @@ public class BC_VerifyCommand extends Command{
 					p.sendMessage(this.configManager.getMessageAsTextComponent("verification.notVerified", true));
 					return;
 				}
-				
-				if(this.discordManager.getDiscordBot() == null) {
+
+				if(this.discordManager.getDiscordBot() == null || this.discordManager.getDiscordBot().getJda() == null || this.discordManager.getDiscordBot().getJda().getGuilds().size() <= 0) {
 					p.sendMessage(this.configManager.getMessageAsTextComponent("verification.botNotReady", true));
 					return;
 				}

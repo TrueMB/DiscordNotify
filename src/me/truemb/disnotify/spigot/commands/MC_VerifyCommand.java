@@ -65,7 +65,7 @@ public class MC_VerifyCommand extends BukkitCommand{
 					return true;
 				}
 				
-				if(this.discordManager.getDiscordBot() == null) {
+				if(this.discordManager.getDiscordBot() == null || this.discordManager.getDiscordBot().getJda() == null || this.discordManager.getDiscordBot().getJda().getGuilds().size() <= 0) {
 					p.sendMessage(this.configManager.getMinecraftMessage("verification.botNotReady", true));
 					return true;
 				}

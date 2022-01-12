@@ -13,6 +13,7 @@ import org.simpleyaml.configuration.file.YamlConfiguration;
 
 import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.utils.ConfigUpdater;
+import me.truemb.disnotify.utils.UTF8YamlConfiguration;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -21,7 +22,7 @@ public class ConfigManager {
 	private static final int configVersion = 9;
 	
 	private File configFile;
-	private YamlConfiguration config;
+	private UTF8YamlConfiguration config;
 	
 	public ConfigManager(Logger logger, InputStream pluginConfig, File dir) {
 		
@@ -42,14 +43,14 @@ public class ConfigManager {
 		}
 			
 		//LOAD ONCE TO GET THE CONFIG VERSION
-		this.config = YamlConfiguration.loadConfiguration(this.configFile);
+		this.config = new UTF8YamlConfiguration(this.configFile);
 			
 		//UPDATE IF THERE IS A NEWER VERSION
 		if(!this.config.isSet("ConfigVersion") || this.config.getInt("ConfigVersion") < configVersion) {
 			logger.info("Updating Config!");
 			try {
 				ConfigUpdater.update(pluginConfig, this.configFile, new ArrayList<>());
-				this.config = YamlConfiguration.loadConfiguration(this.configFile);
+				this.config = new UTF8YamlConfiguration(this.configFile);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
