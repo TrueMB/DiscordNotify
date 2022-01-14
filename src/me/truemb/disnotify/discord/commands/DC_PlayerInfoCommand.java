@@ -78,6 +78,26 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 				if(!pluginInfo.isBungeeCordSubServer() && !pluginInfo.isBungeeCord()) {
 					//IF NOT BUNGEE SYSTEM
 					org.bukkit.OfflinePlayer player = org.bukkit.Bukkit.getOfflinePlayer(uuid);
+					
+					//GETTING THE CURRENT LOCATION OF AN ONLINE PLAYER
+					if(player.isOnline()) {
+						org.bukkit.entity.Player onlinePlayer = org.bukkit.Bukkit.getPlayer(uuid);
+						org.bukkit.Location loc = onlinePlayer.getLocation();
+						
+						String location = this.configManager.getConfig().getString("Options.OtherFormats.Location")
+								.replaceAll("(?i)%" + "world" + "%", loc.getWorld().getName())
+								.replaceAll("(?i)%" + "x" + "%", String.valueOf(loc.getBlockX()))
+								.replaceAll("(?i)%" + "y" + "%", String.valueOf(loc.getBlockY()))
+								.replaceAll("(?i)%" + "z" + "%", String.valueOf(loc.getBlockZ()))
+								.replaceAll("(?i)%" + "yaw" + "%", String.valueOf(Math.round(loc.getYaw() * 100D) / 100D))
+								.replaceAll("(?i)%" + "pitch" + "%", String.valueOf(Math.round(loc.getPitch() * 100D) / 100D));
+
+						placeholder.put("liveLocation", location);
+						
+					}else {
+						placeholder.put("liveLocation", this.configManager.getConfig().getString("Options.DefaultPlaceholder.NotOnline"));
+					}
+					
 					lastplayed = player.isOnline() ? System.currentTimeMillis() : player.getLastPlayed();
 					playtimeSec = player.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE) / 20;
 					offlinetimeSec = (System.currentTimeMillis() - player.getLastPlayed()) / 1000;

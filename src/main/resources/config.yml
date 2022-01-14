@@ -37,6 +37,10 @@ Options:
       Hours: '%amount% Hours'
       Minutes: '%amount% Min'
       Seconds: '%amount% Seconds'
+  OtherFormats:
+    Location: '%world%, x=%x%, y=%y%, z=%z%, yaw=%yaw%, pitch=%pitch%'
+  DefaultPlaceholder:
+    NotOnline: 'Currently Offline'
   Inactivity:
     #Checking, if players are inactive (in Minutes)
     CheckTimer: 60
@@ -214,6 +218,7 @@ DiscordEmbedMessages:
     Color: 'WHITE'
     WithPicture: true
     PictureType: BUST
+  #Placeholder %livelocation% is not Supported on Bungeecord. It shows the exact Location of a Online Player
   PlayerInfoEmbed:
     Title: '**%Player%** Information'
     Description: ''
@@ -231,4 +236,4 @@ DiscordEmbedMessages:
     PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 9
+ConfigVersion: 10

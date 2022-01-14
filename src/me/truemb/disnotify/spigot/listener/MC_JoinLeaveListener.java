@@ -116,7 +116,14 @@ public class MC_JoinLeaveListener implements Listener{
 		this.offlineInfoSQL.getOfflineInfoManager().setInformation(uuid, InformationType.IP, ipAddress);
 		this.messagingManager.sendInformationUpdate(p, InformationType.IP, ipAddress);
 		
-		String location = loc.getWorld().getName() + ", x=" + loc.getBlockX() + ", y=" + loc.getBlockY() + ", z=" + loc.getBlockZ() + ", yaw=" + loc.getYaw() + ", pitch=" + loc.getPitch();
+		String location = this.configManager.getConfig().getString("Options.OtherFormats.Location")
+				.replaceAll("(?i)%" + "world" + "%", loc.getWorld().getName())
+				.replaceAll("(?i)%" + "x" + "%", String.valueOf(loc.getBlockX()))
+				.replaceAll("(?i)%" + "y" + "%", String.valueOf(loc.getBlockY()))
+				.replaceAll("(?i)%" + "z" + "%", String.valueOf(loc.getBlockZ()))
+				.replaceAll("(?i)%" + "yaw" + "%", String.valueOf(Math.round(loc.getYaw() * 100D) / 100D))
+				.replaceAll("(?i)%" + "pitch" + "%", String.valueOf(Math.round(loc.getPitch() * 100D) / 100D));
+		
 		this.offlineInfoSQL.updateInformation(uuid, InformationType.Location, location);
 		this.offlineInfoSQL.getOfflineInfoManager().setInformation(uuid, InformationType.Location, location);
 		this.messagingManager.sendInformationUpdate(p, InformationType.Location, location);
