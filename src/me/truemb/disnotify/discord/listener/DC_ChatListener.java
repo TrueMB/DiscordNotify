@@ -47,7 +47,7 @@ public class DC_ChatListener extends ListenerAdapter {
 	    	return;
 	    	   	    
 	    //CORRECT CHANNEL
-	    if(this.configManager.getChannelID(FeatureType.Chat) == channelId) {
+	    if(!this.configManager.getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat") && this.configManager.getChannelID(FeatureType.Chat) == channelId) {
 	    	
 			if(!this.configManager.isFeatureEnabled(FeatureType.Chat))
 				return;
@@ -90,8 +90,46 @@ public class DC_ChatListener extends ListenerAdapter {
 				}
 		    }
 	    	
+	   	}else if(this.configManager.isFeatureEnabled(FeatureType.Chat) && this.pluginInfo.isBungeeCord()){
+		    
+			List<String> bypassList = this.configManager.getConfig().getStringList("Options." + FeatureType.Chat.toString() + ".bypassPrefix");
+			for(String prefix : bypassList) {
+		    	if(message.toLowerCase().startsWith(prefix.toLowerCase()))
+		    		return;
+		    }
+			
+		    final String mcMessage = EmojiParser.parseToAliases(this.configManager.getMinecraftMessage("discordChatMessage", true)
+		    		.replace("%Tag%", e.getAuthor().getAsTag())
+		    		.replace("%Message%", message)
+		    		.replace("%Channel%", channelName));
+		    
+	   		for(String server : this.configManager.getConfig().getConfigurationSection("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat").getKeys(false)) {
+	   			long channelID = this.configManager.getConfig().getLong("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat." + server);
+	   			
+	   			if(channelID == channelId) {
+	   				//CHANNEL WAS FOUND ON SEPERATED CHANNEL SETUP
+	   				
+					net.md_5.bungee.api.ProxyServer.getInstance().getPlayers().forEach(all -> {
+					    	
+						if(!all.getServer().getInfo().getName().equalsIgnoreCase(server))
+					    	return;
+
+		   				if(this.configManager.getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat")) {
+							UUID uuidAll = all.getUniqueId();
+							if(this.discordChatEnabled.containsKey(uuidAll) && this.discordChatEnabled.get(uuidAll)) {
+								all.sendMessage(new TextComponent(mcMessage));
+							}
+		   				}else
+							all.sendMessage(new TextComponent(mcMessage));
+		   				
+					});
+	   				return;
+	   			}
+	   		}
+	   	}
+	    
 		//STAFF CHAT
-	   	}else if(this.configManager.getChannelID(FeatureType.Staff) == channelId) {
+	    if(this.configManager.getChannelID(FeatureType.Staff) == channelId) {
 	    	
 			if(!this.configManager.isFeatureEnabled(FeatureType.Staff))
 				return;

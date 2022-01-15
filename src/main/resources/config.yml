@@ -56,6 +56,12 @@ Options:
     syncDiscord: true
     #Allows the command /dchat to join or leave the Discord Chat in Minecraft
     enableSplittedChat: false
+    #if enabled, then Options.Chat.serverSeperatedChat.%server% will be used and not Channel.Chat
+    #Only works on MultiServer Setups ofc.
+    enableServerSeperatedChat: false
+    serverSeperatedChat:
+      lobby: -1
+      freebuild: -1
     bypassPrefix:
       - '?'
   Staff:
@@ -236,4 +242,4 @@ DiscordEmbedMessages:
     PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 10
+ConfigVersion: 11

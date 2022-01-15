@@ -1,7 +1,6 @@
 package me.truemb.disnotify.utils;
 
-
-import org.bukkit.configuration.file.FileConfiguration;
+import org.simpleyaml.configuration.file.FileConfiguration;
 
 public class KeyBuilder implements Cloneable {
 
