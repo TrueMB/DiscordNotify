@@ -29,11 +29,18 @@ public class BC_JoinLeaveListener implements Listener{
 		
 		//DISCORD JOIN MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
-			long channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
+
+			String server = e.getTarget().getName();
+			long channelId;
+			if(this.configManager.getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave"))
+				channelId = this.configManager.getConfig().getLong("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + server);
+			else
+				channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
+
 			HashMap<String, String> placeholder = new HashMap<>();
 			placeholder.put("Player", p.getName());
 			placeholder.put("UUID", uuid.toString());
-			placeholder.put("server", e.getTarget().getName());
+			placeholder.put("server", server);
 			
 			if(this.configManager.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
 				this.discordManager.sendEmbedMessage(channelId, uuid, "PlayerJoinEmbed", placeholder);
@@ -50,7 +57,14 @@ public class BC_JoinLeaveListener implements Listener{
 		
 		//DISCORD LEAVE MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
-			long channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
+			
+			String server = e.getTarget().getName();
+			long channelId;
+			if(this.configManager.getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave"))
+				channelId = this.configManager.getConfig().getLong("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + server);
+			else
+				channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
+			
 			HashMap<String, String> placeholder = new HashMap<>();
 			placeholder.put("Player", p.getName());
 			placeholder.put("UUID", uuid.toString());

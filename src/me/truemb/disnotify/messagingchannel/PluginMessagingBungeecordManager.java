@@ -11,6 +11,7 @@ import me.truemb.disnotify.bungeecord.main.Main;
 import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.enums.GroupAction;
 import me.truemb.disnotify.enums.InformationType;
+import me.truemb.disnotify.manager.ConfigManager;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -22,13 +23,16 @@ public class PluginMessagingBungeecordManager implements Listener {
 
 	private Main instance;
 	private static String channel;
+	
+	private ConfigManager configManager;
 
 	// THIS IS THE BUNGEECOR SIDE. BUNGEECORD RECEIVES INFORMATION FROM MINECRAFT
 	// SERVER
 
-	public PluginMessagingBungeecordManager(Main plugin) {
+	public PluginMessagingBungeecordManager(Main plugin, ConfigManager configManager) {
 		PluginMessagingBungeecordManager.channel = "discord:notify";
 		this.instance = plugin;
+		this.configManager = configManager;
 
 		this.instance.getProxy().registerChannel(PluginMessagingBungeecordManager.channel);
 		this.instance.getProxy().getPluginManager().registerListener(this.instance, this);
@@ -50,12 +54,19 @@ public class PluginMessagingBungeecordManager implements Listener {
 			UUID uuid = receiver.getUniqueId();
 			
 			if (subChannel.equalsIgnoreCase("DEATH")) {
+
+				String server = receiver.getServer().getInfo().getName();
+				long channelId;
+				if(this.configManager.getConfig().getBoolean("Options." + FeatureType.PlayerDeath.toString() + ".enableServerSeperatedDeath"))
+					channelId = this.configManager.getConfig().getLong("Options." + FeatureType.PlayerDeath.toString() + ".serverSeperatedDeath." + server);
+				else
+					channelId = this.configManager.getChannelID(FeatureType.PlayerDeath);
 				
-				long channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerDeath);
 				String deathMessage = in.readUTF();
 
 				HashMap<String, String> placeholder = new HashMap<>();
 				placeholder.put("DeathMessage", deathMessage);
+				placeholder.put("server", server);
 				
 				if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerDeath)) {
 					this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "DeathEmbed", placeholder);
