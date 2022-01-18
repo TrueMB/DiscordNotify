@@ -68,7 +68,7 @@ public class BC_JoinLeaveListener implements Listener{
 			HashMap<String, String> placeholder = new HashMap<>();
 			placeholder.put("Player", p.getName());
 			placeholder.put("UUID", uuid.toString());
-			placeholder.put("server", e.getTarget().getName());
+			placeholder.put("server", server);
 			
 			if(this.configManager.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
 				this.discordManager.sendEmbedMessage(channelId, uuid, "PlayerLeaveEmbed", placeholder);
