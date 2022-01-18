@@ -3,7 +3,7 @@ author: TrueMB
 version: ${project.version}
 api-version: 1.16
 main: me.truemb.disnotify.bungeecord.main.Main
-depend: [Spicord]
+depends: [Spicord]
 
 commands:
    staff:

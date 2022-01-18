@@ -62,7 +62,7 @@ public class BC_VerifyCommand extends Command{
 					
 			if(args[0].equalsIgnoreCase("unlink")) {
 				
-				if(!verifyManager.isVerified(uuid)) {
+				if(!this.verifyManager.isVerified(uuid)) {
 					p.sendMessage(this.configManager.getMessageAsTextComponent("verification.notVerified", true));
 					return;
 				}
