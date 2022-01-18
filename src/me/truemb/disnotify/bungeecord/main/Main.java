@@ -70,7 +70,7 @@ public class Main extends Plugin{
 		this.configManager = new ConfigManager(this.getLogger(), this.getResourceAsStream("config.yml"), this.getDataFolder()); //LOADS CONFIG
 		
 		//Bungeecord Messaging Channel
-		this.messagingManager = new PluginMessagingBungeecordManager(this);
+		this.messagingManager = new PluginMessagingBungeecordManager(this, this.getConfigManager());
 		
 		//MANAGERS
 		this.pluginInformations = new PluginInformations(this.getDescription().getName(), this.getDescription().getVersion(), serverVersion, this.getLogger(), true, false);

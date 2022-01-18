@@ -48,8 +48,16 @@ Options:
     useEmbedMessage: true
   PlayerJoinLeave:
     useEmbedMessage: false
+    enableServerSeperatedJoinLeave: false
+    serverSeperatedJoinLeave:
+      lobby: -1
+      freebuild: -1
   PlayerDeath:
     useEmbedMessage: false
+    enableServerSeperatedDeath: false
+    serverSeperatedDeath:
+      lobby: -1
+      freebuild: -1
   Chat:
     useEmbedMessage: false
     #Should the Discord Message send to the Minecraft Server?
@@ -242,4 +250,4 @@ DiscordEmbedMessages:
     PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 11
+ConfigVersion: 12
