@@ -196,6 +196,10 @@ public class DiscordManager {
 				}
 			}
 			//===========
+			if(channel == null) {
+				this.pluginInfo.getLogger().warning("Couldnt send Message to channel: " + channelId);
+				return;
+			}
 			
 			if(file != null)
 				channel.sendMessage(eb.build()).addFile(file, filename).queue();
@@ -227,12 +231,16 @@ public class DiscordManager {
 		title = this.getPlaceholderString(title, placeholder);
 		description = this.getPlaceholderString(description, placeholder);
 		author = this.getPlaceholderString(author, placeholder);
-		
+
 		//EMBED
 		EmbedBuilder eb = new EmbedBuilder();
 
-		if(author != null && !author.equalsIgnoreCase(""))
-			eb.setAuthor(author);
+		if(author != null && !author.equalsIgnoreCase("")) {
+			if(this.configManager.getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithAuthorPicture"))
+				eb.setAuthor(author, null, "https://minotar.net/" + "avatar" + "/" + uuid.toString());
+			else
+				eb.setAuthor(author);
+		}
 
 		if(title != null && !title.equalsIgnoreCase(""))
 			eb.setTitle(title);
@@ -258,9 +266,11 @@ public class DiscordManager {
 		} catch (Exception e) {
 		    color = null; // Not defined
 		}
-				
+
 		eb.setColor(color);
-		eb.setTimestamp(Instant.now());
+
+		if(!this.configManager.getConfig().getBoolean("DiscordEmbedMessages." + path + ".DisableTimestamp"))
+			eb.setTimestamp(Instant.now());
 		
 		return eb;
 	}

@@ -186,6 +186,8 @@ DiscordEmbedMessages:
     Author: '---------------------[ Inactivity ]------------------------'
     #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
     Color: 'RED'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: true
     PictureType: HELM
   PlayerJoinEmbed:
@@ -195,6 +197,8 @@ DiscordEmbedMessages:
     Author: '---------------------[ Connected ]------------------------'
     #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
     Color: 'GREEN'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: true
     PictureType: AVATAR
   PlayerLeaveEmbed:
@@ -204,6 +208,8 @@ DiscordEmbedMessages:
     Author: '---------------------[ Disconnected ]------------------------'
     #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
     Color: 'RED'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: false
     PictureType: AVATAR
   DeathEmbed:
@@ -213,6 +219,8 @@ DiscordEmbedMessages:
     Author: 'Death'
     #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
     Color: 'GREEN'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: true
     PictureType: BUST
   ChatEmbed:
@@ -222,6 +230,8 @@ DiscordEmbedMessages:
     Author: 'Chat'
     #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
     Color: 'WHITE'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: true
     PictureType: BUST
   StaffEmbed:
@@ -230,6 +240,8 @@ DiscordEmbedMessages:
     Fields: {}
     Author: 'STAFF'
     Color: 'WHITE'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: true
     PictureType: BUST
   #Placeholder %livelocation% is not Supported on Bungeecord. It shows the exact Location of a Online Player
@@ -246,6 +258,8 @@ DiscordEmbedMessages:
       - 'Last Played: %LastSeen%'
     Author: 'PLAYERINFO'
     Color: 'WHITE'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: true
     PictureType: BODY
 

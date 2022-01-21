@@ -9,6 +9,7 @@ import me.truemb.disnotify.utils.DiscordManager;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerDisconnectEvent;
+import net.md_5.bungee.api.event.ServerConnectEvent.Reason;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -30,6 +31,9 @@ public class BC_JoinLeaveListener implements Listener{
 		//DISCORD JOIN MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
 
+			if(e.getReason() == Reason.UNKNOWN) 
+				return;
+			
 			String server = e.getTarget().getName();
 			long channelId;
 			if(this.configManager.getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave"))
