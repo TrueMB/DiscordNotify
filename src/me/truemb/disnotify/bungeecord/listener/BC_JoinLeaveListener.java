@@ -27,6 +27,9 @@ public class BC_JoinLeaveListener implements Listener{
 	public void onJoin(ServerConnectEvent e) {
 		ProxiedPlayer p = e.getPlayer();
 		UUID uuid = p.getUniqueId();
+
+		if(p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Join")))
+			return;
 		
 		//DISCORD JOIN MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
@@ -58,6 +61,9 @@ public class BC_JoinLeaveListener implements Listener{
 	public void onQuit(ServerDisconnectEvent e) {
 		ProxiedPlayer p = e.getPlayer();
 		UUID uuid = p.getUniqueId();
+
+		if(p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Leave")))
+			return;
 		
 		//DISCORD LEAVE MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {

@@ -106,6 +106,12 @@ Options:
       mcowner: 'discord-owner'
 Permissions:
   StaffChat: 'dn.staff'
+  #Doesnt send the Discord Messages
+  Bypass:
+    Chat: 'dn.bypass.chat'
+    Join: 'dn.bypass.join'
+    Leave: 'dn.bypass.leave'
+    Death: 'dn.bypass.death'
 #Channel Ids: https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-
 Channel:
   Inactivity: -1

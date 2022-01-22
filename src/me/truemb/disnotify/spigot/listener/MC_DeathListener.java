@@ -24,6 +24,9 @@ public class MC_DeathListener implements Listener{
 	public void onDeath(PlayerDeathEvent e) {
 		Player p = e.getEntity();
 		UUID uuid = p.getUniqueId();
+
+		if(p.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Death")))
+			return;
 		
 		String deathMessage = e.getDeathMessage();
 
