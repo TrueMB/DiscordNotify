@@ -24,9 +24,6 @@ public class MC_DeathListener implements Listener{
 	public void onDeath(PlayerDeathEvent e) {
 		Player p = e.getEntity();
 		UUID uuid = p.getUniqueId();
-
-		if(p.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Death")))
-			return;
 		
 		String deathMessage = e.getDeathMessage();
 
@@ -36,6 +33,9 @@ public class MC_DeathListener implements Listener{
 			this.instance.getMessagingManager().sendPlayerDeath(p, deathMessage);
 			return;
 		}
+
+		if(p.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Death")))
+			return;
 		
 		//DISCORD DEATH MESSAGE
 		long channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerDeath);

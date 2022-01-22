@@ -55,6 +55,9 @@ public class PluginMessagingBungeecordManager implements Listener {
 			
 			if (subChannel.equalsIgnoreCase("DEATH")) {
 
+				if(receiver.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Death")))
+					return;
+
 				String server = receiver.getServer().getInfo().getName();
 				long channelId;
 				if(this.configManager.getConfig().getBoolean("Options." + FeatureType.PlayerDeath.toString() + ".enableServerSeperatedDeath"))
