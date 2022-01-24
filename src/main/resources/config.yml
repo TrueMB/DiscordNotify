@@ -97,6 +97,8 @@ Options:
     #-1 to enable the command for every channel. Otherwise the channel ID
     discordCommandOnlyInChannel: -1
   RoleSync:
+    #Uses only the Primary Group. Otherwise all groups that are directly connected to the player
+    useOnlyPrimaryGroup: false
     #Uses the Ingame Group Names. If false, it only synces the given groups
     useIngameGroupNames: true
     #You can add as many entrys you need. The Key is the Minecraft Group and the Value the Discord Group Name
@@ -270,4 +272,4 @@ DiscordEmbedMessages:
     PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 12
+ConfigVersion: 13

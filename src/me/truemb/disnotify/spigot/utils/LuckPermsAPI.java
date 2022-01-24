@@ -1,6 +1,7 @@
 package me.truemb.disnotify.spigot.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +17,8 @@ import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.types.InheritanceNode;
+import net.luckperms.api.query.Flag;
+import net.luckperms.api.query.QueryMode;
 import net.luckperms.api.query.QueryOptions;
 import net.milkbowl.vault.permission.Permission;
 
@@ -42,7 +45,27 @@ public class LuckPermsAPI {
 		return user.getPrimaryGroup();
 	}
 	
-	public String[] getGroups(UUID uuid) {
+	public String[] getGroupsNoInherits(UUID uuid) {
+
+		List<String> groupList = new ArrayList<>();
+		
+		User user = this.getLuckPerms().getUserManager().getUser(uuid);
+		
+		if(user == null) {
+			this.pluginInfo.getLogger().warning("Couldnt find the user with the UUID: '" + uuid.toString() + "'.");;
+			return groupList.toArray(new String[0]);
+		}
+
+		QueryOptions queryOptions = QueryOptions.builder(QueryMode.CONTEXTUAL).flag(Flag.RESOLVE_INHERITANCE, false).build();
+		Collection<Group> groups = user.getInheritedGroups(queryOptions);
+
+		for (Group group : groups)
+	        groupList.add(group.getName());
+		
+		return groupList.toArray(new String[0]);
+	}
+	
+	public String[] getGroupsWithInherits(UUID uuid) {
 		List<String> groups = new ArrayList<>();
 
 		for (Group group : this.getLuckPerms().getGroupManager().getLoadedGroups()) {
@@ -100,11 +123,26 @@ public class LuckPermsAPI {
 		this.getLuckPerms().getUserManager().saveUser(user);
 		this.getLuckPerms().getGroupManager().saveGroup(group);
 	}
+
 	
+	/***
+	 * Also returns true if this group is a child of another group
+	 * 
+	 * @param uuid - Player UUID
+	 * @param group - Group to check
+	 * @return
+	 */
 	public boolean isPlayerInGroup(UUID uuid, String group) {
 		return this.hasPermission(uuid, "group." + group);
 	}
-	
+
+	/***
+	 * Also returns true if this group is a child of another group
+	 * 
+	 * @param player - Player
+	 * @param group - Group to check
+	 * @return
+	 */
 	public boolean isPlayerInGroup(Player player, String group) {
 		return player.hasPermission("group." + group);
 	}

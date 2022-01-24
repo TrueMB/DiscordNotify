@@ -59,7 +59,7 @@ public class PermissionsAPI {
 		if(this.getPerms() != null && this.getPerms().hasGroupSupport()) {
 			return this.getPerms().getPlayerGroups(null, org.bukkit.Bukkit.getOfflinePlayer(uuid));
 		}else if(this.getLuckPermsAPI() != null) {
-			return this.getLuckPermsAPI().getGroups(uuid);
+			return this.getLuckPermsAPI().getGroupsNoInherits(uuid);
 		}
 		return null;
 	}
@@ -90,6 +90,16 @@ public class PermissionsAPI {
 	}
 
 	public boolean isPlayerInGroup(UUID uuid, String group) {
+
+		if(this.getPerms() != null && this.getPerms().hasGroupSupport()) {
+			return this.getPerms().playerInGroup(null, org.bukkit.Bukkit.getOfflinePlayer(uuid), group);
+		}else if(this.getLuckPermsAPI() != null) {
+			return this.getLuckPermsAPI().isPlayerInGroup(uuid, group);
+		}
+		return false;
+	}
+	
+	public boolean hasPlayerGroupRights(UUID uuid, String group) {
 
 		if(this.getPerms() != null && this.getPerms().hasGroupSupport()) {
 			return this.getPerms().playerInGroup(null, org.bukkit.Bukkit.getOfflinePlayer(uuid), group);
