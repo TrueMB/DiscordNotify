@@ -1,9 +1,12 @@
 package me.truemb.disnotify.spigot.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 
@@ -21,7 +24,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 
-public class MC_VerifyCommand extends BukkitCommand{
+public class MC_VerifyCommand extends BukkitCommand implements TabCompleter{
 
 	private ConfigManager configManager;
 	private PluginInformations pluginInfo;
@@ -29,6 +32,8 @@ public class MC_VerifyCommand extends BukkitCommand{
 	private VerifyManager verifyManager;
 	private VerifySQL verifySQL;
 	private PermissionsAPI permsAPI;
+	
+	private List<String> arguments = new ArrayList<>();
 	
 	public MC_VerifyCommand(DiscordManager discordManager, ConfigManager configManager, PluginInformations pluginInfo, VerifyManager verifyManager, VerifySQL verifySQL, PermissionsAPI permsAPI) {
 		super("verify");
@@ -38,6 +43,10 @@ public class MC_VerifyCommand extends BukkitCommand{
 		this.verifyManager = verifyManager;
 		this.verifySQL = verifySQL;
 		this.permsAPI = permsAPI;
+		
+		this.arguments.add("unlink");
+		this.arguments.add("accept");
+		this.arguments.add("deny");
 	}
 	
 	@Override
@@ -150,6 +159,20 @@ public class MC_VerifyCommand extends BukkitCommand{
 
 		p.sendMessage(this.configManager.getMinecraftMessage("verification.help", true));
 		return true;
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		List<String> result = new ArrayList<>();
+		
+
+		if(args.length == 1) {
+			for(String subCMD : this.arguments)
+				if(subCMD.toLowerCase().startsWith(args[0].toLowerCase()))
+					result.add(subCMD);
+		}
+		
+		return result;
 	}
 
 }

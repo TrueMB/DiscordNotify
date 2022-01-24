@@ -1,5 +1,6 @@
 package me.truemb.disnotify.bungeecord.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,8 +20,9 @@ import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 
-public class BC_VerifyCommand extends Command{
+public class BC_VerifyCommand extends Command implements TabExecutor{
 
 	private ConfigManager configManager;
 	private PluginInformations pluginInfo;
@@ -29,6 +31,8 @@ public class BC_VerifyCommand extends Command{
 	private VerifySQL verifySQL;
 	private PluginMessagingBungeecordManager messagingManager;
 	private PermissionsAPI permsAPI;
+	
+	private List<String> arguments = new ArrayList<>();
 	
 	public BC_VerifyCommand(DiscordManager discordManager, ConfigManager configManager, PluginInformations pluginInfo, VerifyManager verifyManager, VerifySQL verifySQL, PluginMessagingBungeecordManager messagingManager, PermissionsAPI permsAPI) {
 		super("verify");
@@ -40,6 +44,10 @@ public class BC_VerifyCommand extends Command{
 		this.verifySQL = verifySQL;
 		this.messagingManager = messagingManager;
 		this.permsAPI = permsAPI;
+		
+		this.arguments.add("unlink");
+		this.arguments.add("accept");
+		this.arguments.add("deny");
 	}
 
 	@Override
@@ -160,6 +168,20 @@ public class BC_VerifyCommand extends Command{
 		p.sendMessage(this.configManager.getMessageAsTextComponent("verification.help", true));
 		return;
 		
+	}
+
+	@Override
+	public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+		List<String> result = new ArrayList<>();
+		
+
+		if(args.length == 1) {
+			for(String subCMD : this.arguments)
+				if(subCMD.toLowerCase().startsWith(args[0].toLowerCase()))
+					result.add(subCMD);
+		}
+		
+		return result;
 	}
 
 }
