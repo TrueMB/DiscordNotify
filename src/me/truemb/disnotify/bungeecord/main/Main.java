@@ -124,7 +124,7 @@ public class Main extends Plugin{
 		}
 		
 		//GENERAL JOIN QUIT FOR MULTIPLE STUFF
-		BC_JoinQuitGeneralListener joinQuitListener = new BC_JoinQuitGeneralListener(this.getVerifyManager(), this.getMessagingManager(), this.getOfflineInformationsSQL(), this.joinTime);
+		BC_JoinQuitGeneralListener joinQuitListener = new BC_JoinQuitGeneralListener(this.getDiscordManager(), this.getConfigManager(), this.getVerifyManager(), this.getPermissionsAPI(), this.getMessagingManager(), this.getOfflineInformationsSQL(), this.getVerifySQL(), this.joinTime);
 		this.getProxy().getPluginManager().registerListener(this, joinQuitListener);
 		//================================================================================
 		
@@ -139,7 +139,7 @@ public class Main extends Plugin{
 			ProxyServer.getInstance().getPluginManager().registerCommand(this, staffCmd);
 		}
 		
-		BC_VerifyCommand verifyCmd = new BC_VerifyCommand(this.getDiscordManager(), this.getConfigManager(), this.getPluginInformations(), this.getVerifyManager(), this.getVerifySQL(), this.getMessagingManager(), this.getPermissionsAPI());
+		BC_VerifyCommand verifyCmd = new BC_VerifyCommand(this.getDiscordManager(), this.getConfigManager(), this.getPluginInformations(), this.getVerifyManager(), this.getVerifySQL(), this.getPermissionsAPI());
 		ProxyServer.getInstance().getPluginManager().registerCommand(this, verifyCmd);
 				
 		//If Server gets reloaded, it sets the current time again
@@ -187,7 +187,7 @@ public class Main extends Plugin{
 		try {
 			this.sql = new AsyncMySQL(this.getLogger(), this.getConfigManager());
 			this.offlineInfoSQL = new OfflineInformationsSQL(this.getAsyncMySql(), this.getOfflineInformationManager());
-			this.verifySQL = new VerifySQL(this.getAsyncMySql(), this.getVerifyManager(), this.getConfigManager(), this.getPluginInformations(), this.getPermissionsAPI());
+			this.verifySQL = new VerifySQL(this.getAsyncMySql(), this.getVerifyManager(), this.getConfigManager(), this.getPluginInformations(), this.getPermissionsAPI(), this.getMessagingManager());
 			
 			ProxyServer.getInstance().getScheduler().schedule(this, new Runnable() {
 				

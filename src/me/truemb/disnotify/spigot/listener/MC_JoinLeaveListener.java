@@ -90,23 +90,28 @@ public class MC_JoinLeaveListener implements Listener{
 			}
 		}
 		
-		if(!this.verifyManager.isVerified(uuid))
-			return;
+		if(this.verifyManager.isVerified(uuid) && this.configManager.isFeatureEnabled(FeatureType.RoleSync)) {
 		
-		long disuuid = this.verifyManager.getVerfiedWith(uuid);
+			if(this.discordManager.getDiscordBot() == null)
+				return;
 		
-		Member member = this.discordManager.getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
-		if(member == null) {
-			this.discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
-
-				String[] currentGroupList = this.permsAPI.getGroups(uuid);
-				DisnotifyTools.checkForRolesUpdate(uuid, mem, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
-				
-			});
+			long disuuid = this.verifyManager.getVerfiedWith(uuid);
+			
+			String[] currentGroupList;
+	
+			if(this.configManager.getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useOnlyPrimaryGroup"))
+				currentGroupList = new String[]{ this.permsAPI.getPrimaryGroup(uuid) };
+			else
+				currentGroupList = this.permsAPI.getGroups(uuid);
+			
+			Member member = this.discordManager.getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
+			if(member == null) {
+				this.discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
+					DisnotifyTools.checkForRolesUpdate(uuid, mem, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
+				});
+			}else
+				DisnotifyTools.checkForRolesUpdate(uuid, member, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
 		}
-		
-		String[] currentGroupList = this.permsAPI.getGroups(uuid);
-		DisnotifyTools.checkForRolesUpdate(uuid, member, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
 	}
 
 	@EventHandler

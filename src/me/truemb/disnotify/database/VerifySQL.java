@@ -35,15 +35,17 @@ public class VerifySQL {
 	private ConfigManager configManager;
 	private PluginInformations pluginInformations;
 	private PermissionsAPI permsAPI;
+	private PluginMessagingBungeecordManager messagingManager;
 	
 	private String table = "disnotify_verify";
 	
-	public VerifySQL(AsyncMySQL asyncMysql, VerifyManager verifyManager, ConfigManager configManager, PluginInformations pluginInformations, PermissionsAPI permsAPI){
+	public VerifySQL(AsyncMySQL asyncMysql, VerifyManager verifyManager, ConfigManager configManager, PluginInformations pluginInformations, PermissionsAPI permsAPI, PluginMessagingBungeecordManager messagingManager){
 		this.asyncMysql = asyncMysql;
 		this.verifyManager = verifyManager;
 		this.configManager = configManager;
 		this.pluginInformations = pluginInformations;
 		this.permsAPI = permsAPI;
+		this.messagingManager = messagingManager;
 		
 		this.asyncMysql.queryUpdate("CREATE TABLE IF NOT EXISTS " + this.table + " (mcuuid VARCHAR(60) PRIMARY KEY, ingamename VARCHAR(18), disuuid BIGINT UNIQUE KEY, roles TEXT, lastchange TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)");
 	}
@@ -126,7 +128,7 @@ public class VerifySQL {
 		});
 	}
 	
-	public void acceptVerification(DiscordManager discordManager, UUID uuid, String ingameName, String[] currentGroupList) {
+	public void acceptVerification(DiscordManager discordManager, UUID uuid, String ingameName) {
 		long disuuid = this.verifyManager.getVerficationProgress(uuid);
 		VerifySQL verifySQL = this;
 		
@@ -179,11 +181,11 @@ public class VerifySQL {
 						if(array.length == 2) {
 							String minecraftRank = array[1];
 						
-							if(pluginInformations.isBungeeCord() && array[0].equalsIgnoreCase("s") || verifySQL.permsAPI.usePluginBridge) {
+							if(pluginInformations.isBungeeCord() && array[0].equalsIgnoreCase("s") || permsAPI.usePluginBridge) {
 								String[] groups = { minecraftRank };
 								PluginMessagingBungeecordManager.sendGroupAction(net.md_5.bungee.api.ProxyServer.getInstance().getPlayer(uuid), GroupAction.ADD, groups);
 							}else {
-								verifySQL.permsAPI.addGroup(uuid, minecraftRank);
+								permsAPI.addGroup(uuid, minecraftRank);
 							}
 							
 						}else {
@@ -191,9 +193,34 @@ public class VerifySQL {
 						}
 					}
 					
-					//FIRST TIME
-					DisnotifyTools.checkForRolesUpdate(uuid, member, configManager, verifyManager, verifySQL, discordManager, currentGroupList);
 			    	DisnotifyTools.sendMessage(pluginInformations.isBungeeCord(), uuid, new TextComponent(discordManager.getPlaceholderString(configManager.getMinecraftMessage("verification.accept", true), null)));
+					
+					//ROLE SYNC
+					if(configManager.isFeatureEnabled(FeatureType.RoleSync)) {
+						
+						boolean usePrimaryGroup = configManager.getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useOnlyPrimaryGroup");
+						
+						//ASK FOR GROUPS, IF NO PERMISSION SYSTEM FOUND ON BUNGEE (Maybe using Vault)
+						if(permsAPI.usePluginBridge) {
+							if(messagingManager != null) {
+								if(usePrimaryGroup)
+									messagingManager.askForPrimaryGroup(uuid);
+								else
+									messagingManager.askForGroups(uuid);
+							}
+						}else {
+							
+							String[] currentGroupList;
+	
+							if(usePrimaryGroup)
+								currentGroupList = new String[]{ permsAPI.getPrimaryGroup(uuid) };
+							else
+								currentGroupList = permsAPI.getGroups(uuid);
+							
+							DisnotifyTools.checkForRolesUpdate(uuid, member, configManager, verifyManager, verifySQL, discordManager, currentGroupList);
+						}
+						
+					}
 					return;
 				} catch (SQLException e) {
 					e.printStackTrace();

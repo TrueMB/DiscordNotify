@@ -12,6 +12,9 @@ import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.enums.GroupAction;
 import me.truemb.disnotify.enums.InformationType;
 import me.truemb.disnotify.manager.ConfigManager;
+import me.truemb.disnotify.utils.DisnotifyTools;
+import net.dv8tion.jda.api.entities.Member;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.connection.Server;
@@ -82,8 +85,18 @@ public class PluginMessagingBungeecordManager implements Listener {
 				String groupS = in.readUTF();
 				String[] currentGroupList = groupS.split(", ");
 				
+				long disuuid = this.instance.getVerifyManager().getVerfiedWith(uuid);
+				
 				//ACCEPTING REQUEST
-				this.instance.getVerifySQL().acceptVerification(this.instance.getDiscordManager(), uuid, receiver.getName(), currentGroupList);
+				Member member = this.instance.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
+				if(member == null) {
+					this.instance.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
+		
+						DisnotifyTools.checkForRolesUpdate(uuid, mem, this.configManager, this.instance.getVerifyManager(), this.instance.getVerifySQL(), this.instance.getDiscordManager(), currentGroupList);
+						
+					});
+				}else
+					DisnotifyTools.checkForRolesUpdate(uuid, member, this.configManager, this.instance.getVerifyManager(), this.instance.getVerifySQL(), this.instance.getDiscordManager(), currentGroupList);
 			
 			}else if (subChannel.equalsIgnoreCase("INFO_UPDATE")) {
 				
@@ -106,21 +119,36 @@ public class PluginMessagingBungeecordManager implements Listener {
 			
 		}
 	}
+
+	//ASKS THE SERVER OF THE USER CONNECTION, WHAT GROUPS HE GOTS
+	public void askForGroups(UUID uuid) {
+	    ServerInfo server = ProxyServer.getInstance().getPlayer(uuid).getServer().getInfo();
+		this.askForGroups(server, uuid);
+	}
 	
+	//ASKS THE SERVER OF THE USER CONNECTION, WHAT PRIMARY GROUP HE GOTS
+	public void askForPrimaryGroup(UUID uuid) {
+	    ServerInfo server = ProxyServer.getInstance().getPlayer(uuid).getServer().getInfo();
+		this.askForPrimaryGroup(server, uuid);
+	}
 	
-	//ASKS THE SERVER OF THE USER CONNECTION, WHAT GROUPS HE GOT
-	public void askForGroups(ProxiedPlayer player) {
+	//ASKS THE SERVER OF THE USER CONNECTION, WHAT GROUPS HE GOTS
+	public void askForGroups(ServerInfo server, UUID uuid) {
 		
 	    ByteArrayDataOutput out = ByteStreams.newDataOutput();
 	    out.writeUTF("GET_GROUPS_REQUEST"); // the channel could be whatever you want
-	 
-	    // we send the data to the server
-	    // using ServerInfo the packet is being queued if there are no players in the server
-	    // using only the server to send data the packet will be lost if no players are in it
-		ServerInfo server = player.getServer().getInfo();
-		if(server == null)
-			return;
+	    out.writeUTF(uuid.toString()); // UUID of the target
 		
+		server.sendData(channel, out.toByteArray());
+	}
+	
+	//ASKS THE SERVER OF THE USER CONNECTION, WHAT PRIMARY GROUP HE GOTS
+	public void askForPrimaryGroup(ServerInfo server, UUID uuid) {
+		
+	    ByteArrayDataOutput out = ByteStreams.newDataOutput();
+	    out.writeUTF("GET_PRIMARYGROUP_REQUEST"); // the channel could be whatever you want
+	    out.writeUTF(uuid.toString()); // UUID of the target
+	    
 		server.sendData(channel, out.toByteArray());
 	}
 	
@@ -154,6 +182,7 @@ public class PluginMessagingBungeecordManager implements Listener {
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
 		out.writeUTF("INFO_UPDATE");
+		out.writeUTF(player.getUniqueId().toString());
 		out.writeUTF(type.toString());
 		out.writeUTF(value);
 
@@ -176,6 +205,7 @@ public class PluginMessagingBungeecordManager implements Listener {
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
 		out.writeUTF("INFO_UPDATE");
+		out.writeUTF(player.getUniqueId().toString());
 		out.writeUTF(type.toString());
 		out.writeLong(value);
 

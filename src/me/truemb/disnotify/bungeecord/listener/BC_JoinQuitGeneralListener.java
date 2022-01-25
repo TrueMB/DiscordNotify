@@ -4,9 +4,16 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import me.truemb.disnotify.database.OfflineInformationsSQL;
+import me.truemb.disnotify.database.VerifySQL;
+import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.enums.InformationType;
+import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.manager.VerifyManager;
 import me.truemb.disnotify.messagingchannel.PluginMessagingBungeecordManager;
+import me.truemb.disnotify.spigot.utils.PermissionsAPI;
+import me.truemb.disnotify.utils.DiscordManager;
+import me.truemb.disnotify.utils.DisnotifyTools;
+import net.dv8tion.jda.api.entities.Member;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerDisconnectEvent;
@@ -15,16 +22,24 @@ import net.md_5.bungee.event.EventHandler;
 
 public class BC_JoinQuitGeneralListener implements Listener{
 
+	private DiscordManager discordManager;
+	private ConfigManager configManager;
 	private VerifyManager verifyManager;
+	private PermissionsAPI permsAPI;
 	private PluginMessagingBungeecordManager messagingManager;
 	private OfflineInformationsSQL offlineInfoSQL;
+	private VerifySQL verifySQL;
 	
 	private HashMap<UUID, Long> joinTime;
 
-	public BC_JoinQuitGeneralListener(VerifyManager verifyManager, PluginMessagingBungeecordManager messagingManager, OfflineInformationsSQL offlineInfoSQL, HashMap<UUID, Long> joinTime) {
+	public BC_JoinQuitGeneralListener(DiscordManager discordManager, ConfigManager configManager, VerifyManager verifyManager, PermissionsAPI permsAPI, PluginMessagingBungeecordManager messagingManager, OfflineInformationsSQL offlineInfoSQL, VerifySQL verifySQL, HashMap<UUID, Long> joinTime) {
+		this.discordManager = discordManager;
+		this.configManager = configManager;
 		this.verifyManager = verifyManager;
+		this.permsAPI = permsAPI;
 		this.messagingManager = messagingManager;
 		this.offlineInfoSQL = offlineInfoSQL;
+		this.verifySQL = verifySQL;
 		this.joinTime = joinTime;
 	}
 	
@@ -40,6 +55,41 @@ public class BC_JoinQuitGeneralListener implements Listener{
 			this.offlineInfoSQL.updateInformation(uuid, InformationType.Inactivity, "false");
 			this.offlineInfoSQL.getOfflineInfoManager().setInformation(uuid, InformationType.Inactivity, "false");
 			this.messagingManager.sendInformationUpdate(p, InformationType.Inactivity, "false");
+		}
+
+		
+		if(this.verifyManager.isVerified(uuid) && this.configManager.isFeatureEnabled(FeatureType.RoleSync)) {
+		
+			if(this.discordManager.getDiscordBot() == null)
+				return;
+		
+			long disuuid = this.verifyManager.getVerfiedWith(uuid);
+
+			boolean usePrimaryGroup = this.configManager.getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useOnlyPrimaryGroup");
+			String[] currentGroupList;
+			
+			if(this.permsAPI.usePluginBridge) {
+				if(usePrimaryGroup)
+					this.messagingManager.askForPrimaryGroup(e.getTarget(), uuid);
+				else
+					this.messagingManager.askForGroups(e.getTarget(), uuid);
+			}else {
+				
+				if(usePrimaryGroup)
+					currentGroupList = new String[]{ this.permsAPI.getPrimaryGroup(uuid) };
+				else
+					currentGroupList = this.permsAPI.getGroups(uuid);
+				
+				
+				Member member = this.discordManager.getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
+				if(member == null) {
+					this.discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
+						DisnotifyTools.checkForRolesUpdate(uuid, mem, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
+					});
+				}else
+					DisnotifyTools.checkForRolesUpdate(uuid, member, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
+			}
+
 		}
 	}
 

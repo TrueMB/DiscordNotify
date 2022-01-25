@@ -29,12 +29,11 @@ public class BC_VerifyCommand extends Command implements TabExecutor{
 	private DiscordManager discordManager;
 	private VerifyManager verifyManager;
 	private VerifySQL verifySQL;
-	private PluginMessagingBungeecordManager messagingManager;
 	private PermissionsAPI permsAPI;
 	
 	private List<String> arguments = new ArrayList<>();
 	
-	public BC_VerifyCommand(DiscordManager discordManager, ConfigManager configManager, PluginInformations pluginInfo, VerifyManager verifyManager, VerifySQL verifySQL, PluginMessagingBungeecordManager messagingManager, PermissionsAPI permsAPI) {
+	public BC_VerifyCommand(DiscordManager discordManager, ConfigManager configManager, PluginInformations pluginInfo, VerifyManager verifyManager, VerifySQL verifySQL, PermissionsAPI permsAPI) {
 		super("verify");
 		
 		this.configManager = configManager;
@@ -42,7 +41,6 @@ public class BC_VerifyCommand extends Command implements TabExecutor{
 		this.discordManager = discordManager;
 		this.verifyManager = verifyManager;
 		this.verifySQL = verifySQL;
-		this.messagingManager = messagingManager;
 		this.permsAPI = permsAPI;
 		
 		this.arguments.add("unlink");
@@ -138,15 +136,9 @@ public class BC_VerifyCommand extends Command implements TabExecutor{
 					return;
 				}
 				
-				//ASK FOR GROUPS, IF NO PERMISSION SYSTEM FOUND ON BUNGEE (Maybe using Vault)
-				if(this.permsAPI.usePluginBridge)
-					this.messagingManager.askForGroups(p);
-				else {
-					String[] currentGroupList = this.permsAPI.getGroups(uuid);
-					
-					//ACCEPTING REQUEST
-					this.verifySQL.acceptVerification(this.discordManager, uuid, p.getName(), currentGroupList);
-				}
+				//ACCEPTING REQUEST
+				this.verifySQL.acceptVerification(this.discordManager, uuid, p.getName());
+				
 				return;
 				
 			}else if(args[0].equalsIgnoreCase("deny")) {

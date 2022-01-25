@@ -138,7 +138,8 @@ public class MC_VerifyCommand extends BukkitCommand implements TabCompleter{
 				}
 				
 				//ACCEPTING REQUEST
-				this.verifySQL.acceptVerification(this.discordManager, uuid, p.getName(), this.permsAPI.getGroups(uuid));
+				this.verifySQL.acceptVerification(this.discordManager, uuid, p.getName());
+				
 				return true;
 				
 			}else if(args[0].equalsIgnoreCase("deny")) {
