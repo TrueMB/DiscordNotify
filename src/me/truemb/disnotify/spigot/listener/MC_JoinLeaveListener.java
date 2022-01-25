@@ -73,36 +73,45 @@ public class MC_JoinLeaveListener implements Listener{
 		
 		//DISCORD JOIN MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
-			long channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
+
+			if(!p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Join"))) {
 			
-			HashMap<String, String> placeholder = new HashMap<>();
-			placeholder.put("Player", p.getName());
-			placeholder.put("uuid", uuid.toString());
-			
-			if(this.configManager.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
-				this.discordManager.sendEmbedMessage(channelId, uuid, "PlayerJoinEmbed", placeholder);
-			}else {
-				this.discordManager.sendDiscordMessage(channelId, "PlayerJoinMessage", placeholder);
+				long channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
+				
+				HashMap<String, String> placeholder = new HashMap<>();
+				placeholder.put("Player", p.getName());
+				placeholder.put("uuid", uuid.toString());
+				
+				if(this.configManager.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
+					this.discordManager.sendEmbedMessage(channelId, uuid, "PlayerJoinEmbed", placeholder);
+				}else {
+					this.discordManager.sendDiscordMessage(channelId, "PlayerJoinMessage", placeholder);
+				}
 			}
 		}
 		
-		if(!this.verifyManager.isVerified(uuid))
-			return;
+		if(this.verifyManager.isVerified(uuid) && this.configManager.isFeatureEnabled(FeatureType.RoleSync)) {
 		
-		long disuuid = this.verifyManager.getVerfiedWith(uuid);
+			if(this.discordManager.getDiscordBot() == null)
+				return;
 		
-		Member member = this.discordManager.getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
-		if(member == null) {
-			this.discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
-
-				String[] currentGroupList = this.permsAPI.getGroups(uuid);
-				DisnotifyTools.checkForRolesUpdate(uuid, mem, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
-				
-			});
+			long disuuid = this.verifyManager.getVerfiedWith(uuid);
+			
+			String[] currentGroupList;
+	
+			if(this.configManager.getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useOnlyPrimaryGroup"))
+				currentGroupList = new String[]{ this.permsAPI.getPrimaryGroup(uuid) };
+			else
+				currentGroupList = this.permsAPI.getGroups(uuid);
+			
+			Member member = this.discordManager.getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
+			if(member == null) {
+				this.discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
+					DisnotifyTools.checkForRolesUpdate(uuid, mem, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
+				});
+			}else
+				DisnotifyTools.checkForRolesUpdate(uuid, member, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
 		}
-		
-		String[] currentGroupList = this.permsAPI.getGroups(uuid);
-		DisnotifyTools.checkForRolesUpdate(uuid, member, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
 	}
 
 	@EventHandler
@@ -139,12 +148,15 @@ public class MC_JoinLeaveListener implements Listener{
 		
 		//DISCORD LEAVE MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
-			long channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
-			
-			if(this.configManager.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
-				this.discordManager.sendEmbedMessage(channelId, uuid, "PlayerLeaveEmbed", placeholder);
-			}else {
-				this.discordManager.sendDiscordMessage(channelId, "PlayerLeaveMessage", placeholder);
+
+			if(!p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Leave"))) {
+				long channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
+				
+				if(this.configManager.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
+					this.discordManager.sendEmbedMessage(channelId, uuid, "PlayerLeaveEmbed", placeholder);
+				}else {
+					this.discordManager.sendDiscordMessage(channelId, "PlayerLeaveMessage", placeholder);
+				}
 			}
 		}
 		

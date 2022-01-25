@@ -31,6 +31,10 @@ public class DisnotifyTools {
 		if(!configManager.isFeatureEnabled(FeatureType.RoleSync))
 			return;
 		
+		//NOT CORRECTLY VERIFIED
+		if(!verifyManager.isVerified(uuid) || verifyManager.getVerfiedWith(uuid) != member.getIdLong())
+			return;
+		
 		boolean changesWereMade = false;
 
 		List<String> rolesBackup = verifyManager.getBackupRoles(uuid);
@@ -60,7 +64,7 @@ public class DisnotifyTools {
 				continue;
 				
 			rolesBackup.add(roleName);
-			role.getGuild().addRoleToMember(member, role).complete();
+			role.getGuild().addRoleToMember(member, role).queue();
 			changesWereMade = true;
 		}
 		
@@ -90,7 +94,7 @@ public class DisnotifyTools {
 				Role role = roles.get(0);
 				String roleName = role.getName();
 
-				role.getGuild().removeRoleFromMember(member, role).complete();
+				role.getGuild().removeRoleFromMember(member, role).queue();
 				rolesBackup.remove(roleName);
 				
 				changesWereMade = true;

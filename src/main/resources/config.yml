@@ -97,6 +97,8 @@ Options:
     #-1 to enable the command for every channel. Otherwise the channel ID
     discordCommandOnlyInChannel: -1
   RoleSync:
+    #Uses only the Primary Group. Otherwise all groups that are directly connected to the player
+    useOnlyPrimaryGroup: false
     #Uses the Ingame Group Names. If false, it only synces the given groups
     useIngameGroupNames: true
     #You can add as many entrys you need. The Key is the Minecraft Group and the Value the Discord Group Name
@@ -106,6 +108,12 @@ Options:
       mcowner: 'discord-owner'
 Permissions:
   StaffChat: 'dn.staff'
+  #Doesnt send the Discord Messages
+  Bypass:
+    Chat: 'dn.bypass.chat'
+    Join: 'dn.bypass.join'
+    Leave: 'dn.bypass.leave'
+    Death: 'dn.bypass.death'
 #Channel Ids: https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-
 Channel:
   Inactivity: -1
@@ -186,6 +194,8 @@ DiscordEmbedMessages:
     Author: '---------------------[ Inactivity ]------------------------'
     #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
     Color: 'RED'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: true
     PictureType: HELM
   PlayerJoinEmbed:
@@ -195,6 +205,8 @@ DiscordEmbedMessages:
     Author: '---------------------[ Connected ]------------------------'
     #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
     Color: 'GREEN'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: true
     PictureType: AVATAR
   PlayerLeaveEmbed:
@@ -204,6 +216,8 @@ DiscordEmbedMessages:
     Author: '---------------------[ Disconnected ]------------------------'
     #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
     Color: 'RED'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: false
     PictureType: AVATAR
   DeathEmbed:
@@ -213,6 +227,8 @@ DiscordEmbedMessages:
     Author: 'Death'
     #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
     Color: 'GREEN'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: true
     PictureType: BUST
   ChatEmbed:
@@ -222,6 +238,8 @@ DiscordEmbedMessages:
     Author: 'Chat'
     #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
     Color: 'WHITE'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: true
     PictureType: BUST
   StaffEmbed:
@@ -230,6 +248,8 @@ DiscordEmbedMessages:
     Fields: {}
     Author: 'STAFF'
     Color: 'WHITE'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: true
     PictureType: BUST
   #Placeholder %livelocation% is not Supported on Bungeecord. It shows the exact Location of a Online Player
@@ -246,8 +266,10 @@ DiscordEmbedMessages:
       - 'Last Played: %LastSeen%'
     Author: 'PLAYERINFO'
     Color: 'WHITE'
+    DisableTimestamp: false
+    WithAuthorPicture: false
     WithPicture: true
     PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 12
+ConfigVersion: 13

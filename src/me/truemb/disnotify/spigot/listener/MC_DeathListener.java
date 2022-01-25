@@ -33,6 +33,9 @@ public class MC_DeathListener implements Listener{
 			this.instance.getMessagingManager().sendPlayerDeath(p, deathMessage);
 			return;
 		}
+
+		if(p.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Death")))
+			return;
 		
 		//DISCORD DEATH MESSAGE
 		long channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerDeath);

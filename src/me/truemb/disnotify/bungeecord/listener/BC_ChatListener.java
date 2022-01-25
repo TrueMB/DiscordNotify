@@ -10,6 +10,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.event.EventPriority;
 
 public class BC_ChatListener implements Listener{
 
@@ -25,7 +26,7 @@ public class BC_ChatListener implements Listener{
 		this.discordChatEnabled = discordChatEnabled;
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onChat(ChatEvent e) {
 		
 		if(!(e.getSender() instanceof ProxiedPlayer))
@@ -33,6 +34,9 @@ public class BC_ChatListener implements Listener{
 		
 		ProxiedPlayer p = (ProxiedPlayer) e.getSender();
 		UUID uuid = p.getUniqueId();
+
+		if(p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Chat")))
+			return;
 		
 		if(e.isCancelled())
 			return;

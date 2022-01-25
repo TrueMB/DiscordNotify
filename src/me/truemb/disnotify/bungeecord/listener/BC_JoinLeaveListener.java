@@ -9,6 +9,7 @@ import me.truemb.disnotify.utils.DiscordManager;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerDisconnectEvent;
+import net.md_5.bungee.api.event.ServerConnectEvent.Reason;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -26,10 +27,16 @@ public class BC_JoinLeaveListener implements Listener{
 	public void onJoin(ServerConnectEvent e) {
 		ProxiedPlayer p = e.getPlayer();
 		UUID uuid = p.getUniqueId();
+
+		if(p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Join")))
+			return;
 		
 		//DISCORD JOIN MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
 
+			if(e.getReason() == Reason.UNKNOWN) 
+				return;
+			
 			String server = e.getTarget().getName();
 			long channelId;
 			if(this.configManager.getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave"))
@@ -54,6 +61,9 @@ public class BC_JoinLeaveListener implements Listener{
 	public void onQuit(ServerDisconnectEvent e) {
 		ProxiedPlayer p = e.getPlayer();
 		UUID uuid = p.getUniqueId();
+
+		if(p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Leave")))
+			return;
 		
 		//DISCORD LEAVE MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
@@ -68,7 +78,7 @@ public class BC_JoinLeaveListener implements Listener{
 			HashMap<String, String> placeholder = new HashMap<>();
 			placeholder.put("Player", p.getName());
 			placeholder.put("UUID", uuid.toString());
-			placeholder.put("server", e.getTarget().getName());
+			placeholder.put("server", server);
 			
 			if(this.configManager.useEmbedMessage(FeatureType.PlayerJoinLeave)) {
 				this.discordManager.sendEmbedMessage(channelId, uuid, "PlayerLeaveEmbed", placeholder);

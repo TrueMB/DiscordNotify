@@ -37,17 +37,23 @@ public class PluginMessagingSpigotManager implements PluginMessageListener {
 		ByteArrayDataInput in = ByteStreams.newDataInput(message);
 		String subChannel = in.readUTF();
 
-		UUID uuid = player.getUniqueId();
-
 		if (subChannel.equalsIgnoreCase("GET_GROUPS_REQUEST")) {
-
-			// the receiver is a ProxiedPlayer when a server talks to the proxy
-
+			
+			UUID uuid = UUID.fromString(in.readUTF());
+			
 			String[] groups = this.instance.getPermissionsAPI().getGroups(uuid);
 			this.sendPlayerGroups(player, groups);
 		
-		}else if (subChannel.equalsIgnoreCase("INFO_UPDATE")) {
+		}else if (subChannel.equalsIgnoreCase("GET_PRIMARYGROUP_REQUEST")) {
 			
+			UUID uuid = UUID.fromString(in.readUTF());
+
+			String[] groups = new String[]{ this.instance.getPermissionsAPI().getPrimaryGroup(uuid) };
+			this.sendPlayerGroups(player, groups);
+		
+		}else if (subChannel.equalsIgnoreCase("INFO_UPDATE")) {
+
+			UUID uuid = UUID.fromString(in.readUTF());
 			InformationType type = InformationType.valueOf(in.readUTF());
 			
 			if(type.equals(InformationType.LastConnection) || type.equals(InformationType.Playtime)) {

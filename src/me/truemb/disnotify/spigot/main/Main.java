@@ -280,7 +280,7 @@ public class Main extends JavaPlugin{
 		try {
 			this.sql = new AsyncMySQL(this.getLogger(), this.getConfigManager());
 			this.offlineInfoSQL = new OfflineInformationsSQL(this.getAsyncMySql(), this.getOfflineInformationManager());
-			this.verifySQL = new VerifySQL(this.getAsyncMySql(), this.getVerifyManager(), this.getConfigManager(), this.getPluginInformations(), this.getPermissionsAPI());
+			this.verifySQL = new VerifySQL(this.getAsyncMySql(), this.getVerifyManager(), this.getConfigManager(), this.getPluginInformations(), this.getPermissionsAPI(), null);
 			
 			Bukkit.getScheduler().runTaskLaterAsynchronously(this, new Runnable() {
 				

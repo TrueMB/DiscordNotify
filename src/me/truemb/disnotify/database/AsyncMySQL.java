@@ -63,7 +63,7 @@ public class AsyncMySQL {
 			new Thread(() -> consumer.accept(result)).start();
 		});
 	}
-
+	
 	public PreparedStatement prepare(String query) {
 		try {
 			return this.sql.getConnection().prepareStatement(query);

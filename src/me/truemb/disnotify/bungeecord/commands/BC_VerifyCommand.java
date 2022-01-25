@@ -1,5 +1,6 @@
 package me.truemb.disnotify.bungeecord.commands;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,18 +20,20 @@ import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 
-public class BC_VerifyCommand extends Command{
+public class BC_VerifyCommand extends Command implements TabExecutor{
 
 	private ConfigManager configManager;
 	private PluginInformations pluginInfo;
 	private DiscordManager discordManager;
 	private VerifyManager verifyManager;
 	private VerifySQL verifySQL;
-	private PluginMessagingBungeecordManager messagingManager;
 	private PermissionsAPI permsAPI;
 	
-	public BC_VerifyCommand(DiscordManager discordManager, ConfigManager configManager, PluginInformations pluginInfo, VerifyManager verifyManager, VerifySQL verifySQL, PluginMessagingBungeecordManager messagingManager, PermissionsAPI permsAPI) {
+	private List<String> arguments = new ArrayList<>();
+	
+	public BC_VerifyCommand(DiscordManager discordManager, ConfigManager configManager, PluginInformations pluginInfo, VerifyManager verifyManager, VerifySQL verifySQL, PermissionsAPI permsAPI) {
 		super("verify");
 		
 		this.configManager = configManager;
@@ -38,8 +41,11 @@ public class BC_VerifyCommand extends Command{
 		this.discordManager = discordManager;
 		this.verifyManager = verifyManager;
 		this.verifySQL = verifySQL;
-		this.messagingManager = messagingManager;
 		this.permsAPI = permsAPI;
+		
+		this.arguments.add("unlink");
+		this.arguments.add("accept");
+		this.arguments.add("deny");
 	}
 
 	@Override
@@ -130,15 +136,9 @@ public class BC_VerifyCommand extends Command{
 					return;
 				}
 				
-				//ASK FOR GROUPS, IF NO PERMISSION SYSTEM FOUND ON BUNGEE (Maybe using Vault)
-				if(this.permsAPI.usePluginBridge)
-					this.messagingManager.askForGroups(p);
-				else {
-					String[] currentGroupList = this.permsAPI.getGroups(uuid);
-					
-					//ACCEPTING REQUEST
-					this.verifySQL.acceptVerification(this.discordManager, uuid, p.getName(), currentGroupList);
-				}
+				//ACCEPTING REQUEST
+				this.verifySQL.acceptVerification(this.discordManager, uuid, p.getName());
+				
 				return;
 				
 			}else if(args[0].equalsIgnoreCase("deny")) {
@@ -160,6 +160,20 @@ public class BC_VerifyCommand extends Command{
 		p.sendMessage(this.configManager.getMessageAsTextComponent("verification.help", true));
 		return;
 		
+	}
+
+	@Override
+	public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+		List<String> result = new ArrayList<>();
+		
+
+		if(args.length == 1) {
+			for(String subCMD : this.arguments)
+				if(subCMD.toLowerCase().startsWith(args[0].toLowerCase()))
+					result.add(subCMD);
+		}
+		
+		return result;
 	}
 
 }
