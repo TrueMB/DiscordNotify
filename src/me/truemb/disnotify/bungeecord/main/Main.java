@@ -119,7 +119,7 @@ public class Main extends Plugin{
 		}
 
 		if(this.getConfigManager().isFeatureEnabled(FeatureType.Chat)) {
-			BC_ChatListener chatListener = new BC_ChatListener(this.getDiscordManager(), this.getConfigManager(), discordChatEnabled);
+			BC_ChatListener chatListener = new BC_ChatListener(this.getDiscordManager(), this.getConfigManager(), this.getPermissionsAPI(), discordChatEnabled);
 			this.getProxy().getPluginManager().registerListener(this, chatListener);
 		}
 		

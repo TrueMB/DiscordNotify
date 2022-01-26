@@ -149,7 +149,7 @@ public class Main extends JavaPlugin{
 		//NO NEED FOR THIS CLASS, IF BUNGEECORD
 		if(!isBungeeCordSubServer) {
 			if(this.getConfigManager().isFeatureEnabled(FeatureType.Chat)) {
-				MC_ChatListener chatListener = new MC_ChatListener(this.getDiscordManager(), this.getConfigManager(), discordChatEnabled);
+				MC_ChatListener chatListener = new MC_ChatListener(this.getDiscordManager(), this.getConfigManager(), this.getPermissionsAPI(), discordChatEnabled);
 				this.getServer().getPluginManager().registerEvents(chatListener, this);
 			}
 		}
