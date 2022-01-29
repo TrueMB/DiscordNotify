@@ -53,12 +53,12 @@ public class MC_InactivityChecker implements Runnable{
 		for(OfflinePlayer player : Bukkit.getOfflinePlayers()){
 			UUID uuid = player.getUniqueId();
 			Date date = new Date(player.getLastPlayed());
-						
+			
 			//if(this.instance.getCacheFileManager().isInactivePlayer(uuid))
 			if(this.offlineInfoSQL.getOfflineInfoManager().getInformationString(uuid, InformationType.Inactivity) != null && this.offlineInfoSQL.getOfflineInfoManager().getInformationString(uuid, InformationType.Inactivity).equalsIgnoreCase("true"))
 				continue;
 			
-			if(player.isOnline() || player.getLastPlayed() > System.currentTimeMillis() - this.configManager.getConfig().getInt("Options." + FeatureType.Inactivity.toString() + ".InactivForDays") * 24 * 60 * 60 * 1000)
+			if(player.isOnline() || player.getLastPlayed() > System.currentTimeMillis() - this.configManager.getConfig().getLong("Options." + FeatureType.Inactivity.toString() + ".InactivForDays") * 24 * 60 * 60 * 1000L)
 				continue;
 			
 			//MORE SPECIFIC INFORMATIONS

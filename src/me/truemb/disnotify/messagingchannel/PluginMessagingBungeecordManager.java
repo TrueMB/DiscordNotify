@@ -17,7 +17,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.connection.Server;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -153,6 +152,10 @@ public class PluginMessagingBungeecordManager implements Listener {
 	}
 	
 	public static void sendGroupAction(ProxiedPlayer player, GroupAction action, String[] groups) {
+		sendGroupAction(player.getServer().getInfo(), player.getUniqueId(), action, groups);
+	}
+	
+	public static void sendGroupAction(ServerInfo server, UUID uuid, GroupAction action, String[] groups) {
 	    
 	    String groupS = "";
 		for(String group : groups) {
@@ -162,57 +165,43 @@ public class PluginMessagingBungeecordManager implements Listener {
 		
 	    ByteArrayDataOutput out = ByteStreams.newDataOutput();
 	    out.writeUTF("GROUP_ACTION"); // the channel could be whatever you want
-		out.writeUTF(player.getUniqueId().toString());
+		out.writeUTF(uuid.toString());
 		
 	    out.writeUTF(action.toString()); // the channel could be whatever you want
 		out.writeUTF(groupS);
-	 
-	    // we send the data to the server
-	    // using ServerInfo the packet is being queued if there are no players in the server
-	    // using only the server to send data the packet will be lost if no players are in it
-		ServerInfo server = player.getServer().getInfo();
-		if(server == null)
-			return;
 		
 		server.sendData(channel, out.toByteArray());
 	}
 
 	public void sendInformationUpdate(ProxiedPlayer player, InformationType type, String value) {
+		this.sendInformationUpdate(player.getServer().getInfo(), player.getUniqueId(), type, value);
+	}
+
+	public void sendInformationUpdate(ServerInfo server, UUID uuid, InformationType type, String value) {
 
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
 		out.writeUTF("INFO_UPDATE");
-		out.writeUTF(player.getUniqueId().toString());
+		out.writeUTF(uuid.toString());
 		out.writeUTF(type.toString());
 		out.writeUTF(value);
 
-		Server server = player.getServer();
-		
-		if(server == null)
-			return;
-		
-		ServerInfo serverInfo = server.getInfo();
-		
-		if(serverInfo == null)
-			return;
-		
-		
-		serverInfo.sendData(channel, out.toByteArray());
+		server.sendData(channel, out.toByteArray());
 	}
-	
+
 	public void sendInformationUpdate(ProxiedPlayer player, InformationType type, long value) {
+		this.sendInformationUpdate(player.getServer().getInfo(), player.getUniqueId(), type, value);
+	}
+
+	public void sendInformationUpdate(ServerInfo server, UUID uuid, InformationType type, long value) {
 
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 
 		out.writeUTF("INFO_UPDATE");
-		out.writeUTF(player.getUniqueId().toString());
+		out.writeUTF(uuid.toString());
 		out.writeUTF(type.toString());
 		out.writeLong(value);
 
-		ServerInfo server = player.getServer().getInfo();
-		if(server == null)
-			return;
-		
 		server.sendData(channel, out.toByteArray());
 	}
 }

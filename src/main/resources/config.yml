@@ -182,7 +182,7 @@ DiscordMessages:
 DiscordEmbedMessages:
   InactivityEmbed:
     Title: '**%Player%** was inactiv for more than %InactivDays% Days'
-    Description: '**%Player%** was last seen: %LastSeen% (Not Online for: %OfflinetimeDays% Days)'
+    Description: '**%Player%** was last seen: %LastSeen% (Not Online for: %Offlinetime%)'
     #TITLE : TEXT
     Fields:
       - 'User UUID : %uuid%'
