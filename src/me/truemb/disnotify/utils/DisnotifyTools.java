@@ -24,6 +24,17 @@ public class DisnotifyTools {
 			return Bukkit.getPlayer(uuid) != null;
 		}
 	}
+	
+	public static void checkForRolesUpdate(UUID uuid, long disuuid, ConfigManager configManager, VerifyManager verifyManager, VerifySQL verifySQL, DiscordManager discordManager, String[] currentGroupList) {
+		Member member = discordManager.getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
+
+		if(member == null) {
+			discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
+				DisnotifyTools.checkForRolesUpdate(uuid, mem, configManager, verifyManager, verifySQL, discordManager, currentGroupList);
+			});
+		}else
+			DisnotifyTools.checkForRolesUpdate(uuid, member, configManager, verifyManager, verifySQL, discordManager, currentGroupList);
+	}
 
 	//CHECK FOR UPDATES
 	public static void checkForRolesUpdate(UUID uuid, Member member, ConfigManager configManager, VerifyManager verifyManager, VerifySQL verifySQL, DiscordManager discordManager, String[] currentGroupList) {
