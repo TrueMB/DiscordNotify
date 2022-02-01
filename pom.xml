@@ -93,7 +93,7 @@
 		<!-- SPIGOT MC -->
 		<repository>
 	        <id>spigot-repo</id>
-	        <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        	<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
 		
 		<!-- UPDATE CHECKER -->
@@ -107,17 +107,38 @@
 			<id>placeholderapi</id>
 			<url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
 		</repository>
-
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>	
+		
+		<!-- Bungeechat -->
+	    <repository>
+	        <id>AuraDevelopmentTeam</id>
+        	<url>https://maven.aura-dev.team/repository/auradev-releases/</url>
+	    </repository>
 		
 		<!-- Spicord -->
 		<repository>
 		    <id>spicord-repo</id>
 		    <url>https://repo.spicord.org/</url>
 		</repository>
+
+		<repository>
+		    <id>dv8tion</id>
+		    <name>m2-dv8tion</name>
+		    <url>https://m2.dv8tion.net/releases/</url>
+		</repository>
+
+	    <repository>
+	        <snapshots>
+	          <enabled>false</enabled>
+	        </snapshots>
+	        <id>central</id>
+	        <name>Maven Repository Switchboard</name>
+	        <url>https://repo1.maven.org/maven2</url>
+	    </repository>
+
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>	
 		
 	</repositories>
 
@@ -128,15 +149,15 @@
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.17-R0.1-SNAPSHOT</version>
+            <version>1.18-R0.1-SNAPSHOT</version>
             <type>jar</type>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
-            <version>1.17-R0.1-SNAPSHOT</version>
+            <version>1.18-R0.1-SNAPSHOT</version>
             <type>javadoc</type>
             <scope>provided</scope>
         </dependency>
@@ -145,16 +166,16 @@
 		<dependency>
            <groupId>org.spigotmc</groupId>
            <artifactId>spigot-api</artifactId>
-           <version>1.17-R0.1-SNAPSHOT</version>
+           <version>1.18.1-R0.1-SNAPSHOT</version>
            <scope>provided</scope>
 		</dependency>
 		
 		
 		<!-- UPDATE CHECKER -->
 	    <dependency>
-	        <groupId>de.jeff_media</groupId>
-	        <artifactId>SpigotUpdateChecker</artifactId>
-	        <version>1.2.5</version> <!-- Check on GitHub for the latest version -->
+		    <groupId>com.jeff_media</groupId>
+			<artifactId>SpigotUpdateChecker</artifactId>
+			<version>2.1.1</version>
 	        <scope>compile</scope>
 	    </dependency>
 	    
@@ -162,14 +183,14 @@
 	    <dependency>
 		    <groupId>me.carleslc.Simple-YAML</groupId>
 		    <artifactId>Simple-Yaml</artifactId>
-		    <version>1.7.2</version>
+		    <version>f958b0a</version>
 	    </dependency>
 
 		<!-- PLACEHOLDER API -->
 		<dependency>
 			<groupId>me.clip</groupId>
 			<artifactId>placeholderapi</artifactId>
-			<version>2.10.10</version>
+			<version>2.11.1</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -182,12 +203,11 @@
 		</dependency>
 		
 		<dependency>
-		    <groupId>org.spicord</groupId>
+		    <groupId>net.dv8tion</groupId>
 		    <artifactId>JDA</artifactId>
-		    <version>4.2.1</version>
-		    <scope>provided</scope>
+    		<version>4.2.1_253</version>
 		</dependency>
-		
+
 		<!-- bStats -->
 		<dependency>
 		    <groupId>org.bstats</groupId>
@@ -200,7 +220,7 @@
 		<dependency>
 			<groupId>com.vdurmont</groupId>
 			<artifactId>emoji-java</artifactId>
-			<version>4.0.0</version>
+			<version>5.1.1</version>
 		</dependency>
 		
 		<!-- Vault -->
@@ -216,6 +236,15 @@
 	        <groupId>net.luckperms</groupId>
 	        <artifactId>api</artifactId>
 	        <version>5.3</version>
+	        <scope>provided</scope>
+	    </dependency>
+
+	    
+		<!-- Bungeechat -->
+	    <dependency>
+	        <groupId>dev.aura.bungeechat.api</groupId>
+	        <artifactId>BungeeChatApi</artifactId>
+	        <version>2.2.3.1241</version>
 	        <scope>provided</scope>
 	    </dependency>
 

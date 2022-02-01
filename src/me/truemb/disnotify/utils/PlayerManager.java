@@ -56,8 +56,7 @@ public class PlayerManager {
 		    request.connect();
 
 		    // Convert to a JSON object to print data
-		    JsonParser jp = new JsonParser(); //from gson
-		    JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
+		    JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
 		    JsonObject rootobj = root.getAsJsonObject(); //May be an array, may be an object. 
 		    //String zipcode = rootobj.get("zip_code").getAsString(); //just grab the zipcode
 			return rootobj;
@@ -71,8 +70,7 @@ public class PlayerManager {
 	    request.connect();
 
 	    // Convert to a JSON object to print data
-	    JsonParser jp = new JsonParser(); //from gson
-	    JsonElement root = jp.parse(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
+	    JsonElement root = JsonParser.parseReader(new InputStreamReader((InputStream) request.getContent())); //Convert the input stream to a json element
 	    JsonArray rootobj = root.getAsJsonArray(); //May be an array, may be an object. 
 	    //String zipcode = rootobj.get("zip_code").getAsString(); //just grab the zipcode
 		return rootobj;
