@@ -25,6 +25,9 @@ public class MC_DeathListener implements Listener{
 		Player p = e.getEntity();
 		UUID uuid = p.getUniqueId();
 		
+		if(p.hasMetadata("NPC")) //IS NPC?
+			return;
+		
 		String deathMessage = e.getDeathMessage();
 
 		//IF BUNGEECORD SUB SERVER, THEN STOP HERE. IF ONLY SPIGOT, THEN SEND MESSAGES

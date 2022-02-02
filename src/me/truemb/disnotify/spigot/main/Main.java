@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,8 +18,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spicord.bot.DiscordBot.BotStatus;
 
-import de.jeff_media.updatechecker.UpdateChecker;
-import de.jeff_media.updatechecker.UserAgentBuilder;
+import com.jeff_media.updatechecker.UpdateCheckSource;
+import com.jeff_media.updatechecker.UpdateChecker;
+import com.jeff_media.updatechecker.UserAgentBuilder;
+
 import me.truemb.disnotify.database.AsyncMySQL;
 import me.truemb.disnotify.database.OfflineInformationsSQL;
 import me.truemb.disnotify.database.VerifySQL;
@@ -52,7 +55,7 @@ public class Main extends JavaPlugin{
 	
 	private PermissionsAPI permsAPI;
 	
-    private static final int SPIGOT_RESOURCE_ID = 94230;
+    private static final String SPIGOT_RESOURCE_ID = "94230";
     private static final int BSTATS_PLUGIN_ID = 12029;
     
     //CACHE
@@ -149,7 +152,7 @@ public class Main extends JavaPlugin{
 		//NO NEED FOR THIS CLASS, IF BUNGEECORD
 		if(!isBungeeCordSubServer) {
 			if(this.getConfigManager().isFeatureEnabled(FeatureType.Chat)) {
-				MC_ChatListener chatListener = new MC_ChatListener(this.getDiscordManager(), this.getConfigManager(), discordChatEnabled);
+				MC_ChatListener chatListener = new MC_ChatListener(this.getDiscordManager(), this.getConfigManager(), this.getPermissionsAPI(), discordChatEnabled);
 				this.getServer().getPluginManager().registerEvents(chatListener, this);
 			}
 		}
@@ -259,7 +262,7 @@ public class Main extends JavaPlugin{
 	//CHECK FOR UPDATE
 	//https://www.spigotmc.org/threads/powerful-update-checker-with-only-one-line-of-code.500010/
 	private void checkForUpdate() {
-        UpdateChecker.init(this, SPIGOT_RESOURCE_ID) // A link to a URL that contains the latest version as String
+		new UpdateChecker(this, UpdateCheckSource.SPIGET, SPIGOT_RESOURCE_ID)
                 .setDownloadLink(SPIGOT_RESOURCE_ID) // You can either use a custom URL or the Spigot Resource ID
                 .setDonationLink("https://www.paypal.me/truemb")
                 .setChangelogLink(SPIGOT_RESOURCE_ID) // Same as for the Download link: URL or Spigot Resource ID

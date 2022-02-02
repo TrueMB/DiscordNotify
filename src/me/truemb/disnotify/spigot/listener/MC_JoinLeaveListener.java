@@ -21,7 +21,6 @@ import me.truemb.disnotify.spigot.utils.PermissionsAPI;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.DisnotifyTools;
 import me.truemb.disnotify.utils.PluginInformations;
-import net.dv8tion.jda.api.entities.Member;
 
 public class MC_JoinLeaveListener implements Listener{
 
@@ -104,13 +103,7 @@ public class MC_JoinLeaveListener implements Listener{
 			else
 				currentGroupList = this.permsAPI.getGroups(uuid);
 			
-			Member member = this.discordManager.getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
-			if(member == null) {
-				this.discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
-					DisnotifyTools.checkForRolesUpdate(uuid, mem, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
-				});
-			}else
-				DisnotifyTools.checkForRolesUpdate(uuid, member, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
+			DisnotifyTools.checkForRolesUpdate(uuid, disuuid, this.configManager, this.verifyManager, this.verifySQL, this.discordManager, currentGroupList);
 		}
 	}
 

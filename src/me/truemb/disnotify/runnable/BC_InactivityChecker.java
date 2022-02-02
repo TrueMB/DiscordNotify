@@ -52,7 +52,7 @@ public class BC_InactivityChecker implements Runnable{
 		if(channelId < 0)
 			return;
 		
-		long inactivityLimit = System.currentTimeMillis() - this.configManager.getConfig().getInt("Options." + FeatureType.Inactivity.toString() + ".InactivForDays") * 24 * 60 * 60 * 1000;
+		long inactivityLimit = System.currentTimeMillis() - this.configManager.getConfig().getLong("Options." + FeatureType.Inactivity.toString() + ".InactivForDays") * 24 * 60 * 60 * 1000;
 		
 		this.asyncMySQL.prepareStatement("SELECT * FROM " + OfflineInformationsSQL.table + " WHERE " + InformationType.LastConnection.toString() + "<'" + String.valueOf(inactivityLimit) + "'"
 			+ " AND (" + InformationType.Inactivity.toString() + " IS NULL OR " + InformationType.Inactivity.toString() + "='false');", new Consumer<ResultSet>() {

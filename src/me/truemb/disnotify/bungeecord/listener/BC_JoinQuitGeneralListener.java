@@ -14,6 +14,7 @@ import me.truemb.disnotify.spigot.utils.PermissionsAPI;
 import me.truemb.disnotify.utils.DiscordManager;
 import me.truemb.disnotify.utils.DisnotifyTools;
 import net.dv8tion.jda.api.entities.Member;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerDisconnectEvent;
@@ -46,6 +47,7 @@ public class BC_JoinQuitGeneralListener implements Listener{
 	@EventHandler
 	public void onJoin(ServerConnectEvent e) {
 		ProxiedPlayer p = e.getPlayer();
+		ServerInfo server = e.getTarget();
 		UUID uuid = p.getUniqueId();
 		
 		this.joinTime.put(uuid, System.currentTimeMillis());
@@ -54,9 +56,8 @@ public class BC_JoinQuitGeneralListener implements Listener{
 		if(this.offlineInfoSQL.getOfflineInfoManager().getInformationString(uuid, InformationType.Inactivity) != null && this.offlineInfoSQL.getOfflineInfoManager().getInformationString(uuid, InformationType.Inactivity).equalsIgnoreCase("true")) {
 			this.offlineInfoSQL.updateInformation(uuid, InformationType.Inactivity, "false");
 			this.offlineInfoSQL.getOfflineInfoManager().setInformation(uuid, InformationType.Inactivity, "false");
-			this.messagingManager.sendInformationUpdate(p, InformationType.Inactivity, "false");
+			this.messagingManager.sendInformationUpdate(server, uuid, InformationType.Inactivity, "false");
 		}
-
 		
 		if(this.verifyManager.isVerified(uuid) && this.configManager.isFeatureEnabled(FeatureType.RoleSync)) {
 		
@@ -96,6 +97,7 @@ public class BC_JoinQuitGeneralListener implements Listener{
 	@EventHandler
 	public void onQuit(ServerDisconnectEvent e) {
 		ProxiedPlayer p = e.getPlayer();
+		ServerInfo server = e.getTarget();
 		UUID uuid = p.getUniqueId();
 		
 		if(this.joinTime.get(uuid) != null) {
@@ -103,7 +105,7 @@ public class BC_JoinQuitGeneralListener implements Listener{
 			
 			this.offlineInfoSQL.addToInformation(uuid, InformationType.Playtime, time);
 			this.offlineInfoSQL.getOfflineInfoManager().addInformation(uuid, InformationType.Playtime, time);
-			this.messagingManager.sendInformationUpdate(p, InformationType.Playtime, this.offlineInfoSQL.getOfflineInfoManager().getInformationLong(uuid, InformationType.Playtime));
+			this.messagingManager.sendInformationUpdate(server, uuid, InformationType.Playtime, this.offlineInfoSQL.getOfflineInfoManager().getInformationLong(uuid, InformationType.Playtime));
 			
 			this.joinTime.remove(uuid);
 		}
@@ -111,10 +113,9 @@ public class BC_JoinQuitGeneralListener implements Listener{
 		//VERIFICATION
 		this.verifyManager.clearVerficationProgress(uuid);
 		
-		String server = e.getTarget().getName();
-		this.offlineInfoSQL.updateInformation(uuid, InformationType.Bungee_Server, server);
-		this.offlineInfoSQL.getOfflineInfoManager().setInformation(uuid, InformationType.Bungee_Server, server);
-		this.messagingManager.sendInformationUpdate(p, InformationType.Bungee_Server, server);
+		this.offlineInfoSQL.updateInformation(uuid, InformationType.Bungee_Server, server.getName());
+		this.offlineInfoSQL.getOfflineInfoManager().setInformation(uuid, InformationType.Bungee_Server, server.getName());
+		this.messagingManager.sendInformationUpdate(p, InformationType.Bungee_Server, server.getName());
 		
 		long lastConnection = System.currentTimeMillis();
 		this.offlineInfoSQL.updateInformation(uuid, InformationType.LastConnection, lastConnection);
