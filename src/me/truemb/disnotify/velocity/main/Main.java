@@ -76,7 +76,7 @@ public class Main{
         this.proxy = server;
         this.logger = logger;
     }
-
+/*
     @Subscribe
     public void onInitialize(ProxyInitializeEvent e) {
 		
@@ -274,4 +274,5 @@ public class Main{
 	public ProxyServer getProxy() {
 		return this.proxy;
 	}
+	*/
 }

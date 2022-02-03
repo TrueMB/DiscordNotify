@@ -2,14 +2,15 @@ package me.truemb.disnotify.commands.minecraft;
 
 import java.util.UUID;
 
-import eu.mcdb.universal.command.api.Command;
-import eu.mcdb.universal.player.UniversalPlayer;
+import eu.mcdb.shaded.universal.command.api.Command;
+import eu.mcdb.shaded.universal.player.UniversalPlayer;
 import me.truemb.disnotify.main.DiscordNotifyPlugin;
 
 public class DChat_Command extends Command{
 
 	private DiscordNotifyPlugin instance;
 	
+	@SuppressWarnings("deprecation")
 	public DChat_Command(DiscordNotifyPlugin plugin) {
 		super("dchat");
 		this.instance = plugin;

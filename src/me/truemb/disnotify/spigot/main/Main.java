@@ -3,9 +3,7 @@ package me.truemb.disnotify.spigot.main;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 import org.bstats.bukkit.Metrics;
@@ -27,14 +25,13 @@ import me.truemb.disnotify.database.OfflineInformationsSQL;
 import me.truemb.disnotify.database.VerifySQL;
 import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.enums.InformationType;
+import me.truemb.disnotify.main.DiscordNotifyPlugin;
 import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.manager.DelayManager;
 import me.truemb.disnotify.manager.OfflineInformationManager;
 import me.truemb.disnotify.manager.VerifyManager;
 import me.truemb.disnotify.messagingchannel.PluginMessagingSpigotManager;
 import me.truemb.disnotify.runnable.MC_InactivityChecker;
-import me.truemb.disnotify.spigot.commands.MC_DChatCommand;
-import me.truemb.disnotify.spigot.commands.MC_StaffCommand;
 import me.truemb.disnotify.spigot.commands.MC_VerifyCommand;
 import me.truemb.disnotify.spigot.listener.MC_ChatListener;
 import me.truemb.disnotify.spigot.listener.MC_DeathListener;
@@ -160,7 +157,9 @@ public class Main extends JavaPlugin{
 		//================================================================================
 		
 		//COMMANDS
-		
+
+	    new DiscordNotifyPlugin(this, this.getConfigManager(), this.getDiscordManager());
+	    
 		//Enable only if Spicord runs on the SubServer, otherwise is the command already enabled on the bungeecord Proxy
 		if(!isBungeeCordSubServer) {
 
@@ -169,22 +168,23 @@ public class Main extends JavaPlugin{
 			    commandMapField.setAccessible(true);
 			    CommandMap commandMap = (CommandMap) commandMapField.get(Bukkit.getServer());
 
-				
+				/*
 				MC_StaffCommand staffCommand = new MC_StaffCommand(this.getDiscordManager(), this.getConfigManager(), staffChatDisabled);
 				commandMap.register("staff", staffCommand);
 				List<String> staffAliases = new ArrayList<>();
 				staffAliases.add("s");
 				staffCommand.setAliases(staffAliases);
-				
+				*/
+			    
 				MC_VerifyCommand verifyCommand = new MC_VerifyCommand(this.getDiscordManager(), this.getConfigManager(), this.getPluginInformations(), this.getVerifyManager(), this.getVerifySQL(), this.getPermissionsAPI());
 				commandMap.register("verify", verifyCommand);
 				
-
+/*
 				if(this.getConfigManager().getConfig().getBoolean("Options.Chat.enableSplittedChat")) {
 					MC_DChatCommand dchatCmd = new MC_DChatCommand(this.getConfigManager(), discordChatEnabled);
 					commandMap.register("dchat", dchatCmd);
 				}
-			    
+			    */
 			}catch(Exception exception){
 			    exception.printStackTrace();
 			}

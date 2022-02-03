@@ -185,15 +185,6 @@
 	        <type>jar</type>
 	        <scope>provided</scope>
 	    </dependency>
-		
-		
-		<!-- LOMBOK -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.8</version>
-            <scope>provided</scope>
-        </dependency>
         
         
 		<!-- UPDATE CHECKER -->
@@ -203,6 +194,14 @@
 			<version>2.1.1</version>
 	        <scope>compile</scope>
 	    </dependency>
+
+		<!-- LOMBOK -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.22</version>
+			<scope>provided</scope>
+		</dependency>
 	    
 		<!-- YAML (So that I can use it in Bungeecord as well) -->
 	    <dependency>

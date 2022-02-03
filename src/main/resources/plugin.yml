@@ -4,3 +4,10 @@ version: ${project.version}
 api-version: 1.16
 main: me.truemb.disnotify.spigot.main.Main
 softdepend: [Vault, Spicord]
+
+commands:
+     dchat:
+         description: Join or Leave the Discord Chat
+     staff:
+         description: Send messages to the Staff Team and on the Staff DC Channel
+         aliases: [s]
