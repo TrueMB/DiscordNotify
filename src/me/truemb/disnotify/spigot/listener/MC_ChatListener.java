@@ -35,7 +35,7 @@ public class MC_ChatListener implements Listener{
 		Player p = e.getPlayer();
 		UUID uuid = p.getUniqueId();
 
-		if(p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Chat")))
+		if(this.configManager.getConfig().getBoolean("Options.EnableBypassPermission") && p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Chat")))
 			return;
 		
 		if(e.isCancelled())

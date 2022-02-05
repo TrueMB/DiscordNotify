@@ -73,7 +73,7 @@ public class MC_JoinLeaveListener implements Listener{
 		//DISCORD JOIN MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
 
-			if(!p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Join"))) {
+			if(!this.configManager.getConfig().getBoolean("Options.EnableBypassPermission") || !p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Join"))) {
 			
 				long channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
 				
@@ -142,7 +142,7 @@ public class MC_JoinLeaveListener implements Listener{
 		//DISCORD LEAVE MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
 
-			if(!p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Leave"))) {
+			if(!this.configManager.getConfig().getBoolean("Options.EnableBypassPermission") || !p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Leave"))) {
 				long channelId = this.configManager.getChannelID(FeatureType.PlayerJoinLeave);
 				
 				if(this.configManager.useEmbedMessage(FeatureType.PlayerJoinLeave)) {

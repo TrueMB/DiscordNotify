@@ -38,7 +38,7 @@ public class BC_ChatListener implements Listener{
 		ProxiedPlayer p = (ProxiedPlayer) e.getSender();
 		UUID uuid = p.getUniqueId();
 
-		if(p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Chat")))
+		if(this.configManager.getConfig().getBoolean("Options.EnableBypassPermission") && p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Chat")))
 			return;
 		
 		if(e.isCancelled())

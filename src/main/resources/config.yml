@@ -41,6 +41,9 @@ Options:
     Location: '%world%, x=%x%, y=%y%, z=%z%, yaw=%yaw%, pitch=%pitch%'
   DefaultPlaceholder:
     NotOnline: 'Currently Offline'
+  #Turn this to true, to enable the Permission to bypass Discord Messages.
+  #Could be used to join silenty. But remember, if this is turned true, Players with wildcard (*) permissions count in there as well!
+  EnableBypassPermission: false
   Inactivity:
     #Checking, if players are inactive (in Minutes)
     CheckTimer: 60
@@ -272,4 +275,4 @@ DiscordEmbedMessages:
     PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 13
+ConfigVersion: 14

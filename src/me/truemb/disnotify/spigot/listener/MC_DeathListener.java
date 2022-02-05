@@ -37,7 +37,7 @@ public class MC_DeathListener implements Listener{
 			return;
 		}
 
-		if(p.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Death")))
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options.EnableBypassPermission") && p.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Death")))
 			return;
 		
 		//DISCORD DEATH MESSAGE

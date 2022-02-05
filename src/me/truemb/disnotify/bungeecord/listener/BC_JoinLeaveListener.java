@@ -28,7 +28,7 @@ public class BC_JoinLeaveListener implements Listener{
 		ProxiedPlayer p = e.getPlayer();
 		UUID uuid = p.getUniqueId();
 
-		if(p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Join")))
+		if(this.configManager.getConfig().getBoolean("Options.EnableBypassPermission") && p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Join")))
 			return;
 		
 		//DISCORD JOIN MESSAGE
@@ -62,7 +62,7 @@ public class BC_JoinLeaveListener implements Listener{
 		ProxiedPlayer p = e.getPlayer();
 		UUID uuid = p.getUniqueId();
 
-		if(p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Leave")))
+		if(this.configManager.getConfig().getBoolean("Options.EnableBypassPermission") && p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Leave")))
 			return;
 		
 		//DISCORD LEAVE MESSAGE

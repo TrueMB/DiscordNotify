@@ -57,7 +57,7 @@ public class PluginMessagingBungeecordManager implements Listener {
 			
 			if (subChannel.equalsIgnoreCase("DEATH")) {
 
-				if(receiver.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Death")))
+				if(this.configManager.getConfig().getBoolean("Options.EnableBypassPermission") && receiver.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Death")))
 					return;
 
 				String server = receiver.getServer().getInfo().getName();

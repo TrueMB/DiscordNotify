@@ -19,7 +19,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class ConfigManager {
 
-	private static final int configVersion = 13;
+	private static final int configVersion = 14;
 	
 	private File configFile;
 	private UTF8YamlConfiguration config;
