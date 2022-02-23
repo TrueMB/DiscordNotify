@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 
-import me.truemb.disnotify.database.VerifySQL;
+import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.disnotify.enums.FeatureType;
 import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.manager.VerifyManager;
@@ -25,44 +25,44 @@ public class DisnotifyTools {
 		}
 	}
 	
-	public static void checkForRolesUpdate(UUID uuid, long disuuid, ConfigManager configManager, VerifyManager verifyManager, VerifySQL verifySQL, DiscordManager discordManager, String[] currentGroupList) {
-		Member member = discordManager.getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
+	public static void checkForRolesUpdate(DiscordNotifyMain plugin, UUID uuid, long disuuid, String[] currentGroupList) {
+		Member member = plugin.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
 
 		if(member == null) {
-			discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
-				DisnotifyTools.checkForRolesUpdate(uuid, mem, configManager, verifyManager, verifySQL, discordManager, currentGroupList);
+			plugin.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
+				DisnotifyTools.checkForRolesUpdate(plugin, uuid, mem, currentGroupList);
 			});
 		}else
-			DisnotifyTools.checkForRolesUpdate(uuid, member, configManager, verifyManager, verifySQL, discordManager, currentGroupList);
+			DisnotifyTools.checkForRolesUpdate(plugin, uuid, member, currentGroupList);
 	}
 
 	//CHECK FOR UPDATES
-	public static void checkForRolesUpdate(UUID uuid, Member member, ConfigManager configManager, VerifyManager verifyManager, VerifySQL verifySQL, DiscordManager discordManager, String[] currentGroupList) {
+	public static void checkForRolesUpdate(DiscordNotifyMain plugin, UUID uuid, Member member, String[] currentGroupList) {
 
-		if(!configManager.isFeatureEnabled(FeatureType.RoleSync))
+		if(!plugin.getConfigManager().isFeatureEnabled(FeatureType.RoleSync))
 			return;
 		
 		//NOT CORRECTLY VERIFIED
-		if(!verifyManager.isVerified(uuid) || verifyManager.getVerfiedWith(uuid) != member.getIdLong())
+		if(!plugin.getVerifyManager().isVerified(uuid) || plugin.getVerifyManager().getVerfiedWith(uuid) != member.getIdLong())
 			return;
 		
 		boolean changesWereMade = false;
 
-		List<String> rolesBackup = verifyManager.getBackupRoles(uuid);
+		List<String> rolesBackup = plugin.getVerifyManager().getBackupRoles(uuid);
 		if(rolesBackup == null)
 			rolesBackup = new ArrayList<>();
 
 		for(String group : currentGroupList) {
 			List<Role> roles = new ArrayList<>();
-			if(configManager.getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
-				roles = discordManager.getDiscordBot().getJda().getRolesByName(group, true);
+			if(plugin.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
+				roles = plugin.getDiscordManager().getDiscordBot().getJda().getRolesByName(group, true);
 			else {
-				String groupConfig = configManager.getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group.toLowerCase());
+				String groupConfig = plugin.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group.toLowerCase());
 				
 				if(groupConfig == null)
 					continue;
 				
-				roles = discordManager.getDiscordBot().getJda().getRolesByName(groupConfig, true);
+				roles = plugin.getDiscordManager().getDiscordBot().getJda().getRolesByName(groupConfig, true);
 			}
 			
 			if(roles.size() <= 0)
@@ -89,15 +89,15 @@ public class DisnotifyTools {
 			}
 			if(!isInGroup) {
 				List<Role> roles = new ArrayList<>();
-				if(configManager.getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
-					roles = discordManager.getDiscordBot().getJda().getRolesByName(backupRoles, true);
+				if(plugin.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
+					roles = plugin.getDiscordManager().getDiscordBot().getJda().getRolesByName(backupRoles, true);
 				else {
-					String groupConfig = configManager.getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + backupRoles.toLowerCase());
+					String groupConfig = plugin.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + backupRoles.toLowerCase());
 					
 					if(groupConfig == null)
 						continue;
 					
-					roles = discordManager.getDiscordBot().getJda().getRolesByName(groupConfig, true);
+					roles = plugin.getDiscordManager().getDiscordBot().getJda().getRolesByName(groupConfig, true);
 				}
 				if(roles.size() <= 0)
 					continue;
@@ -112,9 +112,9 @@ public class DisnotifyTools {
 			}
 		}
 
-		verifyManager.setBackupRoles(uuid, rolesBackup);
+		plugin.getVerifyManager().setBackupRoles(uuid, rolesBackup);
 		if(changesWereMade)
-			verifySQL.updateRoles(uuid, rolesBackup);
+			plugin.getVerifySQL().updateRoles(uuid, rolesBackup);
 	}
 
 	public static void resetRoles(UUID uuid, Member member, ConfigManager configManager, VerifyManager verifyManager, DiscordManager discordManager) {

@@ -5,6 +5,7 @@ public enum ServerType {
 	VELOCITY,
 	BUNGEECORD,
 	BUKKIT,
-	SPONGE;
+	SPONGE,
+	UNKNOWN;
 	
 }

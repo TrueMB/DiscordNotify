@@ -2,6 +2,7 @@ package me.truemb.disnotify.spigot.utils;
 
 import java.util.UUID;
 
+import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.disnotify.utils.PluginInformations;
 import net.milkbowl.vault.permission.Permission;
 
@@ -16,12 +17,11 @@ public class PermissionsAPI {
 	//Should Proxy send request to SubServer, if no Permissionsystem on the proxy
 	public boolean usePluginBridge = false;
 	
-	public PermissionsAPI(PluginInformations pluginInfo) {
-		this.pluginInfo = pluginInfo;
+	public PermissionsAPI(DiscordNotifyMain plugin) {
 		
-		if(pluginInfo.isBungeeCord()) {
-			//BUNGEECOR SERVER
-			if(net.md_5.bungee.api.ProxyServer.getInstance().getPluginManager().getPlugin("LuckPerms") != null) {
+		if(plugin.getUniversalServer().isProxy()) {
+			//PROXY SERVER
+			if(net.md_5.bungee.api.ProxyServer.getInstance().getPluginManager().getPlugin("LuckPerms") != null) { //TODO PERMISSIONS API FÜR VELOCITY & SPONGE
 				this.luckPermsAPI = new LuckPermsAPI(this.pluginInfo);
 				return;
 			}

@@ -1,6 +1,5 @@
 package me.truemb.disnotify.spigot.listener;
 
-import java.util.HashMap;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
@@ -9,15 +8,20 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
-import me.truemb.disnotify.enums.FeatureType;
+import _me.truemb.universal.player.UniversalPlayer;
+import me.truemb.discordnotify.listener.DiscordNotifyListener;
 import me.truemb.disnotify.spigot.main.Main;
 
 public class MC_DeathListener implements Listener{
 
 	private Main instance;
+	private DiscordNotifyListener listener;
 
-	public MC_DeathListener(Main plugin) {
+	public MC_DeathListener(Main plugin, DiscordNotifyListener listener) {
 		this.instance = plugin;
+		this.listener = listener;
+		
+		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
@@ -36,22 +40,7 @@ public class MC_DeathListener implements Listener{
 			this.instance.getMessagingManager().sendPlayerDeath(p, deathMessage);
 			return;
 		}
-
-		if(p.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Death")))
-			return;
 		
-		//DISCORD DEATH MESSAGE
-		long channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerDeath);
-		
-		HashMap<String, String> placeholder = new HashMap<>();
-		placeholder.put("Player", p.getName());
-		placeholder.put("UUID", p.getUniqueId().toString());
-		placeholder.put("DeathMessage", deathMessage);
-		
-		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerDeath)) {
-			this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "DeathEmbed", placeholder);
-		}else {
-			this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerDeathMessage", placeholder);
-		}
+		this.listener.onPlayerDeath(new UniversalPlayer(uuid, p.getName()), deathMessage);
 	}
 }

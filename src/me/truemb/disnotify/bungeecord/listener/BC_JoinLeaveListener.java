@@ -28,14 +28,14 @@ public class BC_JoinLeaveListener implements Listener{
 		ProxiedPlayer p = e.getPlayer();
 		UUID uuid = p.getUniqueId();
 
+		if(e.getReason() == Reason.UNKNOWN) 
+			return;
+
 		if(p.hasPermission(this.configManager.getConfig().getString("Permissions.Bypass.Join")))
 			return;
 		
 		//DISCORD JOIN MESSAGE
 		if(this.configManager.isFeatureEnabled(FeatureType.PlayerJoinLeave)) {
-
-			if(e.getReason() == Reason.UNKNOWN) 
-				return;
 			
 			String server = e.getTarget().getName();
 			long channelId;

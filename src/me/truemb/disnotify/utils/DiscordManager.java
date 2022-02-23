@@ -15,12 +15,12 @@ import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.bot.DiscordBot;
 
+import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.disnotify.database.VerifySQL;
 import me.truemb.disnotify.discord.commands.DC_PlayerInfoCommand;
 import me.truemb.disnotify.discord.commands.DC_VerifyCommand;
 import me.truemb.disnotify.discord.listener.DC_ChatListener;
 import me.truemb.disnotify.enums.MinotarTypes;
-import me.truemb.disnotify.manager.ConfigManager;
 import me.truemb.disnotify.manager.DelayManager;
 import me.truemb.disnotify.manager.OfflineInformationManager;
 import me.truemb.disnotify.manager.VerifyManager;
@@ -35,7 +35,7 @@ public class DiscordManager {
 	private boolean discordBotHooked = false;
 	private int hookSchedulerId = -1; //IS THE SCHEDULER ID, WHICH HOOKS INTO THE DISCORD BOT
 
-	private ConfigManager configManager;
+	private DiscordNotifyMain instance;
 	private PermissionsAPI permsAPI;
 	private PluginInformations pluginInfo;
 	private OfflineInformationManager offlineInfo;
@@ -54,27 +54,11 @@ public class DiscordManager {
 	private HashMap<UUID, Boolean> staffHash;
 	private HashMap<UUID, Boolean> discordChatHash;
 	
-	private boolean onlineMode;
-	
-	@SuppressWarnings("deprecation") //FOR ONLINE MODE BUNGEECORD
-	public DiscordManager(ConfigManager configManager, PermissionsAPI permsAPI, PluginInformations pluginInfo, OfflineInformationManager offlineInfo, VerifyManager verifyManager, VerifySQL verifySQL,DelayManager delayManager, HashMap<UUID, Boolean> staffHash, HashMap<UUID, Boolean> discordChatHash) {
-		this.configManager = configManager;
-		this.permsAPI = permsAPI;
-		this.pluginInfo = pluginInfo;
-		this.offlineInfo = offlineInfo;
-		this.verifyManager = verifyManager;
-		this.delayManager = delayManager;
-		this.verifySQL = verifySQL;
+	public DiscordManager(DiscordNotifyMain plugin, HashMap<UUID, Boolean> staffHash, HashMap<UUID, Boolean> discordChatHash) {
+		this.instance = plugin;
 		
 		this.staffHash = staffHash;
 		this.discordChatHash = discordChatHash;
-
-		//ONLINE MODE NEEDED FOR SPICORD STUFF. THATSWHY IT IS HERE
-		if(pluginInfo.isBungeeCord()) {
-			this.onlineMode = net.md_5.bungee.api.ProxyServer.getInstance().getConfig().isOnlineMode();
-		}else {
-			this.onlineMode = org.bukkit.Bukkit.getOnlineMode();
-		}
 	}
 
 	//DISCORD
@@ -85,8 +69,8 @@ public class DiscordManager {
     		return;
     	
     	//ADDONS NEEDS TO BE SET UP IN SPICORD
-	    this.playerInfoAddon = new DC_PlayerInfoCommand(this, this.configManager, this.offlineInfo, this.pluginInfo);
-	    this.verifyAddon = new DC_VerifyCommand(this.pluginInfo, this.permsAPI, this, this.verifyManager, this.delayManager, this.configManager, this.verifySQL);
+	    this.playerInfoAddon = new DC_PlayerInfoCommand(this, this.instance.getConfigManager(), this.offlineInfo, this.pluginInfo);
+	    this.verifyAddon = new DC_VerifyCommand(this.pluginInfo, this.permsAPI, this, this.verifyManager, this.delayManager, this.instance.getConfigManager(), this.verifySQL);
 	    	
 	    SpicordLoader.addStartupListener(spicord -> {
 	    	
@@ -145,7 +129,7 @@ public class DiscordManager {
 	    }
 	
 	    //REGISTER LISTENER
-		this.chatListener = new DC_ChatListener(this.configManager, this.pluginInfo, this.staffHash, this.discordChatHash);
+		this.chatListener = new DC_ChatListener(this.instance.getConfigManager(), this.pluginInfo, this.staffHash, this.discordChatHash);
 	    this.getDiscordBot().getJda().addEventListener(this.chatListener);
 	    	
 		this.pluginInfo.getLogger().info("Connected with Discord BOT.");
@@ -175,7 +159,7 @@ public class DiscordManager {
 			EmbedBuilder eb = this.getEmbedMessage(uuid, path, placeholder);
 			
 			//PICTURE ADDING TO MESSAGE
-			String minotarTypeS = this.configManager.getConfig().getString("DiscordEmbedMessages." + path + ".PictureType");
+			String minotarTypeS = this.instance.getConfigManager().getConfig().getString("DiscordEmbedMessages." + path + ".PictureType");
 			MinotarTypes minotarType = MinotarTypes.BUST;
 			try {
 				minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
@@ -184,7 +168,7 @@ public class DiscordManager {
 			InputStream file = null;
 			String filename = minotarType.toString().toLowerCase() + "_" + uuid.toString() + ".jpg";
 			
-			if(this.configManager.getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithPicture")) {
+			if(this.instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithPicture")) {
 				eb.setImage("attachment://" + filename);
 	
 				try {
@@ -224,9 +208,9 @@ public class DiscordManager {
 	public EmbedBuilder getEmbedMessage(UUID uuid, String path, HashMap<String, String> placeholder) {
 		
 		//MESSAGES
-		String title = this.configManager.getConfig().getString("DiscordEmbedMessages." + path + ".Title");
-		String description = this.configManager.getConfig().getString("DiscordEmbedMessages." + path + ".Description");
-		String author = this.configManager.getConfig().getString("DiscordEmbedMessages." + path + ".Author");
+		String title = this.instance.getConfigManager().getConfig().getString("DiscordEmbedMessages." + path + ".Title");
+		String description = this.instance.getConfigManager().getConfig().getString("DiscordEmbedMessages." + path + ".Description");
+		String author = this.instance.getConfigManager().getConfig().getString("DiscordEmbedMessages." + path + ".Author");
 		
 		title = this.getPlaceholderString(title, placeholder);
 		description = this.getPlaceholderString(description, placeholder);
@@ -236,7 +220,7 @@ public class DiscordManager {
 		EmbedBuilder eb = new EmbedBuilder();
 
 		if(author != null && !author.equalsIgnoreCase("")) {
-			if(this.configManager.getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithAuthorPicture"))
+			if(this.instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithAuthorPicture"))
 				eb.setAuthor(author, null, "https://minotar.net/" + "avatar" + "/" + uuid.toString());
 			else
 				eb.setAuthor(author);
@@ -248,7 +232,7 @@ public class DiscordManager {
 		if(description != null && !description.equalsIgnoreCase(""))
 			eb.setDescription(description);
 		
-		List<String> fieldList = this.configManager.getConfig().getStringList("DiscordEmbedMessages." + path + ".Fields");
+		List<String> fieldList = this.instance.getConfigManager().getConfig().getStringList("DiscordEmbedMessages." + path + ".Fields");
 		if(fieldList != null) {
 			for(String field : fieldList) {
 				String[] array = field.split(" : ");
@@ -261,7 +245,7 @@ public class DiscordManager {
 		
 		Color color;
 		try {
-		    Field field = Color.class.getField(this.configManager.getConfig().getString("DiscordEmbedMessages." + path + ".Color").toUpperCase());
+		    Field field = Color.class.getField(this.instance.getConfigManager().getConfig().getString("DiscordEmbedMessages." + path + ".Color").toUpperCase());
 		    color = (Color)field.get(null);
 		} catch (Exception e) {
 		    color = null; // Not defined
@@ -269,14 +253,14 @@ public class DiscordManager {
 
 		eb.setColor(color);
 
-		if(!this.configManager.getConfig().getBoolean("DiscordEmbedMessages." + path + ".DisableTimestamp"))
+		if(!this.instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".DisableTimestamp"))
 			eb.setTimestamp(Instant.now());
 		
 		return eb;
 	}
 	
 	public String getDiscordMessage(String path, HashMap<String, String> placeholder) {
-	   return this.getPlaceholderString(this.configManager.getConfig().getString("DiscordMessages." + path), placeholder);
+	   return this.getPlaceholderString(this.instance.getConfigManager().getConfig().getString("DiscordMessages." + path), placeholder);
     }
 	
 	public void sendDiscordMessage(long channelId, String path, HashMap<String, String> placeholder) {
@@ -331,10 +315,6 @@ public class DiscordManager {
 
 	public void setHookSchedulerId(int hookSchedulerId) {
 		this.hookSchedulerId = hookSchedulerId;
-	}
-
-	public boolean isOnlineMode() {
-		return onlineMode;
 	}
 	
 }
