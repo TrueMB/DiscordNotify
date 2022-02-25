@@ -31,5 +31,11 @@ public class BukkitServer extends UniversalServer {
 		return Bukkit.getOnlineMode();
 	}
 
+	@Override
+	public boolean isProxySubServer() {
+		org.bukkit.configuration.file.YamlConfiguration spigotCfg = Bukkit.spigot().getConfig();
+		return spigotCfg.getBoolean("settings.bungeecord");
+	}
+
 
 }

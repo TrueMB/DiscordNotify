@@ -46,4 +46,10 @@ public class SpongeServer extends UniversalServer {
 		return this.server.getOnlineMode();
 	}
 
+	@Override
+	public boolean isProxySubServer() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

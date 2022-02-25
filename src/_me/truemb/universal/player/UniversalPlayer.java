@@ -3,28 +3,27 @@ package _me.truemb.universal.player;
 import java.util.UUID;
 
 import _me.truemb.universal.enums.ServerType;
+import lombok.Getter;
 
+@Getter
 public class UniversalPlayer {
 	
-	private UUID uuid;
+	private UUID UUID;
 	private String ingameName;
+	private String server;
 	
 	public UniversalPlayer(UUID uuid, String ingameName) {
-		this.uuid = uuid;
+		this.UUID = uuid;
 		this.ingameName = ingameName;
 	}
-	
-	public UUID getUUID() {
-		return uuid;
-	}
-	
-	public String getIngameName() {
-		return ingameName;
-	}
-	
-	//SEVER PLAYER INSTANCE
 
-    public net.md_5.bungee.api.connection.ProxiedPlayer getBungeePlayer() {
+	public void setServer(String server) {
+		this.server = server;
+	}
+
+	
+	//PLAYER INSTANCE
+	public net.md_5.bungee.api.connection.ProxiedPlayer getBungeePlayer() {
         return null;
     }
 
@@ -40,10 +39,12 @@ public class UniversalPlayer {
         return null;
     }
     
+    public UniversalLocation getLocation() {
+		return null;
+	}
+    
     //CHECKING 
-
     public ServerType getServerPlatform() {
-
         if (this.getBukkitPlayer() != null) return ServerType.BUKKIT;
         else if (this.getSpongePlayer() != null) return ServerType.SPONGE;
         else if (this.getVelocityPlayer() != null) return ServerType.VELOCITY;

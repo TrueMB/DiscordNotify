@@ -5,18 +5,20 @@ import java.util.UUID;
 
 import _me.truemb.universal.listener.UniversalEventhandler;
 import _me.truemb.universal.player.UniversalPlayer;
+import me.truemb.discordnotify.enums.FeatureType;
+import me.truemb.discordnotify.enums.InformationType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
-import me.truemb.disnotify.enums.FeatureType;
-import me.truemb.disnotify.enums.InformationType;
-import me.truemb.disnotify.utils.DisnotifyTools;
 import net.dv8tion.jda.api.entities.Member;
 
 public class DiscordNotifyListener extends UniversalEventhandler{
 	
 	private DiscordNotifyMain instance;
 	
-	public DiscordNotifyListener(DiscordNotifyMain plugin) {
+	private HashMap<UUID, Boolean> discordChatEnabled;
+	
+	public DiscordNotifyListener(DiscordNotifyMain plugin, HashMap<UUID, Boolean> discordChatEnabled) {
 		this.instance = plugin;
+		this.discordChatEnabled = discordChatEnabled;
 	}
 	
 	@Override
@@ -37,7 +39,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			
 			this.instance.getOfflineInformationsSQL().updateInformation(uuid, InformationType.Inactivity, "false");
 			this.instance.getOfflineInformationsSQL().getOfflineInfoManager().setInformation(uuid, InformationType.Inactivity, "false");
-			this.messagingManager.sendInformationUpdate(serverName, uuid, InformationType.Inactivity, "false");
+			this.instance.getPluginMessenger().sendInformationUpdate(uuid, InformationType.Inactivity, "false");
 		}
 		
 		if(this.instance.getVerifyManager().isVerified(uuid) && this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync)) {
@@ -52,9 +54,9 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			
 			if(this.instance.getPermsAPI().usePluginBridge) {
 				if(usePrimaryGroup)
-					this.messagingManager.askForPrimaryGroup(e.getTarget(), uuid);
+					this.instance.getPluginMessenger().askForPrimaryGroup(uuid);
 				else
-					this.messagingManager.askForGroups(e.getTarget(), uuid);
+					this.instance.getPluginMessenger().askForGroups(uuid);
 			}else {
 				
 				if(usePrimaryGroup)
@@ -66,10 +68,10 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 				Member member = this.instance.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
 				if(member == null) {
 					this.instance.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
-						DisnotifyTools.checkForRolesUpdate(this.instance, uuid, mem, currentGroupList);
+						this.instance.getVerifyManager().checkForRolesUpdate(uuid, mem, currentGroupList);
 					});
 				}else
-					DisnotifyTools.checkForRolesUpdate(this.instance, uuid, member, currentGroupList);
+					this.instance.getVerifyManager().checkForRolesUpdate(uuid, member, currentGroupList);
 			}
 
 		}
@@ -119,7 +121,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			
 			this.instance.getOfflineInformationsSQL().addToInformation(uuid, InformationType.Playtime, time);
 			this.instance.getOfflineInformationManager().addInformation(uuid, InformationType.Playtime, time);
-			this.messagingManager.sendInformationUpdate(serverName, uuid, InformationType.Playtime, this.instance.getOfflineInformationManager().getInformationLong(uuid, InformationType.Playtime));
+			this.instance.getPluginMessenger().sendInformationUpdate(uuid, InformationType.Playtime, this.instance.getOfflineInformationManager().getInformationLong(uuid, InformationType.Playtime));
 			
 			this.instance.getJoinTime().remove(uuid);
 		}
@@ -129,12 +131,12 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 		this.instance.getOfflineInformationsSQL().updateInformation(uuid, InformationType.Bungee_Server, serverName);
 		this.instance.getOfflineInformationManager().setInformation(uuid, InformationType.Bungee_Server, serverName);
-		this.messagingManager.sendInformationUpdate(p, InformationType.Bungee_Server, serverName);
+		this.instance.getPluginMessenger().sendInformationUpdate(uuid, InformationType.Bungee_Server, serverName);
 		
 		long lastConnection = System.currentTimeMillis();
 		this.instance.getOfflineInformationsSQL().updateInformation(uuid, InformationType.LastConnection, lastConnection);
 		this.instance.getOfflineInformationManager().setInformation(uuid, InformationType.LastConnection, lastConnection);
-		this.messagingManager.sendInformationUpdate(p, InformationType.LastConnection, lastConnection);
+		this.instance.getPluginMessenger().sendInformationUpdate(uuid, InformationType.LastConnection, lastConnection);
 		
 	}
 	
@@ -174,8 +176,39 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 	}
 
-	public void onPlayerMessageFeature(UniversalPlayer up, String message) {
+	private void onPlayerMessageFeature(UniversalPlayer up, String message) {
+		UUID uuid = up.getUUID();
 		
+		if(up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Chat")))
+			return;
+		
+		//Check if extra Chat is enabled for ChatSyncing
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat"))
+			if(!this.discordChatEnabled.containsKey(uuid) || !this.discordChatEnabled.get(uuid))
+				return;
+		
+		//DISCORD MESSAGE
+		String server = up.getServer();
+		String group = this.instance.getPermsAPI().getPrimaryGroup(uuid);
+		
+		long channelId;
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat"))
+			channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat." + server);
+		else
+			channelId = this.instance.getConfigManager().getChannelID(FeatureType.Chat);
+			
+		HashMap<String, String> placeholder = new HashMap<>();
+		placeholder.put("Message", message);
+		placeholder.put("Player", up.getIngameName());
+		placeholder.put("UUID", uuid.toString());
+		placeholder.put("group", group == null ? "" : group);
+		placeholder.put("server", server);
+		
+		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.Chat)) {
+			this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "ChatEmbed", placeholder);
+		}else {
+			this.instance.getDiscordManager().sendDiscordMessage(channelId, "ChatMessage", placeholder);
+		}
 	}
 	
 	@Override

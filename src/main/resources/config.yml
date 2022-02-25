@@ -37,6 +37,10 @@ Options:
       Hours: '%amount% Hours'
       Minutes: '%amount% Min'
       Seconds: '%amount% Seconds'
+  DefaultValues:
+    noPlaytime: 'Unknown'
+    noOfflinetime: 'Unknown'
+    noLastSeen: 'Never'
   OtherFormats:
     Location: '%world%, x=%x%, y=%y%, z=%z%, yaw=%yaw%, pitch=%pitch%'
   DefaultPlaceholder:
@@ -272,4 +276,4 @@ DiscordEmbedMessages:
     PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 13
+ConfigVersion: 14

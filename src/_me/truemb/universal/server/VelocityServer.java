@@ -50,4 +50,9 @@ public class VelocityServer extends UniversalServer{
 		return this.proxyServer.getConfiguration().isOnlineMode();
 	}
 
+	@Override
+	public boolean isProxySubServer() {
+		return false;
+	}
+
 }

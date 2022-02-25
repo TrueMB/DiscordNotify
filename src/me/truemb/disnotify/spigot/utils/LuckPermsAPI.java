@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
-import me.truemb.disnotify.utils.PluginInformations;
+import me.truemb.discordnotify.utils.PluginInformations;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.cacheddata.CachedPermissionData;

@@ -2,6 +2,7 @@ package _me.truemb.universal.server;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -26,14 +27,18 @@ public abstract class UniversalServer {
 	}
 
 	public UniversalPlayer getPlayer(UUID uuid) {
-		return this.onlinePlayers.stream()
-				.filter(up -> up.getUUID().equals(uuid))
-				.toList().get(0);
+		List<UniversalPlayer> players = this.onlinePlayers.stream()
+											.filter(up -> up.getUUID().equals(uuid))
+											.toList();
+		
+		return players.size() > 0 ? players.get(0) : null;
 	}
 
 	public abstract Logger getLogger();
 	
 	public abstract boolean isOnlineMode();
+	
+	public abstract boolean isProxySubServer();
 
 	public abstract void broadcast(String message);
 

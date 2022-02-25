@@ -16,4 +16,9 @@ public class VelocityPlayer extends UniversalPlayer{
 		return this.player;
 	}
 
+	@Override
+	public UniversalLocation getLocation() {
+		return null;
+	}
+
 }

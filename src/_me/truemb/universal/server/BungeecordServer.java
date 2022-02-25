@@ -35,4 +35,9 @@ public class BungeecordServer extends UniversalServer {
 		return ProxyServer.getInstance().getConfig().isOnlineMode();
 	}
 
+	@Override
+	public boolean isProxySubServer() {
+		return false;
+	}
+
 }

@@ -12,21 +12,21 @@ import _me.truemb.universal.enums.ServerType;
 import _me.truemb.universal.player.UniversalPlayer;
 import _me.truemb.universal.server.UniversalServer;
 import lombok.Getter;
+import me.truemb.discordnotify.database.AsyncMySQL;
+import me.truemb.discordnotify.database.OfflineInformationsSQL;
+import me.truemb.discordnotify.database.VerifySQL;
+import me.truemb.discordnotify.enums.FeatureType;
+import me.truemb.discordnotify.enums.InformationType;
 import me.truemb.discordnotify.listener.DiscordNotifyListener;
-import me.truemb.disnotify.database.AsyncMySQL;
-import me.truemb.disnotify.database.OfflineInformationsSQL;
-import me.truemb.disnotify.database.VerifySQL;
-import me.truemb.disnotify.enums.FeatureType;
-import me.truemb.disnotify.enums.InformationType;
-import me.truemb.disnotify.manager.ConfigManager;
-import me.truemb.disnotify.manager.DelayManager;
-import me.truemb.disnotify.manager.OfflineInformationManager;
-import me.truemb.disnotify.manager.VerifyManager;
-import me.truemb.disnotify.messagingchannel.PluginMessagingBungeecordManager;
-import me.truemb.disnotify.runnable.DN_DiscordBotConnector;
-import me.truemb.disnotify.runnable.DN_InactivityChecker;
+import me.truemb.discordnotify.manager.ConfigManager;
+import me.truemb.discordnotify.manager.DelayManager;
+import me.truemb.discordnotify.manager.OfflineInformationManager;
+import me.truemb.discordnotify.manager.VerifyManager;
+import me.truemb.discordnotify.messaging.PluginMessenger;
+import me.truemb.discordnotify.runnable.DN_DiscordBotConnector;
+import me.truemb.discordnotify.runnable.DN_InactivityChecker;
+import me.truemb.discordnotify.utils.DiscordManager;
 import me.truemb.disnotify.spigot.utils.PermissionsAPI;
-import me.truemb.disnotify.utils.DiscordManager;
 
 @Getter
 public class DiscordNotifyMain {
@@ -36,6 +36,10 @@ public class DiscordNotifyMain {
 
 	//DATA
 	public HashMap<UUID, Long> joinTime = new HashMap<UUID, Long>();
+	
+	//COMMANDS
+    private HashMap<UUID, Boolean> staffChatDisabled = new HashMap<>();
+    private HashMap<UUID, Boolean> discordChatEnabled = new HashMap<>();
 	
 	//MySQL
 	private AsyncMySQL asyncMySql;
@@ -49,9 +53,14 @@ public class DiscordNotifyMain {
     private OfflineInformationManager offlineInformationManager;
     private DelayManager delayManager;
     private VerifyManager verifyManager;
-    private PluginMessagingBungeecordManager messagingManager;
     
+    //RUNNABLE
     private DN_InactivityChecker inactivityChecker;
+    
+    //PLUGIN MESSAGING
+    private PluginMessenger pluginMessenger;
+    //private ProxyMessenger proxyMessenger;
+    //private ServerMessenger serverMessenger;
     
     //API
     private PermissionsAPI permsAPI;
@@ -60,8 +69,6 @@ public class DiscordNotifyMain {
 	private UniversalServer universalServer;
 	private DiscordNotifyListener listener;
 	
-	//TODO VELOCITY MAIN NEED TO SET UNIVERSAL PROXY INSTANCE
-	//REMEMBER new DiscordNotify needs to be started on the Server instance
 	public DiscordNotifyMain(File dataDirectory, ServerType type) {
 		int cores = Runtime.getRuntime().availableProcessors();
 		int usedCores = 2;
@@ -72,22 +79,21 @@ public class DiscordNotifyMain {
 		
 		this.onStart();
 	}
-	
+
 	/**
 	 * Enables the DiscordNotify Plugin
 	 */
 	private void onStart() {
-	    HashMap<UUID, Boolean> staffChatDisabled = new HashMap<>();
-	    HashMap<UUID, Boolean> discordChatEnabled = new HashMap<>();
 
         InputStream configInputStream = getClass().getClassLoader().getResourceAsStream("config.yml");
-		this.configManager = new ConfigManager(this.getUniversalServer().getLogger(), configInputStream, this.dataDirectory);
+		this.configManager = new ConfigManager(this.getUniversalServer().getLogger(), configInputStream, this.getDataDirectory());
 		
-		this.listener = new DiscordNotifyListener(this);
+		this.pluginMessenger = new PluginMessenger(this);
+		this.listener = new DiscordNotifyListener(this, this.getDiscordChatEnabled());
 
 		//MANAGER
 		this.delayManager = new DelayManager();
-		this.verifyManager = new VerifyManager(this.getDelayManager());
+		this.verifyManager = new VerifyManager(this);
 		this.offlineInformationManager = new OfflineInformationManager();
 		
 		//PERMISSIONS API
@@ -96,12 +102,16 @@ public class DiscordNotifyMain {
 		//MYSQL
 		this.startMySql();
 		
-		this.discordManager = new DiscordManager(this, staffChatDisabled, discordChatEnabled);
+		//DISCORD
+		this.discordManager = new DiscordManager(this);
 		this.discordManager.registerAddons(this.getConfigManager().getConfig().getString("Options.DiscordBot.Name"));
-		
-		new DN_DiscordBotConnector(this); //TASK WHICH CONNECTS THE DISCORD BOT
+
+		//If Server gets reloaded, it sets the current time again
+		this.getUniversalServer().getOnlinePlayers().forEach(all -> this.getJoinTime().put(all.getUUID(), System.currentTimeMillis()));
 		
 		//RUNNABLES
+		new DN_DiscordBotConnector(this); //TASK WHICH CONNECTS THE DISCORD BOT
+		
 		if(this.getConfigManager().isFeatureEnabled(FeatureType.Inactivity))
 			this.inactivityChecker = new DN_InactivityChecker(this);	
 	}
@@ -109,24 +119,27 @@ public class DiscordNotifyMain {
 	public void onDisable() {
 		
 		for(UniversalPlayer players : this.getUniversalServer().getOnlinePlayers()) {
-		UUID uuid = players.getUUID();
-		
-		if(this.joinTime.get(uuid) != null) {
-			long time = System.currentTimeMillis() - this.joinTime.get(uuid);
+			UUID uuid = players.getUUID();
 			
-			this.getOfflineInformationsSQL().addToInformation(uuid, InformationType.Playtime, time);
-			this.getOfflineInformationManager().addInformation(uuid, InformationType.Playtime, time);
-			this.messagingManager.sendInformationUpdate(all, InformationType.Playtime, this.getOfflineInformationManager().getInformationLong(uuid, InformationType.Playtime));
-			
-			this.joinTime.remove(uuid);
+			if(this.getJoinTime().get(uuid) != null) {
+				long time = System.currentTimeMillis() - this.getJoinTime().get(uuid);
+				
+				this.getOfflineInformationsSQL().addToInformation(uuid, InformationType.Playtime, time);
+				this.getOfflineInformationManager().addInformation(uuid, InformationType.Playtime, time);
+				this.getPluginMessenger().sendInformationUpdate(uuid, InformationType.Playtime, this.getOfflineInformationManager().getInformationLong(uuid, InformationType.Playtime));
+				
+				this.getJoinTime().remove(uuid);
+			}
 		}
-	}
 		
 		if(this.inactivityChecker != null)
 			this.inactivityChecker.cancelTask();
 		
 		if(this.getDiscordManager() != null)
 			this.getDiscordManager().disconnectDiscordBot();
+
+		if(this.getAsyncMySql() != null && this.getAsyncMySql().getMySQL() != null && this.getAsyncMySql().getMySQL().getConnection() != null)
+			this.getAsyncMySql().getMySQL().closeConnection();
 	}
 	
 

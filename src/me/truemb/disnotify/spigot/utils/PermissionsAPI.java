@@ -3,7 +3,7 @@ package me.truemb.disnotify.spigot.utils;
 import java.util.UUID;
 
 import me.truemb.discordnotify.main.DiscordNotifyMain;
-import me.truemb.disnotify.utils.PluginInformations;
+import me.truemb.discordnotify.utils.PluginInformations;
 import net.milkbowl.vault.permission.Permission;
 
 public class PermissionsAPI {
