@@ -2,6 +2,7 @@ package _me.truemb.universal.minecraft.events;
 
 import java.util.UUID;
 
+import _me.truemb.universal.player.BungeePlayer;
 import _me.truemb.universal.player.UniversalPlayer;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -50,14 +51,12 @@ public class BungeeEventsListener implements Listener {
 		ProxiedPlayer p = (ProxiedPlayer) e.getPlayer();
 		
 		UUID uuid = p.getUniqueId();
-		String name = p.getName();
 		String serverName = e.getTarget().getName();
 
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
-		if(up == null) {
-			up = new UniversalPlayer(uuid, name);
-			this.plugin.getUniversalServer().addPlayer(up);
-		}
+		if(up == null)
+			this.plugin.getUniversalServer().addPlayer(up = new BungeePlayer(p));
+		
 		up.setServer(serverName);
 		
 		this.plugin.getListener().onPlayerJoin(up, serverName);

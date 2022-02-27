@@ -6,13 +6,16 @@ import _me.truemb.universal.enums.ServerType;
 import lombok.Getter;
 
 @Getter
-public class UniversalPlayer {
+public abstract class UniversalPlayer {
 	
 	private UUID UUID;
 	private String ingameName;
+	
+	private ServerType serverType;
 	private String server;
 	
-	public UniversalPlayer(UUID uuid, String ingameName) {
+	public UniversalPlayer(ServerType type, UUID uuid, String ingameName) {
+		this.serverType = type;
 		this.UUID = uuid;
 		this.ingameName = ingameName;
 	}
@@ -22,7 +25,7 @@ public class UniversalPlayer {
 	}
 
 	
-	//PLAYER INSTANCE
+	//PLAYER 
 	public net.md_5.bungee.api.connection.ProxiedPlayer getBungeePlayer() {
         return null;
     }
@@ -39,43 +42,14 @@ public class UniversalPlayer {
         return null;
     }
     
-    public UniversalLocation getLocation() {
-		return null;
-	}
+    public abstract UniversalLocation getLocation();
     
-    //CHECKING 
-    public ServerType getServerPlatform() {
-        if (this.getBukkitPlayer() != null) return ServerType.BUKKIT;
-        else if (this.getSpongePlayer() != null) return ServerType.SPONGE;
-        else if (this.getVelocityPlayer() != null) return ServerType.VELOCITY;
-        else if (this.getBungeePlayer() != null) return ServerType.BUNGEECORD;
-        else return ServerType.UNKNOWN;
-    }
-    
-    //TODO SWITCH STATEMENT GOES THROUGH EVERYTHING. IMPORT ERROR?
-    public void sendMessage(String message) {
-    	switch (this.getServerPlatform()) {
-		case BUKKIT:
-			this.getBukkitPlayer().sendMessage(message);
-			break;
-		case SPONGE:
-			this.getSpongePlayer().sendMessage(org.spongepowered.api.text.Text.of(message));
-			break;
-		case BUNGEECORD:
-			this.getBungeePlayer().sendMessage(new net.md_5.bungee.api.chat.TextComponent(message));
-			break;
-		case VELOCITY:
-			this.getVelocityPlayer().sendMessage(net.kyori.adventure.text.Component.text(message));
-			break;
-		default:
-			break;
-		}
-    }
+    public abstract void sendMessage(String message);
 
     public boolean hasPermission(String permission) {
         if (permission == null || permission.isEmpty()) return true;
 
-        switch (this.getServerPlatform()) {
+        switch (this.getServerType()) {
 		case BUKKIT:
 			return this.getBukkitPlayer().hasPermission(permission);
 		case SPONGE:
@@ -90,7 +64,7 @@ public class UniversalPlayer {
     }
     
     public boolean isOnline() {
-        switch (this.getServerPlatform()) {
+        switch (this.getServerType()) {
 		case BUKKIT:
 			return this.getBukkitPlayer().isOnline();
 		case SPONGE:

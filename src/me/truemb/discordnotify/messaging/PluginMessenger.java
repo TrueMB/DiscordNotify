@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import _me.truemb.universal.messenger.IPipeline;
+import _me.truemb.universal.messenger.IPipelineRegistry;
+import _me.truemb.universal.messenger.MessageChannelAPI;
+import _me.truemb.universal.messenger.PipelineMessage;
 import _me.truemb.universal.player.UniversalPlayer;
-import me.crypnotic.messagechannel.api.MessageChannelAPI;
-import me.crypnotic.messagechannel.api.pipeline.IPipeline;
-import me.crypnotic.messagechannel.api.pipeline.IPipelineRegistry;
-import me.crypnotic.messagechannel.api.pipeline.PipelineMessage;
 import me.truemb.discordnotify.enums.GroupAction;
 import me.truemb.discordnotify.enums.InformationType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.entities.Member;
 
 public class PluginMessenger {
 	
-	private final String channelName = "discord:notify";
+	public static final String channelName = "discord:notify";
 	
 	private DiscordNotifyMain instance;
 	private IPipeline pipeline;
@@ -25,7 +25,7 @@ public class PluginMessenger {
 		this.instance = plugin;
 		
 		IPipelineRegistry registry = MessageChannelAPI.getPipelineRegistry();
-		this.pipeline =  registry.register(this.channelName);
+		this.pipeline = registry.registerAsync(plugin, PluginMessenger.channelName);
 		this.pipeline.onReceive(this.onReceive());
 	}
 	
@@ -36,7 +36,7 @@ public class PluginMessenger {
 			public void accept(PipelineMessage message) {
 
 				List<Object> rows = message.getContents();
-				
+
 				if(rows.size() <= 0)
 					return;
 				
@@ -167,7 +167,11 @@ public class PluginMessenger {
 	}
 	
 	public void sendInformationUpdate(UUID uuid, InformationType type, Object value) {
-		PipelineMessage message = new PipelineMessage(uuid);
+		 this.sendInformationUpdate(uuid, null, type, value);
+	}
+	
+	public void sendInformationUpdate(UUID uuid, String server, InformationType type, Object value) {
+		PipelineMessage message = new PipelineMessage(uuid, server);
 
 		message.write("INFO_UPDATE");
 		message.write(type.toString());
@@ -177,6 +181,8 @@ public class PluginMessenger {
 	}
 
 	public void sendPlayerDeath(UUID uuid, String deathMessage) {
+		
+		System.out.println("DEATH MESSAGE SENT");
 
 		PipelineMessage message = new PipelineMessage(uuid);
 		

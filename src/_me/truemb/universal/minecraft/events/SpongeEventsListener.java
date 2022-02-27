@@ -9,6 +9,7 @@ import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
+import _me.truemb.universal.player.SpongePlayer;
 import _me.truemb.universal.player.UniversalPlayer;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 
@@ -46,10 +47,8 @@ public class SpongeEventsListener {
 	public void onConnect(ClientConnectionEvent.Join e) {
 
 		Player p = e.getTargetEntity();
-		UUID uuid = p.getUniqueId();
-		String name = p.getName();
 		
-		UniversalPlayer up = new UniversalPlayer(uuid, name);
+		UniversalPlayer up = new SpongePlayer(p);
 		this.plugin.getUniversalServer().addPlayer(up);
 		
 		this.plugin.getListener().onPlayerJoin(up, null);

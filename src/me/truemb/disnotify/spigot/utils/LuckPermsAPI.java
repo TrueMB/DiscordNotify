@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
-import me.truemb.discordnotify.utils.PluginInformations;
+import me.truemb.discordnotify.main.DiscordNotifyMain;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.cacheddata.CachedPermissionData;
@@ -26,15 +26,15 @@ public class LuckPermsAPI {
 	
 	private LuckPerms luckPerms;
 	private Permission permission;
-	private PluginInformations pluginInfo;
+	private DiscordNotifyMain instance;
 	
-	public LuckPermsAPI(PluginInformations pluginInfo) {
-		this.pluginInfo = pluginInfo;
+	public LuckPermsAPI(DiscordNotifyMain plugin) {
+		this.instance = plugin;
 		
 		try {
 			LuckPerms api = LuckPermsProvider.get();
 			this.luckPerms = api;
-			pluginInfo.getLogger().info("LuckPerms Permission System was found.");
+			plugin.getUniversalServer().getLogger().info("LuckPerms Permission System was found.");
 		}catch(IllegalStateException ex){
 			return;
 		}
@@ -52,7 +52,7 @@ public class LuckPermsAPI {
 		User user = this.getLuckPerms().getUserManager().getUser(uuid);
 		
 		if(user == null) {
-			this.pluginInfo.getLogger().warning("Couldnt find the user with the UUID: '" + uuid.toString() + "'.");;
+			this.instance.getUniversalServer().getLogger().warning("Couldn't find the user with the UUID: '" + uuid.toString() + "'.");;
 			return groupList.toArray(new String[0]);
 		}
 
@@ -86,14 +86,14 @@ public class LuckPermsAPI {
 		Group group = this.getLuckPerms().getGroupManager().getGroup(groupS);
 		
 		if(group == null) {
-			this.pluginInfo.getLogger().warning("Couldnt find the group: '" + groupS + "' to add it.");;
+			this.instance.getUniversalServer().getLogger().warning("Couldn't find the group: '" + groupS + "' to add it.");;
 			return;
 		}
 		
 		User user = this.getLuckPerms().getUserManager().getUser(uuid);
 		
 		if(user == null) {
-			this.pluginInfo.getLogger().warning("Couldnt find the user with the UUID: '" + uuid.toString() + "'.");;
+			this.instance.getUniversalServer().getLogger().warning("Couldn't find the user with the UUID: '" + uuid.toString() + "'.");;
 			return;
 		}
 		
@@ -107,14 +107,14 @@ public class LuckPermsAPI {
 		Group group = this.getLuckPerms().getGroupManager().getGroup(groupS);
 		
 		if(group == null) {
-			this.pluginInfo.getLogger().warning("Couldnt find the group: '" + groupS + "' to remove it.");;
+			this.instance.getUniversalServer().getLogger().warning("Couldn't find the group: '" + groupS + "' to remove it.");;
 			return;
 		}
 		
 		User user = this.getLuckPerms().getUserManager().getUser(uuid);
 		
 		if(user == null) {
-			this.pluginInfo.getLogger().warning("Couldnt find the user with the UUID: '" + uuid.toString() + "'.");;
+			this.instance.getUniversalServer().getLogger().warning("Couldn't find the user with the UUID: '" + uuid.toString() + "'.");;
 			return;
 		}
 		
@@ -152,7 +152,7 @@ public class LuckPermsAPI {
 		User user = this.getLuckPerms().getUserManager().getUser(uuid);
 		
 		if(user == null) {
-			this.pluginInfo.getLogger().warning("Couldnt find the user with the UUID: '" + uuid.toString() + "'.");;
+			this.instance.getUniversalServer().getLogger().warning("Couldn't find the user with the UUID: '" + uuid.toString() + "'.");;
 			return false;
 		}
 			
@@ -166,7 +166,7 @@ public class LuckPermsAPI {
 		User user = this.getLuckPerms().getUserManager().getUser(uuid);
 		
 		if(user == null) {
-			this.pluginInfo.getLogger().warning("Couldnt find the user with the UUID: '" + uuid.toString() + "'.");;
+			this.instance.getUniversalServer().getLogger().warning("Couldn't find the user with the UUID: '" + uuid.toString() + "'.");;
 			return false;
 		}
 		

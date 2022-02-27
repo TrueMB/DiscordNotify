@@ -3,12 +3,11 @@ package me.truemb.disnotify.spigot.utils;
 import java.util.UUID;
 
 import me.truemb.discordnotify.main.DiscordNotifyMain;
-import me.truemb.discordnotify.utils.PluginInformations;
 import net.milkbowl.vault.permission.Permission;
 
 public class PermissionsAPI {
 	
-	private PluginInformations pluginInfo;
+	private DiscordNotifyMain instance;
 	
 	private LuckPermsAPI luckPermsAPI;
 	private Permission permission;
@@ -18,24 +17,25 @@ public class PermissionsAPI {
 	public boolean usePluginBridge = false;
 	
 	public PermissionsAPI(DiscordNotifyMain plugin) {
+		this.instance = plugin;
 		
 		if(plugin.getUniversalServer().isProxy()) {
 			//PROXY SERVER
 			if(net.md_5.bungee.api.ProxyServer.getInstance().getPluginManager().getPlugin("LuckPerms") != null) { //TODO PERMISSIONS API FÜR VELOCITY & SPONGE
-				this.luckPermsAPI = new LuckPermsAPI(this.pluginInfo);
+				this.luckPermsAPI = new LuckPermsAPI(plugin);
 				return;
 			}
 			
 			this.usePluginBridge = true;
-			pluginInfo.getLogger().warning("LuckPerms wasn't found. Using Vault and DiscordNotify as a Bridge.");
+			plugin.getUniversalServer().getLogger().warning("LuckPerms wasn't found. Using Vault and DiscordNotify as a Bridge.");
 			
 		}else {
 			if(org.bukkit.Bukkit.getPluginManager().getPlugin("LuckPerms") != null) {
-				this.luckPermsAPI = new LuckPermsAPI(this.pluginInfo);
+				this.luckPermsAPI = new LuckPermsAPI(plugin);
 				return;
 			}
 			if(!this.setupPermissions()) { //IF VAULT DIDNT FIND IT, TRY LUCKPERMS
-				pluginInfo.getLogger().warning("No Permission System was found. (optional - Needed for verify)");
+				plugin.getUniversalServer().getLogger().warning("No Permission System was found. (optional - Needed for verify)");
 			}
 		}
 		
@@ -43,7 +43,7 @@ public class PermissionsAPI {
 	
 	private boolean setupPermissions() {
 		if(org.bukkit.Bukkit.getPluginManager().getPlugin("Vault") == null) {
-			this.pluginInfo.getLogger().warning("Vault is missing!");
+			this.instance.getUniversalServer().getLogger().warning("Vault is missing!");
 			return false;
 	    }
 		org.bukkit.plugin.RegisteredServiceProvider<Permission> rsp = org.bukkit.Bukkit.getServer().getServicesManager().getRegistration(Permission.class);
@@ -51,7 +51,7 @@ public class PermissionsAPI {
 	    	return false;
 	    
 	    this.permission = rsp.getProvider();
-	    this.pluginInfo.getLogger().info("Permission System was found.");
+	    this.instance.getUniversalServer().getLogger().info("Permission System was found.");
 	    return permission != null;
 	}
 

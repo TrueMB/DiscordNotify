@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>DiscordNotify</groupId>
   <artifactId>DiscordNotify</artifactId>
-  <version>2.0.10</version>
+  <version>3.0.0</version>
   <name>DiscordNotify</name>
   <description>Multifunctional Discord Spigot Plugin</description>
   
@@ -201,13 +201,6 @@
 			<artifactId>lombok</artifactId>
 			<version>1.18.22</version>
 			<scope>provided</scope>
-		</dependency>
-
-		<!-- MessagingChannelAPI -->
-		<dependency>
-			<groupId>me.crypnotic.messagechannel</groupId>
-			<artifactId>messagechannel-api</artifactId>
-			<version>3.0.0</version>
 		</dependency>
 	    
 		<!-- YAML (So that I can use it in Bungeecord as well) -->

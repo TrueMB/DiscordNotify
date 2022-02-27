@@ -31,7 +31,7 @@ import me.truemb.disnotify.spigot.utils.PermissionsAPI;
 @Getter
 public class DiscordNotifyMain {
 	
-	private final File dataDirectory = new File("\\plugins\\DiscordNotify\\");
+	private final File dataDirectory;
 	private ScheduledExecutorService executor;
 
 	//DATA
@@ -70,6 +70,7 @@ public class DiscordNotifyMain {
 	private DiscordNotifyListener listener;
 	
 	public DiscordNotifyMain(File dataDirectory, ServerType type) {
+		this.dataDirectory = dataDirectory;
 		int cores = Runtime.getRuntime().availableProcessors();
 		int usedCores = 2;
 		if(usedCores > cores) usedCores = cores;
@@ -79,6 +80,10 @@ public class DiscordNotifyMain {
 		
 		this.onStart();
 	}
+	
+	//TODO SERVER CHANGE -> NPE
+	//TODO SPONGE SUPPORT
+	//TODO TEST Velocity and Bukkit
 
 	/**
 	 * Enables the DiscordNotify Plugin
@@ -103,16 +108,18 @@ public class DiscordNotifyMain {
 		this.startMySql();
 		
 		//DISCORD
-		this.discordManager = new DiscordManager(this);
-		this.discordManager.registerAddons(this.getConfigManager().getConfig().getString("Options.DiscordBot.Name"));
+		if(!this.getUniversalServer().isProxySubServer()) {
+			this.discordManager = new DiscordManager(this);
+			this.discordManager.registerAddons(this.getConfigManager().getConfig().getString("Options.DiscordBot.Name"));
+			
+			new DN_DiscordBotConnector(this); //TASK WHICH CONNECTS THE DISCORD BOT
+		}
 
 		//If Server gets reloaded, it sets the current time again
 		this.getUniversalServer().getOnlinePlayers().forEach(all -> this.getJoinTime().put(all.getUUID(), System.currentTimeMillis()));
 		
-		//RUNNABLES
-		new DN_DiscordBotConnector(this); //TASK WHICH CONNECTS THE DISCORD BOT
-		
-		if(this.getConfigManager().isFeatureEnabled(FeatureType.Inactivity))
+		//RUNNABLE
+		if(!this.getUniversalServer().isProxySubServer() && this.getConfigManager().isFeatureEnabled(FeatureType.Inactivity))
 			this.inactivityChecker = new DN_InactivityChecker(this);	
 	}
 	

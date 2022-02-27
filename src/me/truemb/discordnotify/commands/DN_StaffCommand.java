@@ -56,7 +56,7 @@ public class DN_StaffCommand {
 			UUID uuidAll = all.getUUID();
 			if(all.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.StaffChat"))) {
 				if(up.equals(all) || !this.instance.getStaffChatDisabled().containsKey(uuidAll) || !this.instance.getStaffChatDisabled().get(uuidAll)) {
-					all.sendMessage(this.instance.getConfigManager().getMinecraftMessage("minecraftStaffMessage", true).replaceAll("(?i)%" + "%Message%" + "%", message));
+					all.sendMessage(this.instance.getConfigManager().getMinecraftMessage("minecraftStaffMessage", true).replaceAll("(?i)%" + "message" + "%", message));
 				}
 			}
 		}

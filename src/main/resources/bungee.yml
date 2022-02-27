@@ -2,7 +2,7 @@ name: ${project.name}
 author: TrueMB
 version: ${project.version}
 api-version: 1.16
-main: me.truemb.disnotify.bungeecord.main.Main
+main: _me.truemb.universal.minecraft.main.BungeeMain
 depends: [Spicord]
 
 commands:

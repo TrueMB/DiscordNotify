@@ -4,7 +4,7 @@
   <groupId>DiscordNotify</groupId>
   <artifactId>DiscordNotify</artifactId>
   <name>DiscordNotify</name>
-  <version>2.0.10</version>
+  <version>3.0.0</version>
   <description>Multifunctional Discord Spigot Plugin</description>
   <build>
     <sourceDirectory>src</sourceDirectory>

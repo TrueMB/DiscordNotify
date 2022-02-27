@@ -18,10 +18,6 @@ import me.truemb.discordnotify.utils.DiscordManager;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 
 public class VerifySQL {
 
@@ -87,6 +83,7 @@ public class VerifySQL {
 			    	cmd.reply(discordManager.getDiscordMessage("verification.request", placeholder));
 			    	
 			    	//MINECRAFT CLICK MESSAGE
+			    	/*
 			    	TextComponent mainComponent = new TextComponent(instance.getConfigManager().getMinecraftMessage("verification.requestClickMessage.message", false).replaceAll("(?i)%user%", member.getUser().getAsTag()) + "\n");
 			    	
 			    	TextComponent acceptComponent = instance.getConfigManager().getMessageAsTextComponent("verification.requestClickMessage.accept", false);
@@ -102,7 +99,7 @@ public class VerifySQL {
 			    	mainComponent.addExtra(acceptComponent);
 			    	mainComponent.addExtra(spaceComponent);
 			    	mainComponent.addExtra(denyComponent);
-			    	
+			    	*/
 			    	instance.getUniversalServer().getPlayer(mcuuid).sendMessage("VERIFICATION WURDE GESTARTET (NACHRICHT MUSS NOCH BEARBEITET WERDEN)");
 			    	//TODO DisnotifyTools.sendMessage(pluginInformations.isBungeeCord(), mcuuid, mainComponent);
 					return;

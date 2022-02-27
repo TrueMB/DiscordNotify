@@ -10,6 +10,7 @@ import com.velocitypowered.api.event.player.PlayerChatEvent.ChatResult;
 import com.velocitypowered.api.proxy.Player;
 
 import _me.truemb.universal.player.UniversalPlayer;
+import _me.truemb.universal.player.VelocityPlayer;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 
 public class VelocityEventsListener {
@@ -47,12 +48,11 @@ public class VelocityEventsListener {
 		Player p = e.getPlayer();
 		
 		UUID uuid = p.getUniqueId();
-		String name = p.getUsername();
 		String serverName = e.getPlayer().getCurrentServer().get().getServerInfo().getName();
 		
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
 		if(up == null) {
-			up = new UniversalPlayer(uuid, name);
+			up = new VelocityPlayer(p);
 			this.plugin.getUniversalServer().addPlayer(up);
 		}
 		up.setServer(serverName);

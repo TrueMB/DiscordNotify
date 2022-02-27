@@ -10,6 +10,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import _me.truemb.universal.player.BukkitPlayer;
 import _me.truemb.universal.player.UniversalPlayer;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 
@@ -43,10 +44,7 @@ public class BukkitEventsListener implements Listener {
 
 		Player p = e.getPlayer();
 		
-		UUID uuid = p.getUniqueId();
-		String name = p.getName();
-		
-		UniversalPlayer up = new UniversalPlayer(uuid, name);
+		UniversalPlayer up = new BukkitPlayer(p);
 		this.plugin.getUniversalServer().addPlayer(up);
 		
 		this.plugin.getListener().onPlayerJoin(up, null);

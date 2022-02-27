@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import me.crypnotic.messagechannel.api.MessageChannelAPI;
-import me.crypnotic.messagechannel.api.pipeline.IPipeline;
-import me.crypnotic.messagechannel.api.pipeline.IPipelineRegistry;
-import me.crypnotic.messagechannel.api.pipeline.PipelineMessage;
+import _me.truemb.universal.messenger.IPipeline;
+import _me.truemb.universal.messenger.IPipelineRegistry;
+import _me.truemb.universal.messenger.MessageChannelAPI;
+import _me.truemb.universal.messenger.PipelineMessage;
 import me.truemb.discordnotify.enums.GroupAction;
 import me.truemb.discordnotify.enums.InformationType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;

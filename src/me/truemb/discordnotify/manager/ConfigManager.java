@@ -9,13 +9,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.simpleyaml.configuration.file.YamlConfiguration;
-
 import me.truemb.discordnotify.enums.FeatureType;
+import me.truemb.discordnotify.utils.ChatColor;
 import me.truemb.discordnotify.utils.ConfigUpdater;
 import me.truemb.discordnotify.utils.UTF8YamlConfiguration;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
 
 public class ConfigManager {
 
@@ -58,7 +55,7 @@ public class ConfigManager {
 		
 	}
 	
-	public YamlConfiguration getConfig() {
+	public UTF8YamlConfiguration getConfig() {
 		return this.config;
 	}
 	
@@ -73,10 +70,6 @@ public class ConfigManager {
 	
 	public long getChannelID(FeatureType type) {
 		return this.getConfig().getLong("Channel." + type);
-	}
-
-	public TextComponent getMessageAsTextComponent(String path, boolean prefix) {
-		return new TextComponent(this.getMinecraftMessage(path, prefix));
 	}
 	
 	public String getMinecraftMessage(String path, boolean prefix) {

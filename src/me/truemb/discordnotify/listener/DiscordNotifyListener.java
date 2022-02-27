@@ -27,7 +27,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		UUID uuid = up.getUUID();
 		
 		//IF FEATURE ENABLED
-		if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.PlayerJoinLeave))
+		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.PlayerJoinLeave))
 			this.onPlayerJoinFeature(up, serverName);
 		
 		//ALWAYS ON JOIN
@@ -39,10 +39,10 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			
 			this.instance.getOfflineInformationsSQL().updateInformation(uuid, InformationType.Inactivity, "false");
 			this.instance.getOfflineInformationsSQL().getOfflineInfoManager().setInformation(uuid, InformationType.Inactivity, "false");
-			this.instance.getPluginMessenger().sendInformationUpdate(uuid, InformationType.Inactivity, "false");
+			this.instance.getPluginMessenger().sendInformationUpdate(uuid, serverName, InformationType.Inactivity, "false"); 
 		}
 		
-		if(this.instance.getVerifyManager().isVerified(uuid) && this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync)) {
+		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getVerifyManager().isVerified(uuid) && this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync)) {
 		
 			if(this.instance.getDiscordManager().getDiscordBot() == null)
 				return;
@@ -99,7 +99,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		placeholder.put("UUID", uuid.toString());
 		placeholder.put("server", serverName);
 		
-		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
+		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
 			this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerJoinEmbed", placeholder);
 		}else {
 			this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerJoinMessage", placeholder);
@@ -113,7 +113,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		UUID uuid = up.getUUID();
 		
 		//IF FEATURE ENABLED
-		if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.PlayerJoinLeave))
+		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.PlayerJoinLeave))
 			this.onPlayerQuitFeature(up, serverName);
 		
 		if(this.instance.getJoinTime().get(uuid) != null) {
@@ -171,7 +171,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 	@Override
 	public void onPlayerMessage(UniversalPlayer up, String message) {
 		//IF FEATURE ENABLED
-		if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat))
+		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat))
 			this.onPlayerMessageFeature(up, message);
 		
 	}
@@ -204,7 +204,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		placeholder.put("group", group == null ? "" : group);
 		placeholder.put("server", server);
 		
-		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.Chat)) {
+		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().useEmbedMessage(FeatureType.Chat)) {
 			this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "ChatEmbed", placeholder);
 		}else {
 			this.instance.getDiscordManager().sendDiscordMessage(channelId, "ChatMessage", placeholder);
@@ -213,6 +213,10 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 	
 	@Override
 	public void onPlayerDeath(UniversalPlayer up, String deathMessage) {
+		if(this.instance.getUniversalServer().isProxySubServer()){
+			this.instance.getPluginMessenger().sendPlayerDeath(up.getUUID(), deathMessage);
+			return;
+		}
 		
 		UUID uuid = up.getUUID();
 		String ingameName = up.getIngameName();
@@ -221,7 +225,12 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			return;
 		
 		//DISCORD DEATH MESSAGE
-		long channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerDeath);
+		String server = up.getServer();
+		long channelId;
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerDeath.toString() + ".enableServerSeperatedDeath"))
+			channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.PlayerDeath.toString() + ".serverSeperatedDeath." + server);
+		else
+			channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerDeath);
 		
 		HashMap<String, String> placeholder = new HashMap<>();
 		placeholder.put("Player", ingameName);

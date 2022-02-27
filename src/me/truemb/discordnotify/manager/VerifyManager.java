@@ -98,6 +98,7 @@ public class VerifyManager {
 	
 	//ROLESYNC
 	public void checkForRolesUpdate(UUID uuid, long disuuid, String[] currentGroupList) {
+		if(this.instance.getDiscordManager() == null) return;
 		Member member = this.instance.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
 
 		if(member == null) {
@@ -110,6 +111,7 @@ public class VerifyManager {
 
 	//CHECK FOR UPDATES
 	public void checkForRolesUpdate(UUID uuid, Member member, String[] currentGroupList) {
+		if(this.instance.getDiscordManager() == null) return;
 
 		if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync))
 			return;
@@ -190,7 +192,8 @@ public class VerifyManager {
 	}
 
 	public void resetRoles(UUID uuid, Member member) {
-
+		if(this.instance.getDiscordManager() == null) return;
+		
 		if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync))
 			return;
 
