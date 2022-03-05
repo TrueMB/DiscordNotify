@@ -45,9 +45,10 @@ public class BukkitEventsListener implements Listener {
 		Player p = e.getPlayer();
 		
 		UniversalPlayer up = new BukkitPlayer(p);
-		this.plugin.getUniversalServer().addPlayer(up);
 		
 		this.plugin.getListener().onPlayerJoin(up, null);
+		
+		this.plugin.getUniversalServer().addPlayer(up);
 	}
 	
 	@EventHandler
@@ -58,9 +59,10 @@ public class BukkitEventsListener implements Listener {
 		UUID uuid = p.getUniqueId();
 		
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
-		this.plugin.getUniversalServer().removePlayer(up);
 		
 		this.plugin.getListener().onPlayerQuit(up, null);
+		
+		this.plugin.getUniversalServer().removePlayer(up);
 	}
 	
 	@EventHandler

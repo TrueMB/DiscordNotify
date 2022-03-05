@@ -7,9 +7,8 @@ import _me.truemb.universal.player.UniversalPlayer;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
-import net.md_5.bungee.api.event.ServerConnectEvent;
-import net.md_5.bungee.api.event.ServerDisconnectEvent;
-import net.md_5.bungee.api.event.ServerConnectEvent.Reason;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.ServerConnectedEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
@@ -43,37 +42,39 @@ public class BungeeEventsListener implements Listener {
 	}
 
 	@EventHandler
-	public void onConnect(ServerConnectEvent e) {
-
-		if(e.getReason() == Reason.UNKNOWN) 
-			return;
+	public void onConnect(ServerConnectedEvent e) {
 
 		ProxiedPlayer p = (ProxiedPlayer) e.getPlayer();
 		
 		UUID uuid = p.getUniqueId();
-		String serverName = e.getTarget().getName();
+		String newServerName = e.getServer().getInfo().getName();
 
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
 		if(up == null)
 			this.plugin.getUniversalServer().addPlayer(up = new BungeePlayer(p));
 		
-		up.setServer(serverName);
+		//SERVER CHANGE? PRIORIZES FIRST THE DISCONNECT AND THEN THE JOIN
+		String oldServerName = up.getServer();
+		if(oldServerName != null)
+			this.plugin.getListener().onPlayerQuit(up, oldServerName); //OLD SERVER QUIT
 		
-		this.plugin.getListener().onPlayerJoin(up, serverName);
+		up.setServer(newServerName);
+		this.plugin.getListener().onPlayerJoin(up, newServerName); //NEW SERVER JOIN
 	}
 	
 	@EventHandler
-	public void onDisconnect(ServerDisconnectEvent e) {
+	public void onDisconnect(PlayerDisconnectEvent e) {
 
 		ProxiedPlayer p = (ProxiedPlayer) e.getPlayer();
 		
 		UUID uuid = p.getUniqueId();
-		String serverName = e.getTarget().getName();
 		
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
-		this.plugin.getUniversalServer().removePlayer(up);
+		String serverName = up.getServer();
 		
 		this.plugin.getListener().onPlayerQuit(up, serverName);
+		
+		this.plugin.getUniversalServer().removePlayer(up);
 	}
 	
 }

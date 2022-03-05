@@ -134,7 +134,7 @@ public class PluginMessenger {
 
 	//ASKS WHAT GROUPS THE UUID GOT
 	public void askForGroups(UUID uuid) {
-		PipelineMessage message = new PipelineMessage(uuid); //TODO CAN TARGET BE AN OFFLINE PLAYER F.E.?
+		PipelineMessage message = new PipelineMessage(uuid);
 
 		message.write("GET_GROUPS_REQUEST");
 		
@@ -181,8 +181,6 @@ public class PluginMessenger {
 	}
 
 	public void sendPlayerDeath(UUID uuid, String deathMessage) {
-		
-		System.out.println("DEATH MESSAGE SENT");
 
 		PipelineMessage message = new PipelineMessage(uuid);
 		

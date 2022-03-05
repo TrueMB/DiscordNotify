@@ -49,9 +49,10 @@ public class SpongeEventsListener {
 		Player p = e.getTargetEntity();
 		
 		UniversalPlayer up = new SpongePlayer(p);
-		this.plugin.getUniversalServer().addPlayer(up);
 		
 		this.plugin.getListener().onPlayerJoin(up, null);
+		
+		this.plugin.getUniversalServer().addPlayer(up);
 	}
 	
 	@Listener
@@ -61,9 +62,10 @@ public class SpongeEventsListener {
 		UUID uuid = p.getUniqueId();
 		
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
-		this.plugin.getUniversalServer().removePlayer(up);
 		
 		this.plugin.getListener().onPlayerQuit(up, null);
+		
+		this.plugin.getUniversalServer().removePlayer(up);
 	}
 
 	@Listener
