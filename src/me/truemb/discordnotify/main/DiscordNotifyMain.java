@@ -26,7 +26,7 @@ import me.truemb.discordnotify.messaging.PluginMessenger;
 import me.truemb.discordnotify.runnable.DN_DiscordBotConnector;
 import me.truemb.discordnotify.runnable.DN_InactivityChecker;
 import me.truemb.discordnotify.utils.DiscordManager;
-import me.truemb.disnotify.spigot.utils.PermissionsAPI;
+import me.truemb.discordnotify.utils.PermissionsAPI;
 
 @Getter
 public class DiscordNotifyMain {

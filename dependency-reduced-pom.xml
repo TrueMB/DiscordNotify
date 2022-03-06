@@ -16,6 +16,7 @@
           <include>plugin.yml</include>
           <include>config.yml</include>
           <include>bungee.yml</include>
+          <include>velocity-plugin.json</include>
         </includes>
       </resource>
     </resources>
@@ -27,6 +28,13 @@
           <source>16</source>
           <target>16</target>
           <encoding>UTF-8</encoding>
+          <annotationProcessorPaths>
+            <annotationProcessorPath>
+              <groupId>com.velocitypowered</groupId>
+              <artifactId>velocity-api</artifactId>
+              <version>3.0.1</version>
+            </annotationProcessorPath>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
       <plugin>

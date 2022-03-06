@@ -38,7 +38,8 @@ import _me.truemb.universal.server.VelocityServer;
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 
-@Plugin(id = "${project.artifactId}", name = "${project.name}", version = "${project.version}", authors = {"TrueMB"})
+//@Plugin(id = "${project.artifactId}", name = "${project.name}", version = "${project.version}", authors = {"TrueMB"})
+@Plugin(id = "DiscordNotify", name = "DiscordNotify", version = "3.0.0", authors = {"TrueMB"})
 public class VelocityMain implements IRelay {
 	
 	private DiscordNotifyMain instance;

@@ -1,4 +1,4 @@
-package me.truemb.disnotify.spigot.utils;
+package me.truemb.discordnotify.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;

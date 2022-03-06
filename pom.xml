@@ -4,7 +4,7 @@
   <artifactId>DiscordNotify</artifactId>
   <version>3.0.0</version>
   <name>DiscordNotify</name>
-  <description>Multifunctional Discord Spigot Plugin</description>
+  <description>Multifunctional Discord Plugin</description>
   
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,6 +21,7 @@
 					<include>plugin.yml</include>
 					<include>config.yml</include>
 					<include>bungee.yml</include>
+					<include>velocity-plugin.json</include>
 				</includes>
 			</resource>
 		</resources>
