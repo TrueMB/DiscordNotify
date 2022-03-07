@@ -20,7 +20,7 @@ public class AsyncMySQL {
 	private MySQL sql;
 
 	public AsyncMySQL(Logger logger, ConfigManager configManager) throws Exception {
-		
+				
 		String host = configManager.getConfig().getString("Database.host");
 		int port = configManager.getConfig().getInt("Database.port");
 		boolean useSSL = configManager.getConfig().getBoolean("Database.useSSL");
@@ -154,7 +154,7 @@ public class AsyncMySQL {
 		}
 
 		public Connection openConnection() throws Exception {
-			//Class.forName("com.mysql.jdbc.Driver");
+	        Class.forName("com.mysql.cj.jdbc.Driver");
 			return this.conn = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + "?autoReconnect=true&failOverReadOnly=false&maxReconnects=10&useSSL=" + String.valueOf(this.useSSL), this.user, this.password);
 		}
 		

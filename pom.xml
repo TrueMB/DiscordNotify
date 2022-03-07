@@ -55,12 +55,12 @@
           						
 			                    <relocation>
 			                        <pattern>com.jeff_media.updatechecker</pattern>
-			                        <shadedPattern>me.truemb.disnotify.updater</shadedPattern>
+			                        <shadedPattern>me.truemb.discordnotify.updater</shadedPattern>
 			                    </relocation>
 			                    
 					            <relocation>
 					              <pattern>org.bstats</pattern>
-					              <shadedPattern>me.truemb.disnotify.bstats</shadedPattern>
+					              <shadedPattern>me.truemb.discordnotify.bstats</shadedPattern>
 					            </relocation>
 					            
 			                </relocations>
@@ -108,6 +108,12 @@
 	        <id>sponge-repo</id>
 	        <name>Sponge Maven Repository</name>
 	        <url>https://repo.spongepowered.org/maven</url>
+	    </repository>
+
+		<!-- Kyori Custom Text -->
+	    <repository>
+	       <id>sonatype-oss-snapshots</id>
+	       <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 	    </repository>
 		
 		<!-- UPDATE CHECKER -->
@@ -166,7 +172,7 @@
 	    <dependency>
 	        <groupId>com.velocitypowered</groupId>
 	        <artifactId>velocity-api</artifactId>
-	        <version>3.0.0-SNAPSHOT</version>
+	        <version>3.1.0</version>
 	        <scope>provided</scope>
 	    </dependency>
 
@@ -185,8 +191,37 @@
 	        <version>7.2.0</version>
 	        <type>jar</type>
 	        <scope>provided</scope>
-	    </dependency>
+	    </dependency> 
+
+		<!-- KYORI CUSTOM TEXT -->
+		<dependency>
+		    <groupId>net.kyori</groupId>
+		    <artifactId>adventure-api</artifactId>
+		    <version>4.10.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.kyori</groupId>
+			<artifactId>adventure-platform-bukkit</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.kyori</groupId>
+			<artifactId>adventure-platform-spongeapi</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.kyori</groupId>
+			<artifactId>adventure-platform-bungeecord</artifactId>
+			<version>4.1.0</version>
+		</dependency>
         
+		<!-- MYSQL Connector -->
+		<dependency>
+		    <groupId>mysql</groupId>
+		    <artifactId>mysql-connector-java</artifactId>
+		    <version>8.0.28</version>
+		</dependency>
         
 		<!-- UPDATE CHECKER -->
 	    <dependency>

@@ -2,7 +2,7 @@ name: ${project.name}
 author: TrueMB
 version: ${project.version}
 api-version: 1.16
-main: _me.truemb.universal.minecraft.main.BungeeMain
+main: me.truemb.universal.minecraft.main.BungeeMain
 depends: [Spicord]
 
 commands:

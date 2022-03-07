@@ -18,6 +18,10 @@ import me.truemb.discordnotify.utils.DiscordManager;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 
 public class VerifySQL {
 
@@ -83,25 +87,20 @@ public class VerifySQL {
 			    	cmd.reply(discordManager.getDiscordMessage("verification.request", placeholder));
 			    	
 			    	//MINECRAFT CLICK MESSAGE
-			    	/*
-			    	TextComponent mainComponent = new TextComponent(instance.getConfigManager().getMinecraftMessage("verification.requestClickMessage.message", false).replaceAll("(?i)%user%", member.getUser().getAsTag()) + "\n");
-			    	
-			    	TextComponent acceptComponent = instance.getConfigManager().getMessageAsTextComponent("verification.requestClickMessage.accept", false);
-			    	acceptComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(instance.getConfigManager().getMinecraftMessage("verification.requestClickMessage.acceptHover", false))));
-			    	acceptComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/verify accept"));
-
-			    	TextComponent spaceComponent = instance.getConfigManager().getMessageAsTextComponent("verification.requestClickMessage.space", false);
-			    	
-			    	TextComponent denyComponent = instance.getConfigManager().getMessageAsTextComponent("verification.requestClickMessage.deny", false);
-			    	denyComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(instance.getConfigManager().getMinecraftMessage("verification.requestClickMessage.denyHover", false))));
-			    	denyComponent.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/verify deny"));
-			    	
-			    	mainComponent.addExtra(acceptComponent);
-			    	mainComponent.addExtra(spaceComponent);
-			    	mainComponent.addExtra(denyComponent);
-			    	*/
-			    	instance.getUniversalServer().getPlayer(mcuuid).sendMessage("VERIFICATION WURDE GESTARTET (NACHRICHT MUSS NOCH BEARBEITET WERDEN)");
-			    	//TODO DisnotifyTools.sendMessage(pluginInformations.isBungeeCord(), mcuuid, mainComponent);
+			    	TextComponent textComponent = Component
+			    			.text(instance.getConfigManager().getMinecraftMessage("verification.requestClickMessage.message", false).replaceAll("(?i)%user%", member.getUser().getAsTag()) + "\n")
+			    				.append(
+			    					Component.text(instance.getConfigManager().getMinecraftMessage("verification.requestClickMessage.accept", false))
+			    					.clickEvent(ClickEvent.runCommand("/verify accept"))
+			    					.hoverEvent(HoverEvent.showText(Component.text(instance.getConfigManager().getMinecraftMessage("verification.requestClickMessage.acceptHover", false))))
+			    				).append(
+					    			Component.text(instance.getConfigManager().getMinecraftMessage("verification.requestClickMessage.space", false))
+					    		).append(
+				    				Component.text(instance.getConfigManager().getMinecraftMessage("verification.requestClickMessage.deny", false))
+				    				.clickEvent(ClickEvent.runCommand("/verify deny"))
+				    				.hoverEvent(HoverEvent.showText(Component.text(instance.getConfigManager().getMinecraftMessage("verification.requestClickMessage.denyHover", false))))
+				    			);
+			    	instance.getUniversalServer().getPlayer(mcuuid).sendMessage(textComponent);
 					return;
 				} catch (SQLException e) {
 					e.printStackTrace();

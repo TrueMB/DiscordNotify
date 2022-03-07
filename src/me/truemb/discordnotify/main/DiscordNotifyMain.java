@@ -8,9 +8,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import _me.truemb.universal.enums.ServerType;
-import _me.truemb.universal.player.UniversalPlayer;
-import _me.truemb.universal.server.UniversalServer;
 import lombok.Getter;
 import me.truemb.discordnotify.database.AsyncMySQL;
 import me.truemb.discordnotify.database.OfflineInformationsSQL;
@@ -27,6 +24,9 @@ import me.truemb.discordnotify.runnable.DN_DiscordBotConnector;
 import me.truemb.discordnotify.runnable.DN_InactivityChecker;
 import me.truemb.discordnotify.utils.DiscordManager;
 import me.truemb.discordnotify.utils.PermissionsAPI;
+import me.truemb.universal.enums.ServerType;
+import me.truemb.universal.player.UniversalPlayer;
+import me.truemb.universal.server.UniversalServer;
 
 @Getter
 public class DiscordNotifyMain {
@@ -68,6 +68,21 @@ public class DiscordNotifyMain {
     //UNIVERSAL
 	private UniversalServer universalServer;
 	private DiscordNotifyListener listener;
+
+	//OWN CONSTRUCTER FOR VELOCITY SINCE THE PROXYSERVER INSTANCE IS NEED ON START
+	public DiscordNotifyMain(File dataDirectory, com.velocitypowered.api.proxy.ProxyServer proxy) {
+		this.dataDirectory = dataDirectory;
+		int cores = Runtime.getRuntime().availableProcessors();
+		int usedCores = 2;
+		if(usedCores > cores) usedCores = cores;
+		
+		this.executor = Executors.newScheduledThreadPool(usedCores);
+		this.universalServer = UniversalServer.buildServer(ServerType.VELOCITY);
+		
+		this.getUniversalServer().getVelocityServer().setInstance(proxy);
+		
+		this.onStart();
+	}
 	
 	public DiscordNotifyMain(File dataDirectory, ServerType type) {
 		this.dataDirectory = dataDirectory;
@@ -81,10 +96,9 @@ public class DiscordNotifyMain {
 		this.onStart();
 	}
 	
-	//TODO SERVER CHANGE -> NPE
 	//TODO SPONGE SUPPORT
-	//TODO TEST Velocity and Bukkit
 
+	//Velocity needs Spicord v4.2.1
 	/**
 	 * Enables the DiscordNotify Plugin
 	 */

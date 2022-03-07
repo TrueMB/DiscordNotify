@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import _me.truemb.universal.player.UniversalPlayer;
 import lombok.Getter;
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.GroupAction;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
+import me.truemb.universal.player.UniversalPlayer;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.HierarchyException;

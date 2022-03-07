@@ -45,10 +45,6 @@ public class DiscordManager {
 
 	//DISCORD
 	public void registerAddons(String botname) {
-		
-		//ADDONS
-    	if(Spicord.getInstance() == null || Spicord.getInstance().getAddonManager() == null)
-    		return;
     	
     	//ADDONS NEEDS TO BE SET UP IN SPICORD
 	    this.playerInfoAddon = new DC_PlayerInfoCommand(this.instance);

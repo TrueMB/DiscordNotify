@@ -3,9 +3,9 @@ package me.truemb.discordnotify.commands;
 import java.util.HashMap;
 import java.util.UUID;
 
-import _me.truemb.universal.player.UniversalPlayer;
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
+import me.truemb.universal.player.UniversalPlayer;
 
 public class DN_StaffCommand {
 	

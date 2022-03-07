@@ -10,13 +10,13 @@ import org.spicord.api.addon.SimpleAddon;
 import org.spicord.bot.DiscordBot;
 import org.spicord.bot.command.DiscordBotCommand;
 
-import _me.truemb.universal.player.UniversalLocation;
-import _me.truemb.universal.player.UniversalPlayer;
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.InformationType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.discordnotify.utils.PlayerManager;
 import me.truemb.discordnotify.utils.TimeFormatter;
+import me.truemb.universal.player.UniversalLocation;
+import me.truemb.universal.player.UniversalPlayer;
 import net.dv8tion.jda.api.entities.Member;
 
 public class DC_PlayerInfoCommand extends SimpleAddon {

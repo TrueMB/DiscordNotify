@@ -3,11 +3,11 @@ package me.truemb.discordnotify.listener;
 import java.util.HashMap;
 import java.util.UUID;
 
-import _me.truemb.universal.listener.UniversalEventhandler;
-import _me.truemb.universal.player.UniversalPlayer;
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.InformationType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
+import me.truemb.universal.listener.UniversalEventhandler;
+import me.truemb.universal.player.UniversalPlayer;
 import net.dv8tion.jda.api.entities.Member;
 
 public class DiscordNotifyListener extends UniversalEventhandler{

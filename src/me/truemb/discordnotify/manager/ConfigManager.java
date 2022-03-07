@@ -73,7 +73,7 @@ public class ConfigManager {
 	}
 	
 	public String getMinecraftMessage(String path, boolean prefix) {
-		return this.translateHexColorCodes(this.getConfig().getString("Messages." + path));
+		return (prefix ? this.translateHexColorCodes(this.getConfig().getString("Messages.prefix")) + " " : "") + this.translateHexColorCodes(this.getConfig().getString("Messages." + path));
 	}
 		
 	private String translateHexColorCodes(String message){

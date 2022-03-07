@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import _me.truemb.universal.messenger.IPipeline;
-import _me.truemb.universal.messenger.IPipelineRegistry;
-import _me.truemb.universal.messenger.MessageChannelAPI;
-import _me.truemb.universal.messenger.PipelineMessage;
-import _me.truemb.universal.player.UniversalPlayer;
 import me.truemb.discordnotify.enums.GroupAction;
 import me.truemb.discordnotify.enums.InformationType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
+import me.truemb.universal.messenger.IPipeline;
+import me.truemb.universal.messenger.IPipelineRegistry;
+import me.truemb.universal.messenger.MessageChannelAPI;
+import me.truemb.universal.messenger.PipelineMessage;
+import me.truemb.universal.player.UniversalPlayer;
 import net.dv8tion.jda.api.entities.Member;
 
 public class ProxyMessenger {

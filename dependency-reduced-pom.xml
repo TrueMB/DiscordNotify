@@ -5,7 +5,7 @@
   <artifactId>DiscordNotify</artifactId>
   <name>DiscordNotify</name>
   <version>3.0.0</version>
-  <description>Multifunctional Discord Spigot Plugin</description>
+  <description>Multifunctional Discord Plugin</description>
   <build>
     <sourceDirectory>src</sourceDirectory>
     <resources>
@@ -28,13 +28,6 @@
           <source>16</source>
           <target>16</target>
           <encoding>UTF-8</encoding>
-          <annotationProcessorPaths>
-            <annotationProcessorPath>
-              <groupId>com.velocitypowered</groupId>
-              <artifactId>velocity-api</artifactId>
-              <version>3.0.1</version>
-            </annotationProcessorPath>
-          </annotationProcessorPaths>
         </configuration>
       </plugin>
       <plugin>
@@ -50,11 +43,11 @@
               <relocations>
                 <relocation>
                   <pattern>com.jeff_media.updatechecker</pattern>
-                  <shadedPattern>me.truemb.disnotify.updater</shadedPattern>
+                  <shadedPattern>me.truemb.discordnotify.updater</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>org.bstats</pattern>
-                  <shadedPattern>me.truemb.disnotify.bstats</shadedPattern>
+                  <shadedPattern>me.truemb.discordnotify.bstats</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
@@ -80,6 +73,10 @@
       <id>sponge-repo</id>
       <name>Sponge Maven Repository</name>
       <url>https://repo.spongepowered.org/maven</url>
+    </repository>
+    <repository>
+      <id>sonatype-oss-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
     </repository>
     <repository>
       <id>jeff-media-gbr</id>
@@ -126,7 +123,7 @@
     <dependency>
       <groupId>com.velocitypowered</groupId>
       <artifactId>velocity-api</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
+      <version>3.1.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

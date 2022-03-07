@@ -3,6 +3,7 @@ package me.truemb.discordnotify.utils;
 import java.util.UUID;
 
 import me.truemb.discordnotify.main.DiscordNotifyMain;
+import me.truemb.universal.enums.ServerType;
 import net.milkbowl.vault.permission.Permission;
 
 public class PermissionsAPI {
@@ -19,22 +20,22 @@ public class PermissionsAPI {
 	public PermissionsAPI(DiscordNotifyMain plugin) {
 		this.instance = plugin;
 		
+		if(this.instance.getUniversalServer().getServerPlatform() == ServerType.VELOCITY && this.instance.getUniversalServer().getVelocityServer().getInstance().getPluginManager().getPlugin("luckperms").isPresent()
+				|| this.instance.getUniversalServer().getServerPlatform() == ServerType.BUNGEECORD && net.md_5.bungee.api.ProxyServer.getInstance().getPluginManager().getPlugin("LuckPerms") != null
+				|| this.instance.getUniversalServer().getServerPlatform() == ServerType.BUKKIT && org.bukkit.Bukkit.getPluginManager().getPlugin("LuckPerms") != null
+				|| this.instance.getUniversalServer().getServerPlatform() == ServerType.SPONGE ) {//TODO SPONGE
+			
+			this.luckPermsAPI = new LuckPermsAPI(plugin);
+			return;
+		}
+		
 		if(plugin.getUniversalServer().isProxy()) {
-			//PROXY SERVER
-			if(net.md_5.bungee.api.ProxyServer.getInstance().getPluginManager().getPlugin("LuckPerms") != null) { //TODO PERMISSIONS API FÜR VELOCITY & SPONGE
-				this.luckPermsAPI = new LuckPermsAPI(plugin);
-				return;
-			}
-			
 			this.usePluginBridge = true;
-			plugin.getUniversalServer().getLogger().warning("LuckPerms wasn't found. Using Vault and DiscordNotify as a Bridge.");
-			
+			plugin.getUniversalServer().getLogger().info("LuckPerms wasn't found. Using Vault and DiscordNotify as a Bridge.");
 		}else {
-			if(org.bukkit.Bukkit.getPluginManager().getPlugin("LuckPerms") != null) {
-				this.luckPermsAPI = new LuckPermsAPI(plugin);
-				return;
-			}
-			if(!this.setupPermissions()) { //IF VAULT DIDNT FIND IT, TRY LUCKPERMS
+			if(this.setupPermissions()) {
+				plugin.getUniversalServer().getLogger().info("Using Vault for Permissions.");
+			}else {
 				plugin.getUniversalServer().getLogger().warning("No Permission System was found. (optional - Needed for verify)");
 			}
 		}
