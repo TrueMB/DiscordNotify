@@ -6,16 +6,12 @@ import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 
-import eu.mcdb.util.SLF4JWrapper;
-
 public class SpongeServer extends UniversalServer {
 
 	private final Server server;
-	private final Logger logger;
 
 	public SpongeServer() {
 		this.server = Sponge.getServer();
-		this.logger = new SLF4JWrapper();
 	}
 
 	@Override
@@ -25,7 +21,7 @@ public class SpongeServer extends UniversalServer {
 
 	@Override
 	public Logger getLogger() {
-		return this.logger;
+		return Logger.getLogger("DiscordNotify");
 	}
 
 	@Override

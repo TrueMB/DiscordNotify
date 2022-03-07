@@ -13,7 +13,7 @@ public class BukkitServer extends UniversalServer {
 
 	@Override
 	public Logger getLogger() {
-		return Bukkit.getLogger();
+		return Logger.getLogger("DiscordNotify");
 	}
 
 	@Override

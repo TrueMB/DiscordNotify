@@ -63,6 +63,11 @@
 					              <shadedPattern>me.truemb.discordnotify.bstats</shadedPattern>
 					            </relocation>
 					            
+					            <relocation>
+					              <pattern>net.kyori</pattern>
+					              <shadedPattern>me.truemb.discordnotify.kyori</shadedPattern>
+					            </relocation>
+
 			                </relocations>
 			                
 						</configuration>

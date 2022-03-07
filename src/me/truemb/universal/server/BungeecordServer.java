@@ -14,7 +14,7 @@ public class BungeecordServer extends UniversalServer {
 	
 	@Override
 	public Logger getLogger() {
-		return ProxyServer.getInstance().getLogger();
+		return Logger.getLogger("DiscordNotify");
 	}
 
 	@Override
