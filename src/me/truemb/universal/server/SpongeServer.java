@@ -2,17 +2,26 @@ package me.truemb.universal.server;
 
 import java.util.logging.Logger;
 
+import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.text.Text;
+
+import net.kyori.adventure.text.Component;
 
 public class SpongeServer extends UniversalServer {
 
 	private final Server server;
+	private final Game game;
 
 	public SpongeServer() {
-		this.server = Sponge.getServer();
+		this.server = Sponge.server();
+		this.game = Sponge.game();
 	}
+
+	public Game getGame() {
+		return this.game;
+	}
+
 
 	@Override
 	public SpongeServer getSpongeServer() {
@@ -26,26 +35,24 @@ public class SpongeServer extends UniversalServer {
 
 	@Override
 	public void broadcast(String message) {
-		this.server.getBroadcastChannel().send(Text.of(message));
+		this.server.broadcastAudience().sendMessage(Component.text(message));
 	}
 
 	@Override
 	public void broadcast(String message, String permission) {
-		this.server.getOnlinePlayers().forEach(player -> {
+		this.server.onlinePlayers().forEach(player -> {
 			if(player.hasPermission(permission))
-				player.sendMessage(Text.of(message));
+				player.sendMessage(Component.text(message));
 		});
 	}
 
 	@Override
 	public boolean isOnlineMode() {
-		return this.server.getOnlineMode();
+		return this.server.isOnlineModeEnabled();
 	}
 
 	@Override
 	public boolean isProxySubServer() {
-		// TODO Auto-generated method stub
 		return false;
 	}
-
 }

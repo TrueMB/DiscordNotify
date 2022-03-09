@@ -20,11 +20,7 @@ public class PermissionsAPI {
 	public PermissionsAPI(DiscordNotifyMain plugin) {
 		this.instance = plugin;
 		
-		if(this.instance.getUniversalServer().getServerPlatform() == ServerType.VELOCITY && this.instance.getUniversalServer().getVelocityServer().getInstance().getPluginManager().getPlugin("luckperms").isPresent()
-				|| this.instance.getUniversalServer().getServerPlatform() == ServerType.BUNGEECORD && net.md_5.bungee.api.ProxyServer.getInstance().getPluginManager().getPlugin("LuckPerms") != null
-				|| this.instance.getUniversalServer().getServerPlatform() == ServerType.BUKKIT && org.bukkit.Bukkit.getPluginManager().getPlugin("LuckPerms") != null
-				|| this.instance.getUniversalServer().getServerPlatform() == ServerType.SPONGE ) {//TODO SPONGE
-			
+		if(this.doesPluginExists("LuckPerms")) {
 			this.luckPermsAPI = new LuckPermsAPI(plugin);
 			return;
 		}
@@ -43,7 +39,8 @@ public class PermissionsAPI {
 	}
 	
 	private boolean setupPermissions() {
-		if(org.bukkit.Bukkit.getPluginManager().getPlugin("Vault") == null) {
+		//TODO SETUP SPONGE INTERFACES https://docs.spongepowered.org/stable/en/plugin/economy/implementing.html
+		if(!this.doesPluginExists("Vault")) {
 			this.instance.getUniversalServer().getLogger().warning("Vault is missing!");
 			return false;
 	    }
@@ -54,6 +51,13 @@ public class PermissionsAPI {
 	    this.permission = rsp.getProvider();
 	    this.instance.getUniversalServer().getLogger().info("Permission System was found.");
 	    return permission != null;
+	}
+	
+	private boolean doesPluginExists(String pluginName) {
+		return this.instance.getUniversalServer().getServerPlatform() == ServerType.VELOCITY && this.instance.getUniversalServer().getVelocityServer().getInstance().getPluginManager().getPlugin(pluginName.toLowerCase()).isPresent()
+				|| this.instance.getUniversalServer().getServerPlatform() == ServerType.BUNGEECORD && net.md_5.bungee.api.ProxyServer.getInstance().getPluginManager().getPlugin(pluginName) != null
+				|| this.instance.getUniversalServer().getServerPlatform() == ServerType.BUKKIT && org.bukkit.Bukkit.getPluginManager().getPlugin(pluginName) != null
+				|| this.instance.getUniversalServer().getServerPlatform() == ServerType.SPONGE && this.instance.getUniversalServer().getSpongeServer().getGame().pluginManager().plugin(pluginName.toLowerCase()).isPresent();
 	}
 
 	public String[] getGroups(UUID uuid) {

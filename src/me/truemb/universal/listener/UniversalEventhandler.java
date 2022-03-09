@@ -1,6 +1,7 @@
 package me.truemb.universal.listener;
 
 import me.truemb.universal.player.UniversalPlayer;
+import net.kyori.adventure.text.Component;
 
 public abstract class UniversalEventhandler {
 	

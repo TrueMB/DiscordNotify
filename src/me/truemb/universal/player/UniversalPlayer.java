@@ -39,7 +39,7 @@ public abstract class UniversalPlayer {
         return null;
     }
 
-    public org.spongepowered.api.entity.living.player.Player getSpongePlayer() {
+    public org.spongepowered.api.entity.living.player.server.ServerPlayer getSpongePlayer() {
         return null;
     }
     

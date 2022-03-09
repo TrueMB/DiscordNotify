@@ -2,17 +2,17 @@ package me.truemb.universal.minecraft.events;
 
 import java.util.UUID;
 
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.message.PlayerChatEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.universal.player.SpongePlayer;
 import me.truemb.universal.player.UniversalPlayer;
-import net.kyori.adventure.platform.spongeapi.SpongeAudiences;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class SpongeEventsListener {
 	
@@ -20,25 +20,20 @@ public class SpongeEventsListener {
 	//https://docs.spongepowered.org/stable/en/plugin/event/listeners.html
 	
 	private DiscordNotifyMain plugin;
-	private SpongeAudiences adventure;
 	
-	public SpongeEventsListener(DiscordNotifyMain plugin, SpongeAudiences adventure) {
+	public SpongeEventsListener(DiscordNotifyMain plugin) {
 		this.plugin = plugin;
-		this.adventure = adventure;
 	}
 
 	@Listener
-	public void onChat(MessageChannelEvent.Chat e, @First Player p) {
+	public void onChat(PlayerChatEvent e, @First ServerPlayer p) {
 		
 		if(e.isCancelled())
 			return;
-		
-		if(e.isMessageCancelled())
-			return;
-
-		UUID uuid = p.getUniqueId();
+				
+		UUID uuid = p.uniqueId();
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
-		String message = e.getMessage().toPlain();
+		String message = PlainTextComponentSerializer.plainText().serialize(e.message());
 
 		if(message.startsWith("/"))
 			return;
@@ -47,11 +42,11 @@ public class SpongeEventsListener {
 	}
 
 	@Listener
-	public void onConnect(ClientConnectionEvent.Join e) {
+	public void onConnect(ServerSideConnectionEvent.Join e) {
 
-		Player p = e.getTargetEntity();
+		ServerPlayer p = e.player();
 		
-		UniversalPlayer up = new SpongePlayer(p, this.adventure);
+		UniversalPlayer up = new SpongePlayer(p);
 		
 		this.plugin.getListener().onPlayerJoin(up, null);
 		
@@ -59,10 +54,10 @@ public class SpongeEventsListener {
 	}
 	
 	@Listener
-	public void onDisconnect(ClientConnectionEvent.Disconnect e) {
+	public void onDisconnect(ServerSideConnectionEvent.Disconnect e) {
 
-		Player p = e.getTargetEntity();
-		UUID uuid = p.getUniqueId();
+		ServerPlayer p = e.player();
+		UUID uuid = p.uniqueId();
 		
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
 		
@@ -74,13 +69,13 @@ public class SpongeEventsListener {
 	@Listener
 	public void onDeath(DestructEntityEvent.Death e) {
 
-		if(!(e.getTargetEntity() instanceof Player))
+		if(!(e.entity() instanceof ServerPlayer))
 			return;
 		
-		Player p = (Player) e.getTargetEntity();
-		UUID uuid = p.getUniqueId();
+		ServerPlayer p = (ServerPlayer) e.entity();
+		UUID uuid = p.uniqueId();
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
-		String deathMessage = e.getMessage().toPlain();
+		String deathMessage = PlainTextComponentSerializer.plainText().serialize(e.message());
 		
 		this.plugin.getListener().onPlayerDeath(up, deathMessage);
 	}

@@ -5,21 +5,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.spongepowered.api.Game;
-import org.spongepowered.api.Platform;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.command.Command;
 import org.spongepowered.api.config.ConfigDir;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameConstructionEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
-import org.spongepowered.api.network.ChannelBinding.RawDataChannel;
-import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.api.event.lifecycle.LoadedGameEvent;
+import org.spongepowered.api.event.lifecycle.RegisterChannelEvent;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
+import org.spongepowered.api.event.lifecycle.StoppedGameEvent;
+import org.spongepowered.api.network.EngineConnection;
+import org.spongepowered.api.network.channel.ChannelBuf;
+import org.spongepowered.api.network.channel.raw.RawDataChannel;
+import org.spongepowered.api.network.channel.raw.play.RawPlayDataHandler;
+import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import com.google.inject.Inject;
 
-import lombok.Getter;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.universal.enums.ServerType;
 import me.truemb.universal.messenger.IMessageChannel;
@@ -31,10 +34,12 @@ import me.truemb.universal.messenger.PipelineMessage;
 import me.truemb.universal.minecraft.events.SpongeEventsListener;
 import me.truemb.universal.player.SpongePlayer;
 import me.truemb.universal.player.UniversalPlayer;
-import net.kyori.adventure.platform.spongeapi.SpongeAudiences;
 
 //@Plugin(id = "${project.artifactId}", name = "${project.name}", version = "${project.version}", authors = {"TrueMB"})
-@Plugin(id = "discordnotify", name = "DiscordNotify", version = "3.0.0", authors = {"TrueMB"})
+//@Plugin(id = "discordnotify", name = "DiscordNotify", version = "3.0.0", authors = {"TrueMB"})
+//@Plugin(id = "discordnotify", name = "${project.name}", version = "${project.version}", authors = {"TrueMB"}, dependencies = { @Dependency(id = "spicord", optional = true)} )
+//@Plugin(value = "${project.artifactId}")
+@Plugin(value = "DiscordNotify")
 public class SpongeMain implements IRelay {
 	
 	private DiscordNotifyMain instance;
@@ -48,41 +53,30 @@ public class SpongeMain implements IRelay {
     private IMessageChannel core;
     private RawDataChannel outgoing;
     
-    @Getter
-    private final SpongeAudiences adventure;
-
-    @Inject
-    public SpongeMain(final SpongeAudiences adventure) {
-        this.adventure = adventure;
-	}
-
     @Listener
-    public void onServerStart(GameStartedServerEvent e) {
-    	Game game = Sponge.getGame();
-		this.instance = new DiscordNotifyMain(this.configDir.toFile(), ServerType.VELOCITY);
+    public void onServerStart(LoadedGameEvent e) {
+    	Game game = e.game();
+		this.instance = new DiscordNotifyMain(this.configDir.toFile(), ServerType.SPONGE);
 		
 		//LOAD PLAYERS
 		Collection<UniversalPlayer> players = new ArrayList<>();
-		for(Player all : game.getServer().getOnlinePlayers()) {
-			players.add(new SpongePlayer(all, this.getAdventure()));
-		}
+		for(ServerPlayer all : game.server().onlinePlayers())
+			players.add(new SpongePlayer(all));
 		this.instance.getUniversalServer().loadPlayers(players);
-		
-		//LOAD LISTENER
-		SpongeEventsListener listener = new SpongeEventsListener(this.instance, this.adventure);
-		Sponge.getEventManager().registerListeners(this, listener);
 		
 		//TODO LOAD COMMANDS
 	}
-
+    
     @Listener
-    public void onDisable(GameStoppingServerEvent e) {
-    	if(this.instance != null)
-    		this.instance.onDisable();
+    public void onRegisterCommand(RegisterCommandEvent<Command.Raw> e) {
+    	
     }
     
     @Listener
-    public void onGameConstruction(GameConstructionEvent event) {
+    public void onConstructPlugin(ConstructPluginEvent e) {
+    	Game game = e.game();
+
+    	//PLUGIN CHANNEL
         this.core = new MessageChannelCore(this);
 
         try {
@@ -90,27 +84,52 @@ public class SpongeMain implements IRelay {
         } catch (MessageChannelException exception) {
             exception.printStackTrace();
         }
+        
+		//LOAD LISTENER
+		SpongeEventsListener listener = new SpongeEventsListener(this.instance);
+    	game.eventManager().registerListeners(e.plugin(), listener);
     }
 
     @Listener
-    public void onGamePreInitialization(GamePreInitializationEvent event) {
+    public void onDisable(StoppedGameEvent e) {
+    	if(this.instance != null)
+    		this.instance.onDisable();
+    }
+
+    @Listener
+    public void onRegisterChannel(RegisterChannelEvent e) {
+
+    	this.outgoing = e.register(ResourceKey.of("messagechannel", "proxy"), RawDataChannel.class);
+    	e.register(ResourceKey.of("messagechannel", "server"), RawDataChannel.class).play().addHandler(new RawPlayDataHandler<EngineConnection>() {
+
+			@Override
+			public void handlePayload(ChannelBuf data, EngineConnection connection) {
+				try {
+                    core.getPipelineRegistry().receive(data.readBytes(data.available()));
+                } catch (UnsupportedOperationException exception) {
+                    exception.printStackTrace();
+                }
+			}
+		});
+    }
+    	//OLD
+    	/*
         this.outgoing = game.getChannelRegistrar().createRawChannel(this, "messagechannel:proxy");
-        game.getChannelRegistrar().createRawChannel(this, "messagechannel:server").addListener(Platform.Type.SERVER,
-                (buffer, connection, side) -> {
+        this.game.getChannelRegistrar().createRawChannel(this, "messagechannel:server").addListener(Platform.Type.SERVER, (buffer, connection, side) -> {
                     try {
                         core.getPipelineRegistry().receive(buffer.readBytes(buffer.available()));
                     } catch (UnsupportedOperationException exception) {
                         exception.printStackTrace();
                     }
                 });
-    }
+                */
 
     @Override
     public boolean send(PipelineMessage message, byte[] data) {
-        if (game.getServer().getOnlinePlayers().size() > 0) {
-            Player player = (Player) game.getServer().getOnlinePlayers().toArray()[0];
+        if (this.game.server().onlinePlayers().size() > 0) {
+            ServerPlayer player = (ServerPlayer) this.game.server().onlinePlayers().toArray()[0];
             if (player != null) {
-                outgoing.sendTo(player, (buffer) -> {
+                outgoing.play().sendTo(player, (buffer) -> {
                     buffer.writeBytes(data);
                 });
             }
