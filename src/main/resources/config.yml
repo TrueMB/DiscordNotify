@@ -165,6 +165,11 @@ DiscordMessages:
   InactivityMessage: '**%Player%** was inactiv for more than %InactivDays% Days'
   PlayerJoinMessage: '**%Player%** joined the server.'
   PlayerLeaveMessage: '**%Player%** left the server.'
+  #If Player Switches Server (Proxy Setup)
+  PlayerServerChangeMessage: '**%Player%** went from **%old%** to **%target%**.'
+  #If Player Switches Server (Proxy Setup) and seperated Channels are active
+  PlayerServerChangeJoinMessage: '**%Player%** joined the server from %old%.'
+  PlayerServerChangeLeaveMessage: '**%Player%** left the server and went to %target%.'
   PlayerDeathMessage: '%DeathMessage%'
   ChatMessage: '%Player%: %Message%'
   StaffMessage: '%Player%: %Message%'
@@ -215,6 +220,40 @@ DiscordEmbedMessages:
     PictureType: AVATAR
   PlayerLeaveEmbed:
     Title: '**%Player%** left the server.'
+    Description: ''
+    Fields: {}
+    Author: '---------------------[ Disconnected ]------------------------'
+    #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
+    Color: 'RED'
+    DisableTimestamp: false
+    WithAuthorPicture: false
+    WithPicture: false
+    PictureType: AVATAR
+  #Triggers if no seperated Channels are active
+  PlayerServerChangeEmbed:
+    Title: '**%Player%** went from **%old%** to **%target%**.'
+    Description: ''
+    Fields: {}
+    Author: '---------------------[ Connected ]------------------------'
+    #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
+    Color: 'GREEN'
+    DisableTimestamp: false
+    WithAuthorPicture: false
+    WithPicture: true
+    PictureType: AVATAR
+  PlayerServerChangeJoinEmbed:
+    Title: '**%Player%** joined the server from %old%.'
+    Description: ''
+    Fields: {}
+    Author: '---------------------[ Connected ]------------------------'
+    #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
+    Color: 'GREEN'
+    DisableTimestamp: false
+    WithAuthorPicture: false
+    WithPicture: true
+    PictureType: AVATAR
+  PlayerServerChangeLeaveEmbed:
+    Title: '**%Player%** left the server and went to %target%.'
     Description: ''
     Fields: {}
     Author: '---------------------[ Disconnected ]------------------------'
@@ -276,4 +315,4 @@ DiscordEmbedMessages:
     PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 14
+ConfigVersion: 15

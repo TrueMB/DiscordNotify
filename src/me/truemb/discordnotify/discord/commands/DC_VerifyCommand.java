@@ -13,6 +13,7 @@ import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.GroupAction;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.discordnotify.utils.PlayerManager;
+import me.truemb.universal.player.UniversalPlayer;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
@@ -143,7 +144,8 @@ public class DC_VerifyCommand extends SimpleAddon {
 			}
 			
 			//PLAYER NOT ONLINE
-			if(!this.instance.getUniversalServer().getPlayer(uuid).isOnline()) {
+			UniversalPlayer up =  this.instance.getUniversalServer().getPlayer(uuid);
+			if(up == null || !up.isOnline()) {
 			   	command.reply(this.instance.getDiscordManager().getDiscordMessage("verification.playerOffline", placeholder));
 				return;
 			}

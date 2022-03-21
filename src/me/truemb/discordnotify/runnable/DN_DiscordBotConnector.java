@@ -22,10 +22,12 @@ public class DN_DiscordBotConnector implements Runnable {
 	@Override
 	public void run() {
 		
+		//TRY CONNECTING
+		this.instance.getDiscordManager().prepareDiscordBot();
+		
+		//IF FAILED, THEN RETRY IN ONE SECOND
 		if(this.instance.getDiscordManager().getDiscordBot() == null)
 			return;
-		
-		this.instance.getDiscordManager().prepareDiscordBot();
 		
 		if(this.instance.getDiscordManager().isDiscordBotHooked()) //TASK SUCCESSFUL DONE
 			this.task.cancel(true);

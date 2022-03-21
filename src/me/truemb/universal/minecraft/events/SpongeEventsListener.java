@@ -60,6 +60,8 @@ public class SpongeEventsListener {
 		UUID uuid = p.uniqueId();
 		
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
+		if(up == null)
+			return;
 		
 		this.plugin.getListener().onPlayerQuit(up, null);
 		

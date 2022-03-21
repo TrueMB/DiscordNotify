@@ -43,7 +43,7 @@ public class BungeeEventsListener implements Listener {
 		
 		this.plugin.getListener().onPlayerMessage(up, message);
 	}
-
+	
 	@EventHandler
 	public void onConnect(ServerConnectedEvent e) {
 
@@ -51,20 +51,23 @@ public class BungeeEventsListener implements Listener {
 		
 		UUID uuid = p.getUniqueId();
 		String newServerName = e.getServer().getInfo().getName();
-
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
 		if(up == null)
 			this.plugin.getUniversalServer().addPlayer(up = new BungeePlayer(p, this.adventure));
 		
-		//SERVER CHANGE? PRIORIZES FIRST THE DISCONNECT AND THEN THE JOIN
+		//PLAYER JOINS PROXY - Server current null
 		String oldServerName = up.getServer();
-		if(oldServerName != null)
-			this.plugin.getListener().onPlayerQuit(up, oldServerName); //OLD SERVER QUIT
+		if(oldServerName == null)
+			this.plugin.getListener().onPlayerJoin(up, newServerName); //JOINING PROXY
+		else
+			this.plugin.getListener().onPlayerServerChange(up, oldServerName, newServerName); //CHANGING SERVER
 		
 		up.setServer(newServerName);
-		this.plugin.getListener().onPlayerJoin(up, newServerName); //NEW SERVER JOIN
+			
+		
 	}
 	
+	//LEAVING PROXY
 	@EventHandler
 	public void onDisconnect(PlayerDisconnectEvent e) {
 
@@ -73,6 +76,9 @@ public class BungeeEventsListener implements Listener {
 		UUID uuid = p.getUniqueId();
 		
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
+		if(up == null)
+			return;
+		
 		String serverName = up.getServer();
 		
 		this.plugin.getListener().onPlayerQuit(up, serverName);

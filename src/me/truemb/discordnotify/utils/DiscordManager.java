@@ -284,11 +284,11 @@ public class DiscordManager {
 	}
 
 	public boolean isDiscordBotHooked() {
-		return discordBotHooked;
+		return this.discordBotHooked;
 	}
 
 	public int getHookSchedulerId() {
-		return hookSchedulerId;
+		return this.hookSchedulerId;
 	}
 
 	public void setHookSchedulerId(int hookSchedulerId) {

@@ -59,8 +59,6 @@ public class DiscordNotifyMain {
     
     //PLUGIN MESSAGING
     private PluginMessenger pluginMessenger;
-    //private ProxyMessenger proxyMessenger;
-    //private ServerMessenger serverMessenger;
     
     //API
     private PermissionsAPI permsAPI;

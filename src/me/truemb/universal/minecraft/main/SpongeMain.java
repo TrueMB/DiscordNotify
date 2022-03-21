@@ -19,6 +19,7 @@ import org.spongepowered.api.network.EngineConnection;
 import org.spongepowered.api.network.channel.ChannelBuf;
 import org.spongepowered.api.network.channel.raw.RawDataChannel;
 import org.spongepowered.api.network.channel.raw.play.RawPlayDataHandler;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.builtin.jvm.Plugin;
 
 import com.google.inject.Inject;
@@ -31,6 +32,9 @@ import me.truemb.universal.messenger.MessageChannelAPI;
 import me.truemb.universal.messenger.MessageChannelCore;
 import me.truemb.universal.messenger.MessageChannelException;
 import me.truemb.universal.messenger.PipelineMessage;
+import me.truemb.universal.minecraft.commands.SpongeCommandExecutor_DChat;
+import me.truemb.universal.minecraft.commands.SpongeCommandExecutor_Staff;
+import me.truemb.universal.minecraft.commands.SpongeCommandExecutor_Verify;
 import me.truemb.universal.minecraft.events.SpongeEventsListener;
 import me.truemb.universal.player.SpongePlayer;
 import me.truemb.universal.player.UniversalPlayer;
@@ -50,8 +54,27 @@ public class SpongeMain implements IRelay {
 	
     @Inject
     private Game game;
+    
+    @Inject
+    private PluginContainer pluginContainer;
     private IMessageChannel core;
     private RawDataChannel outgoing;
+    
+    //COMMANDS
+    private SpongeCommandExecutor_DChat dchatCommand = new SpongeCommandExecutor_DChat();
+    private SpongeCommandExecutor_Verify verifyCommand = new SpongeCommandExecutor_Verify();
+    private SpongeCommandExecutor_Staff staffCommand = new SpongeCommandExecutor_Staff();
+    
+    @Listener
+    public void onConstructPlugin(ConstructPluginEvent e) {
+    	//PLUGIN CHANNEL
+        this.core = new MessageChannelCore(this);
+        try {
+            MessageChannelAPI.setCore(core);
+        } catch (MessageChannelException exception) {
+            exception.printStackTrace();
+        }
+    }
     
     @Listener
     public void onServerStart(LoadedGameEvent e) {
@@ -64,36 +87,33 @@ public class SpongeMain implements IRelay {
 			players.add(new SpongePlayer(all));
 		this.instance.getUniversalServer().loadPlayers(players);
 		
-		//TODO LOAD COMMANDS
-	}
-    
-    @Listener
-    public void onRegisterCommand(RegisterCommandEvent<Command.Raw> e) {
-    	
-    }
-    
-    @Listener
-    public void onConstructPlugin(ConstructPluginEvent e) {
-    	Game game = e.game();
-
-    	//PLUGIN CHANNEL
-        this.core = new MessageChannelCore(this);
-
-        try {
-            MessageChannelAPI.setCore(core);
-        } catch (MessageChannelException exception) {
-            exception.printStackTrace();
-        }
-        
 		//LOAD LISTENER
 		SpongeEventsListener listener = new SpongeEventsListener(this.instance);
-    	game.eventManager().registerListeners(e.plugin(), listener);
-    }
+    	game.eventManager().registerListeners(this.pluginContainer, listener);
+    	
+    	//FINISH COMMAND LOADING
+		if(!this.instance.getUniversalServer().isProxySubServer()) {
+	    	this.dchatCommand.setup(this.instance);
+	    	this.verifyCommand.setup(this.instance);
+	    	this.staffCommand.setup(this.instance);
+		}
+	}
 
     @Listener
     public void onDisable(StoppedGameEvent e) {
     	if(this.instance != null)
     		this.instance.onDisable();
+    }
+
+    @Listener
+    public void onRegisterCommand(RegisterCommandEvent<Command.Raw> e) {
+    	
+		//LOAD COMMANDS
+		if(!this.instance.getUniversalServer().isProxySubServer()) {
+	    	e.register(this.pluginContainer, this.dchatCommand, "dchat");
+	    	e.register(this.pluginContainer, this.verifyCommand, "verify");
+	    	e.register(this.pluginContainer, this.staffCommand, "staff", "s");
+		}
     }
 
     @Listener

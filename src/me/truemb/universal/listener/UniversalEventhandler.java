@@ -1,7 +1,6 @@
 package me.truemb.universal.listener;
 
 import me.truemb.universal.player.UniversalPlayer;
-import net.kyori.adventure.text.Component;
 
 public abstract class UniversalEventhandler {
 	
@@ -12,6 +11,8 @@ public abstract class UniversalEventhandler {
 	public abstract void onPlayerQuit(UniversalPlayer up, String serverName);
 	
 	public abstract void onPlayerJoin(UniversalPlayer up, String serverName);
+	
+	public abstract void onPlayerServerChange(UniversalPlayer up, String oldServerName, String newServerName);
 	
 	public abstract void onPlayerMessage(UniversalPlayer up, String message);
 	

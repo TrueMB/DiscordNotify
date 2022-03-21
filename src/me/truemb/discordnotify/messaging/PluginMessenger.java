@@ -79,10 +79,10 @@ public class PluginMessenger {
 						instance.getOfflineInformationManager().setInformation(uuid, type, value);
 					}
 				}else if (subChannel.equalsIgnoreCase("SERVER_STATUS")) {
-					//ONLY SENDS MESSAGE, IF PLAYER ON SERVER. MAKES NO SENSE FOR SERVER START AND STOP
+					//ONLY SENDS A MESSAGE, IF PLAYER ON SERVER. MAKES NO SENSE FOR SERVER START AND STOP
 					
-					//String server = in.readUTF();
-					//boolean status = in.readBoolean();
+					//String server = (String) rows.get(1);
+					//boolean status = (Boolean) rows.get(2);
 					
 				}else if (subChannel.equalsIgnoreCase("GET_GROUPS_REQUEST")) {
 						

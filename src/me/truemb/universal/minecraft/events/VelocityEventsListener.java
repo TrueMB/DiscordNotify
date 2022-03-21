@@ -15,9 +15,6 @@ import me.truemb.universal.player.VelocityPlayer;
 
 public class VelocityEventsListener {
 	
-	//server.getEventManager().register(this, new MyListener());
-	//https://velocitypowered.com/wiki/developers/event-api/
-	
 	private DiscordNotifyMain plugin;
 	
 	public VelocityEventsListener(DiscordNotifyMain plugin) {
@@ -59,22 +56,27 @@ public class VelocityEventsListener {
 			up = new VelocityPlayer(p);
 			this.plugin.getUniversalServer().addPlayer(up);
 		}
-
-		if(oldServerName != null)
-			this.plugin.getListener().onPlayerQuit(up, oldServerName); //OLD SERVER QUIT
+		
+		//PLAYER JOINS PROXY - Server current null
+		if(oldServerName == null)
+			this.plugin.getListener().onPlayerJoin(up, newServerName); //JOINING PROXY
+		else
+			this.plugin.getListener().onPlayerServerChange(up, oldServerName, newServerName); //CHANGING SERVER
 		
 		up.setServer(newServerName);
-		this.plugin.getListener().onPlayerJoin(up, newServerName); //NEW SERVER JOIN
 	}
 	
+	//LEAVE PROXY
 	@Subscribe
 	public void onDisconnect(DisconnectEvent e) {
 
 		Player p = e.getPlayer();
 		UUID uuid = p.getUniqueId();
-		String serverName = p.getCurrentServer().get().getServerInfo().getName();
+		String serverName = p.getCurrentServer().isPresent() ? p.getCurrentServer().get().getServerInfo().getName() : null;
 		
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
+		if(up == null)
+			return;
 		
 		this.plugin.getListener().onPlayerQuit(up, serverName);
 		

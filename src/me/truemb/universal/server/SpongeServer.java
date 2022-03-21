@@ -6,12 +6,17 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 
+import com.google.inject.Inject;
+
 import net.kyori.adventure.text.Component;
 
 public class SpongeServer extends UniversalServer {
 
 	private final Server server;
 	private final Game game;
+	
+    @Inject
+    private Logger logger;
 
 	public SpongeServer() {
 		this.server = Sponge.server();
@@ -30,7 +35,8 @@ public class SpongeServer extends UniversalServer {
 
 	@Override
 	public Logger getLogger() {
-		return Logger.getLogger("DiscordNotify");
+		//return Logger.getLogger("DiscordNotify");
+		return this.logger;
 	}
 
 	@Override
@@ -53,6 +59,6 @@ public class SpongeServer extends UniversalServer {
 
 	@Override
 	public boolean isProxySubServer() {
-		return false;
+		return true; //TODO
 	}
 }

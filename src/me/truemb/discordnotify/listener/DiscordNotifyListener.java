@@ -244,4 +244,63 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		}
 	}
 
+	@Override
+	public void onPlayerServerChange(UniversalPlayer up, String oldServerName, String newServerName) {
+
+		UUID uuid = up.getUUID();
+		
+		HashMap<String, String> placeholder = new HashMap<>();
+		placeholder.put("Player", up.getIngameName());
+		placeholder.put("UUID", uuid.toString());
+		placeholder.put("old", oldServerName);
+		placeholder.put("target", newServerName);
+		
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave")) {
+			//SEND A MESSAGE TO THE OLD SERVER
+			if(!up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Leave"))) {
+				for(String server : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave").getKeys(false)){
+					if(server.equalsIgnoreCase(oldServerName)) {
+						long channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + server);
+						
+						if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
+							this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerServerChangeLeaveEmbed", placeholder);
+						}else {
+							this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerServerChangeLeaveMessage", placeholder);
+						}
+						break;
+					}
+				}
+			}
+			
+			//SEND A MESSAGE TO THE NEW SERVER
+			if(!up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Join"))) {
+				for(String server : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave").getKeys(false)){
+					if(server.equalsIgnoreCase(newServerName)) {
+						long channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + server);
+						
+						if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
+							this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerServerChangeJoinEmbed", placeholder);
+						}else {
+							this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerServerChangeJoinMessage", placeholder);
+						}
+						break;
+					}
+				}
+			}
+
+		} else {
+
+			if(up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Join")))
+				return;
+			
+			long channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerJoinLeave);
+			
+			if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
+				this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerServerChangeEmbed", placeholder);
+			}else {
+				this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerServerChangeMessage", placeholder);
+			}
+		}
+	}
+
 }
