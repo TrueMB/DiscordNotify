@@ -1,8 +1,10 @@
 package me.truemb.universal.server;
 
+import java.io.File;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.simpleyaml.configuration.file.YamlConfiguration;
 
 public class BukkitServer extends UniversalServer {
 		
@@ -33,8 +35,11 @@ public class BukkitServer extends UniversalServer {
 
 	@Override
 	public boolean isProxySubServer() {
+		File paperYml = new File("paper.yml");
+		YamlConfiguration paperCfg = YamlConfiguration.loadConfiguration(paperYml);
+		
 		org.bukkit.configuration.file.YamlConfiguration spigotCfg = Bukkit.spigot().getConfig();
-		return spigotCfg.getBoolean("settings.bungeecord");
+		return paperYml.exists() ? spigotCfg.getBoolean("settings.bungeecord") || paperCfg.getBoolean("settings.velocity-support.enabled") : spigotCfg.getBoolean("settings.bungeecord");
 	}
 
 

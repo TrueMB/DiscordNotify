@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
+import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.event.player.PlayerChatEvent.ChatResult;
 import com.velocitypowered.api.event.player.ServerConnectedEvent;
@@ -64,6 +65,11 @@ public class VelocityEventsListener {
 			this.plugin.getListener().onPlayerServerChange(up, oldServerName, newServerName); //CHANGING SERVER
 		
 		up.setServer(newServerName);
+	}
+	
+	@Subscribe
+	public void onKick(KickedFromServerEvent e) {
+		//
 	}
 	
 	//LEAVE PROXY

@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import me.truemb.discordnotify.main.DiscordNotifyMain;
@@ -52,6 +53,11 @@ public class BukkitEventsListener implements Listener {
 		this.plugin.getListener().onPlayerJoin(up, null);
 		
 		this.plugin.getUniversalServer().addPlayer(up);
+	}
+	
+	@EventHandler
+	public void onKick(PlayerKickEvent e) {
+		//
 	}
 	
 	@EventHandler
