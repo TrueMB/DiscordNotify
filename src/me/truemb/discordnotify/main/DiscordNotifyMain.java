@@ -95,6 +95,9 @@ public class DiscordNotifyMain {
 	}
 	
 	//TODO SPONGE SUPPORT
+	//TODO Announcement Channel
+	//TODO Kick Event
+	//TODO Server Start/Stop
 
 	//Velocity needs Spicord v4.2.1
 	/**
