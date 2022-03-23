@@ -24,7 +24,6 @@ import me.truemb.discordnotify.utils.PlayerManager;
 import me.truemb.discordnotify.utils.TimeFormatter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.md_5.bungee.api.ProxyServer;
 
 public class DN_InactivityChecker implements Runnable {
 	
@@ -63,7 +62,7 @@ public class DN_InactivityChecker implements Runnable {
 						
 						UUID uuid = UUID.fromString(rs.getString("uuid"));
 							
-						if(ProxyServer.getInstance().getPlayer(uuid) != null) //PLAYER IS ONLINE
+						if(instance.getUniversalServer().getPlayer(uuid) != null && instance.getUniversalServer().getPlayer(uuid).isOnline()) //PLAYER IS ONLINE
 							continue;
 							
 						long playtimeInTicks = rs.getLong(InformationType.Playtime.toString());
