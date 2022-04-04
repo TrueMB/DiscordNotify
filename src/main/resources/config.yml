@@ -144,7 +144,7 @@ Messages:
   discordChatEnable: '&aEnabled the Discord Chat.'
   staffHelp: '&cPlease use &f/staff <message>'
   discordStaffMessage: '&7[&4S&7] &f%Tag%&7: &f%Message%'
-  minecraftStaffMessage: '&7[&4S&7] &f%Message%'
+  minecraftStaffMessage: '&7[&4S&7] &f%player%&7: &f%Message%'
   verification:
     unlinked: '&6You deleted your Verification.'
     denied: '&6You denied the Verification Request.'
