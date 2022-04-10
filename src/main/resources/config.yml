@@ -62,6 +62,20 @@ Options:
     serverSeperatedDeath:
       lobby: -1
       freebuild: -1
+  Broadcast:
+    #Sends the Message in the specified discord Channel to all named minecraft servers.
+    # * = all servers; otherwise the exact configurated name of the server
+    'channelId':
+      prefix: false
+      messageFormat: '&6%message%'
+      servers:
+        - '*'
+    '238923488923489234892348':
+      prefix: true
+      messageFormat: '%message%'
+      servers:
+        - 'lobby'
+        - 'freebuild'
   Chat:
     useEmbedMessage: false
     #Should the Discord Message send to the Minecraft Server?
@@ -315,4 +329,4 @@ DiscordEmbedMessages:
     PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 15
+ConfigVersion: 16

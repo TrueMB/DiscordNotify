@@ -95,7 +95,6 @@ public class DiscordNotifyMain {
 	}
 	
 	//TODO SPONGE SUPPORT
-	//TODO Announcement Channel
 	//TODO Kick Event
 	//TODO Server Start/Stop
 

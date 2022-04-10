@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,7 +16,7 @@ import me.truemb.discordnotify.utils.UTF8YamlConfiguration;
 
 public class ConfigManager {
 
-	private static final int configVersion = 15;
+	private static final int configVersion = 16;
 	
 	private File configFile;
 	private UTF8YamlConfiguration config;
@@ -46,7 +46,7 @@ public class ConfigManager {
 		if(!this.config.isSet("ConfigVersion") || this.config.getInt("ConfigVersion") < configVersion) {
 			logger.info("Updating Config!");
 			try {
-				ConfigUpdater.update(pluginConfig, this.configFile, new ArrayList<>());
+				ConfigUpdater.update(pluginConfig, this.configFile, List.of("Options.Broadcast"));
 				this.config = new UTF8YamlConfiguration(this.configFile);
 			} catch (IOException e) {
 				e.printStackTrace();

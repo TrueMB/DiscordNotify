@@ -39,7 +39,7 @@ public class BukkitServer extends UniversalServer {
 		YamlConfiguration paperCfg = YamlConfiguration.loadConfiguration(paperYml);
 		
 		org.bukkit.configuration.file.YamlConfiguration spigotCfg = Bukkit.spigot().getConfig();
-		return paperYml.exists() ? spigotCfg.getBoolean("settings.bungeecord") || paperCfg.getBoolean("settings.velocity-support.enabled") : spigotCfg.getBoolean("settings.bungeecord");
+		return paperYml.exists() && paperCfg.getBoolean("settings.velocity-support.enabled") || spigotCfg.getBoolean("settings.bungeecord") ? true : false;
 	}
 
 

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>DiscordNotify</groupId>
   <artifactId>discordnotify</artifactId>
-  <version>3.0.0</version>
+  <version>3.1.0</version>
   <name>DiscordNotify</name>
   <description>Multifunctional Discord Plugin</description>
   

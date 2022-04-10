@@ -17,6 +17,7 @@ import org.spicord.bot.DiscordBot;
 
 import me.truemb.discordnotify.discord.commands.DC_PlayerInfoCommand;
 import me.truemb.discordnotify.discord.commands.DC_VerifyCommand;
+import me.truemb.discordnotify.discord.listener.DC_BroadcastListener;
 import me.truemb.discordnotify.discord.listener.DC_ChatListener;
 import me.truemb.discordnotify.enums.MinotarTypes;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
@@ -38,6 +39,7 @@ public class DiscordManager {
 	
 	//LISTENER
 	private DC_ChatListener chatListener;
+	private DC_BroadcastListener broadcastListener;
 	
 	public DiscordManager(DiscordNotifyMain plugin) {
 		this.instance = plugin;
@@ -80,6 +82,7 @@ public class DiscordManager {
         	
         	//LISTENER
             this.getDiscordBot().getJda().removeEventListener(this.chatListener);
+            this.getDiscordBot().getJda().removeEventListener(this.broadcastListener);
         	
         	//SHUTDOWN
         	this.getDiscordBot().getJda().shutdownNow();
@@ -108,7 +111,10 @@ public class DiscordManager {
 	
 	    //REGISTER LISTENER
 		this.chatListener = new DC_ChatListener(this.instance);
+		this.broadcastListener = new DC_BroadcastListener(this.instance);
+		
 	    this.getDiscordBot().getJda().addEventListener(this.chatListener);
+	    this.getDiscordBot().getJda().addEventListener(this.broadcastListener);
 	    	
 		this.instance.getUniversalServer().getLogger().info("Connected with Discord BOT.");
 		
