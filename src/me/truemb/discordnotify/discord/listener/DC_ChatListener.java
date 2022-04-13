@@ -7,7 +7,6 @@ import com.vdurmont.emoji.EmojiParser;
 
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
-import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -23,15 +22,13 @@ public class DC_ChatListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
     	
-    	if(!e.isFromType(ChannelType.TEXT))
-    		return;
-    	
         long channelId = e.getChannel().getIdLong();
         TextChannel channel = e.getTextChannel();
         String channelName =  EmojiParser.removeAllEmojis(channel.getName()).replace("[^a-zA-Z0-9 -]", "");
 
 	    String message = e.getMessage().getContentDisplay();
 	    
+	    //WONT SEND MESSAGE OF DISCORD BOTS. SINCE THEY COULD BE A BAN COMMAND OR SO ON
 	    if(e.getAuthor().isBot())
 	    	return;
 	    	   	    

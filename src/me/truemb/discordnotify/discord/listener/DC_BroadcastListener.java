@@ -22,7 +22,8 @@ public class DC_BroadcastListener extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
 
-	    if(e.getAuthor().isBot())
+    	//EXPECTING ONLY THE STAFF HERE. SO NO NEED FOR OTHER BOTS IN THE CHANNEL. ONLY IF YOU WANT THAT.
+	    if(e.getAuthor().getIdLong() == this.instance.getDiscordManager().getDiscordBot().getJda().getSelfUser().getIdLong())
 	    	return;
 	    	   	    
         long channelId = e.getChannel().getIdLong();
