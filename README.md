@@ -91,5 +91,5 @@ For Bungeecord it is also sometimes possible to use %server% for the current ser
 #### Spigot: 
 https://www.spigotmc.org/threads/bungeecord-velocity-bukkit-discordnotify-notifications-and-utils-for-discord.515879/
 
-If you like this plugin, please consider to rate it on Spigot. And if you like to [donate](paypal.me/truemb).<br />
+If you like this plugin, please consider to rate it on Spigot. And if you like to [donate](https://paypal.me/truemb).<br />
 New Bugs will be shortly fixed!
