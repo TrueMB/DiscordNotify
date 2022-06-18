@@ -4,16 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.entity.Player;
 
 import me.truemb.discordnotify.commands.DN_VerifyCommand;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 
-public class BukkitCommandExecutor_Verify extends BukkitCommand implements TabCompleter {
+public class BukkitCommandExecutor_Verify extends BukkitCommand {
 
 	private DiscordNotifyMain instance;
 	private DN_VerifyCommand verifyCommand;
@@ -40,7 +38,7 @@ public class BukkitCommandExecutor_Verify extends BukkitCommand implements TabCo
 	}
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+	public List<String> tabComplete(CommandSender sender, String alias, String[] args) throws IllegalArgumentException {
 		List<String> result = new ArrayList<>();
 
 		if(args.length == 1) {

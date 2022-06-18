@@ -125,8 +125,8 @@
 		
 		<!-- UPDATE CHECKER -->
 	    <repository>
-	        <id>jeff-media-gbr</id>
-	        <url>https://repo.jeff-media.de/maven2/</url>
+	        <id>jeff-media-public</id>
+	        <url>https://hub.jeff-media.com/nexus/repository/jeff-media-public/</url>
 	    </repository>
 
 		<!-- PLACEHOLDER API -->
@@ -204,25 +204,25 @@
 		<dependency>
 		    <groupId>net.kyori</groupId>
 		    <artifactId>adventure-api</artifactId>
-		    <version>4.10.1</version>
+		    <version>4.11.0</version>
 		</dependency>
 
 		<!-- TEXT COMPONENT TO STRING -->
 		<dependency>
 		    <groupId>net.kyori</groupId>
 		    <artifactId>adventure-text-serializer-plain</artifactId>
-		    <version>4.9.3</version>
+		    <version>4.11.0</version>
 		 </dependency>
 
 		<dependency>
 			<groupId>net.kyori</groupId>
 			<artifactId>adventure-platform-bukkit</artifactId>
-			<version>4.1.0</version>
+			<version>4.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>net.kyori</groupId>
 			<artifactId>adventure-platform-bungeecord</artifactId>
-			<version>4.1.0</version>
+			<version>4.1.1</version>
 		</dependency>
         
 		<!-- MYSQL Connector -->
@@ -236,7 +236,7 @@
 	    <dependency>
 		    <groupId>com.jeff_media</groupId>
 			<artifactId>SpigotUpdateChecker</artifactId>
-			<version>2.1.1</version>
+			<version>3.0.0</version>
 	        <scope>compile</scope>
 	    </dependency>
 
@@ -282,7 +282,7 @@
 		<dependency>
 		    <groupId>org.bstats</groupId>
 		    <artifactId>bstats-bukkit</artifactId>
-		    <version>2.2.1</version>
+		    <version>3.0.0</version>
 		    <scope>compile</scope>
 		</dependency>
 
@@ -305,7 +305,7 @@
 	    <dependency>
 	        <groupId>net.luckperms</groupId>
 	        <artifactId>api</artifactId>
-	        <version>5.3</version>
+	        <version>5.4</version>
 	        <scope>provided</scope>
 	    </dependency>
 
