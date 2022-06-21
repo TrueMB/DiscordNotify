@@ -4,7 +4,7 @@
   <groupId>DiscordNotify</groupId>
   <artifactId>discordnotify</artifactId>
   <name>DiscordNotify</name>
-  <version>3.1.0</version>
+  <version>3.1.2</version>
   <description>Multifunctional Discord Plugin</description>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -80,8 +80,8 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
     </repository>
     <repository>
-      <id>jeff-media-gbr</id>
-      <url>https://repo.jeff-media.de/maven2/</url>
+      <id>jeff-media-public</id>
+      <url>https://hub.jeff-media.com/nexus/repository/jeff-media-public/</url>
     </repository>
     <repository>
       <id>placeholderapi</id>
@@ -142,7 +142,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.22</version>
+      <version>1.18.24</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -172,7 +172,7 @@
     <dependency>
       <groupId>net.luckperms</groupId>
       <artifactId>api</artifactId>
-      <version>5.3</version>
+      <version>5.4</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

@@ -114,6 +114,8 @@ Options:
     delayForNewRequest: 500
     #-1 to enable the command for every channel. Otherwise the channel ID
     discordCommandOnlyInChannel: -1
+    #Set to true, if you want to notify the player on Join
+    reminder: false
   RoleSync:
     #Uses only the Primary Group. Otherwise all groups that are directly connected to the player
     useOnlyPrimaryGroup: false
@@ -168,6 +170,7 @@ Messages:
     sessionTimeOut: '&6Your Session run out. Please try the Verification again on the Discord Server!'
     otherReasonVerification: '&6Your Discord or Minecraft Account got already verfied for some other Reason.'
     help: '&6Please use &f/verify <accept/deny> &6for Verification or &f/verify unlink &6to remove a Discord Account.'
+    reminder: '&cYou are not verfied on the Discord Server.'
     requestClickMessage:
       message: '&f%User% &6wants to link with your Minecraft Account.'
       accept: '&7[&aAccept&7]'
@@ -329,4 +332,4 @@ DiscordEmbedMessages:
     PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 16
+ConfigVersion: 17
