@@ -43,7 +43,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		}
 		
 		//REMINDER - If not verified
-		if(this.instance.getDiscordManager().isAddonEnabled("disnotify::verify") && !this.instance.getVerifyManager().isVerified(uuid))
+		if(this.instance.getDiscordManager() != null && this.instance.getDiscordManager().isAddonEnabled("disnotify::verify") && !this.instance.getVerifyManager().isVerified(uuid))
 			up.sendMessage(this.instance.getConfigManager().getMinecraftMessage("verification.reminder", true));
 		
 		//ROLE UPDATES

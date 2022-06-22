@@ -46,7 +46,7 @@ public class BukkitServer extends UniversalServer {
 			if(paperBungee)
 				return true;
 		}else if(newPaperYml.exists()) {
-			YamlConfiguration newPaperCfg = YamlConfiguration.loadConfiguration(oldPaperYml);
+			YamlConfiguration newPaperCfg = YamlConfiguration.loadConfiguration(newPaperYml);
 			boolean paperBungee = newPaperCfg.getBoolean("proxies.velocity.enabled");
 			if(paperBungee)
 				return true;

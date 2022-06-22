@@ -85,6 +85,11 @@ public class BukkitMain extends JavaPlugin implements IRelay {
 			}catch(Exception exception){
 			    exception.printStackTrace();
 			}
+		}else if(this.getServer().getPluginManager().getPlugin("Spicord") != null){
+			this.instance.getUniversalServer().getLogger().severe("Bungeecord Sub-Server detected, but Spicord as well. Please install Spicord on your Bungeecord Server.");
+			return;
+		}else {
+			this.instance.getUniversalServer().getLogger().info("Bungeecord Sub-Server detected.");
 		}
 	}
 	

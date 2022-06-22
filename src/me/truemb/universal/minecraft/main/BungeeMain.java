@@ -1,7 +1,9 @@
 package me.truemb.universal.minecraft.main;
 
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 import lombok.Getter;
 import me.truemb.discordnotify.enums.FeatureType;
@@ -56,6 +58,13 @@ public class BungeeMain extends Plugin implements IRelay, Listener {
 			up.setServer(all.getServer().getInfo().getName());
 		}
 		this.instance.getUniversalServer().loadPlayers(players);
+		
+		HashMap<String, SocketAddress> servers = new HashMap<String, SocketAddress>();
+		for(String server : this.getProxy().getServers().keySet()) {
+			SocketAddress address = this.getProxy().getServers().get(server).getSocketAddress();
+			servers.put(server, address);
+		}
+		this.instance.getUniversalServer().loadServers(servers);
 		
 		//LOAD LISTENER
 		BungeeEventsListener listener = new BungeeEventsListener(this.instance, this.adventure);

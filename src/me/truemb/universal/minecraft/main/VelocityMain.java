@@ -1,9 +1,11 @@
 package me.truemb.universal.minecraft.main;
 
 import java.io.File;
+import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -40,7 +42,7 @@ import me.truemb.universal.player.UniversalPlayer;
 import me.truemb.universal.player.VelocityPlayer;
 
 //@Plugin(id = "discordnotify", name = "${project.name}", version = "${project.version}", authors = {"TrueMB"}, dependencies = { @Dependency(id = "spicord")} )
-@Plugin(id = "discordnotify", name = "DiscordNotify", version = "3.1.2", authors = {"TrueMB"}, dependencies = { @Dependency(id = "spicord")} )
+@Plugin(id = "discordnotify", name = "DiscordNotify", version = "3.2.0", authors = {"TrueMB"}, dependencies = { @Dependency(id = "spicord")} )
 public class VelocityMain implements IRelay {
 	
 	private DiscordNotifyMain instance;
@@ -79,7 +81,7 @@ public class VelocityMain implements IRelay {
 		//MESSAGING CHANNEL
         this.proxy.getChannelRegistrar().register(INCOMING = MinecraftChannelIdentifier.create("messagechannel", "proxy"));
         this.proxy.getChannelRegistrar().register(OUTGOING = MinecraftChannelIdentifier.create("messagechannel", "server"));
-		
+        
 		//LOAD PLAYERS
 		Collection<UniversalPlayer> players = new ArrayList<>();
 		for(Player all : this.proxy.getAllPlayers()) {
@@ -90,6 +92,14 @@ public class VelocityMain implements IRelay {
 				up.setServer(all.getCurrentServer().get().getServerInfo().getName());
 		}
 		this.instance.getUniversalServer().loadPlayers(players);
+		
+		HashMap<String, SocketAddress> servers = new HashMap<String, SocketAddress>();
+		for(RegisteredServer rserver : this.proxy.getAllServers()) {
+			String server = rserver.getServerInfo().getName();
+			SocketAddress address = rserver.getServerInfo().getAddress();
+			servers.put(server, address);
+		}
+		this.instance.getUniversalServer().loadServers(servers);
 		
 		//LOAD LISTENER
 		VelocityEventsListener listener = new VelocityEventsListener(this.instance);

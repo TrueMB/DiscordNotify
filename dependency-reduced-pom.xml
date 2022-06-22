@@ -4,7 +4,7 @@
   <groupId>DiscordNotify</groupId>
   <artifactId>discordnotify</artifactId>
   <name>DiscordNotify</name>
-  <version>3.1.2</version>
+  <version>3.2.0</version>
   <description>Multifunctional Discord Plugin</description>
   <build>
     <sourceDirectory>src</sourceDirectory>

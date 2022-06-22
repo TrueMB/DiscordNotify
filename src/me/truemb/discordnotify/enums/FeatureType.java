@@ -8,7 +8,7 @@ public enum FeatureType {
 	Chat(false),
 	Staff(false),
 	RoleSync(false),
-	//ServerStatus(false),
+	ServerStatus(false),
 	
 	//ADDONS
 	Verification(true),

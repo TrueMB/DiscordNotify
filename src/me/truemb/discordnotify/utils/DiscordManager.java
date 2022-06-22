@@ -125,6 +125,13 @@ public class DiscordManager {
 		return this.discordBot;
 	}
 
+	/**
+	 * 
+	 * @param channelId - Channel to send the message to
+	 * @param uuid - can be null - only interesting for Minotar Picture
+	 * @param path
+	 * @param placeholder
+	 */
 	public void sendEmbedMessage(long channelId, UUID uuid, String path, HashMap<String, String> placeholder) {
 		if(this.getDiscordBot() == null) {
     		this.instance.getUniversalServer().getLogger().warning("Discord BOT is not ready.");
@@ -139,22 +146,26 @@ public class DiscordManager {
 	    		this.instance.getUniversalServer().getLogger().warning("The Channel with the ID: " + channelId + " doesn't exists.");
 				return;
 			}
+
+			if(channel == null) {
+				this.instance.getUniversalServer().getLogger().warning("Couldn't send Message to channel: " + channelId);
+				return;
+			}
 			
 			EmbedBuilder eb = this.getEmbedMessage(uuid, path, placeholder);
 			
-			//PICTURE ADDING TO MESSAGE
-			String minotarTypeS = this.instance.getConfigManager().getConfig().getString("DiscordEmbedMessages." + path + ".PictureType");
-			MinotarTypes minotarType = MinotarTypes.BUST;
-			try {
-				minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
-			}catch(Exception ex) { /* NOTING */ }
-			
-			InputStream file = null;
-			String filename = minotarType.toString().toLowerCase() + "_" + uuid.toString() + ".jpg";
-			
-			if(this.instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithPicture")) {
+			//PICTURE ADDING TO MESSAGE - Only if uuid not null and Pictures are on
+			if(uuid != null && this.instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithPicture")) {
+				String minotarTypeS = this.instance.getConfigManager().getConfig().getString("DiscordEmbedMessages." + path + ".PictureType");
+				MinotarTypes minotarType = MinotarTypes.BUST;
+				try {
+					minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+				}catch(Exception ex) { /* NOTING */ }
+				
+				InputStream file = null;
+				String filename = minotarType.toString().toLowerCase() + "_" + uuid.toString() + ".jpg";
+				
 				eb.setImage("attachment://" + filename);
-	
 				try {
 					URL url = new URL("https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString());
 					URLConnection urlConn = url.openConnection();
@@ -162,17 +173,16 @@ public class DiscordManager {
 				}catch (IOException e) {
 					e.printStackTrace();
 				}
-			}
-			//===========
-			if(channel == null) {
-				this.instance.getUniversalServer().getLogger().warning("Couldn't send Message to channel: " + channelId);
-				return;
+
+				//SENDING MESSAGE WITH PICTURE
+				if(file != null) {
+					channel.sendMessage(eb.build()).addFile(file, filename).queue();
+					return;
+				}
 			}
 			
-			if(file != null)
-				channel.sendMessage(eb.build()).addFile(file, filename).queue();
-			else
-				channel.sendMessage(eb.build()).queue();
+			//SENDS MESSAGE - if no Pictures are enabled
+			channel.sendMessage(eb.build()).queue();
 			
 		}).start();
 	}
@@ -204,7 +214,7 @@ public class DiscordManager {
 		EmbedBuilder eb = new EmbedBuilder();
 
 		if(author != null && !author.equalsIgnoreCase("")) {
-			if(this.instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithAuthorPicture"))
+			if(uuid != null && this.instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithAuthorPicture"))
 				eb.setAuthor(author, null, "https://minotar.net/" + "avatar" + "/" + uuid.toString());
 			else
 				eb.setAuthor(author);

@@ -1,7 +1,9 @@
 package me.truemb.universal.server;
 
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -13,6 +15,7 @@ import me.truemb.universal.player.UniversalPlayer;
 public abstract class UniversalServer {
 
 	@Getter private Collection<UniversalPlayer> onlinePlayers = new ArrayList<>();
+	@Getter private HashMap<String, SocketAddress> servers = new HashMap<String, SocketAddress>();
 	
 	public void loadPlayers(Collection<UniversalPlayer> players) {
 		this.onlinePlayers = players;
@@ -34,6 +37,10 @@ public abstract class UniversalServer {
 		return players.size() > 0 ? players.get(0) : null;
 	}
 
+	public void loadServers(HashMap<String, SocketAddress> servers) {
+		this.servers = servers;
+	}
+	
 	public abstract Logger getLogger();
 	
 	public abstract boolean isOnlineMode();

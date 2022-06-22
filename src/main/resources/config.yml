@@ -20,6 +20,7 @@ FeaturesEnabled:
   Chat: false
   Staff: true
   RoleSync: false
+  ServerStatus: false
 Options:
   useMetrics: true
   DiscordBot:
@@ -126,6 +127,18 @@ Options:
     customGroupSync:
       default: 'default'
       mcowner: 'discord-owner'
+  #Only Works on Server Networks
+  ServerStatus:
+    useEmbedMessage: false
+    #Seconds after DiscordNotify checks, if a server Status changed.
+    scanDelay: 5
+    #Millisenconds. Increase, if you experience a server going down and up again without actually restarting it.
+    pingTimeout: 500
+    #if enabled, then Options.ServerStatus.enableServerSeperatedStatus.%server% will be used and not Channel.ServerStatus
+    enableServerSeperatedStatus: false
+    serverSeperatedStatus:
+      lobby: -1
+      freebuild: -1
 Permissions:
   StaffChat: 'dn.staff'
   #Doesnt send the Discord Messages
@@ -141,8 +154,9 @@ Channel:
   PlayerDeath: -1
   Chat: -1
   #Should be a seperated Channel from the chat, because players can send message back to the server,
-  #but the system wouldnt know, if it is a chat or staff message
+  #but the system wouldnt know, if it is a chat or staff 
   Staff: -1
+  ServerStatus: -1
 Messages:
   prefix: '&7[&5Discord&fNotify&7]'
   perm: '&cYou dont have enough Permissions!'
@@ -182,6 +196,8 @@ DiscordMessages:
   InactivityMessage: '**%Player%** was inactiv for more than %InactivDays% Days'
   PlayerJoinMessage: '**%Player%** joined the server.'
   PlayerLeaveMessage: '**%Player%** left the server.'
+  ServerStartMessage: ':green_circle: **%Server%** is now Online.'
+  ServerStopMessage: ':no_entry: **%Server%** is now Offline.'
   #If Player Switches Server (Proxy Setup)
   PlayerServerChangeMessage: '**%Player%** went from **%old%** to **%target%**.'
   #If Player Switches Server (Proxy Setup) and seperated Channels are active
@@ -330,6 +346,24 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
     WithPicture: true
     PictureType: BODY
+  ServerStartEmbed:
+    Title: ':green_circle: **%Server%**'
+    Description: The Server is now Online again!
+    Fields: {}
+    Author: '---------------------[ Server Online ]------------------------'
+    #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
+    Color: GREEN
+    DisableTimestamp: false
+    WithAuthorPicture: false
+  ServerStopEmbed:
+    Title: ':no_entry: **%Server%**'
+    Description: The Server is now Offline!
+    Fields: {}
+    Author: '---------------------[ Server Offline ]------------------------'
+    #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
+    Color: RED
+    DisableTimestamp: false
+    WithAuthorPicture: false
 
   #Do NOT touch
-ConfigVersion: 17
+ConfigVersion: 18

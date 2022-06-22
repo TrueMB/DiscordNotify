@@ -22,6 +22,7 @@ import me.truemb.discordnotify.manager.VerifyManager;
 import me.truemb.discordnotify.messaging.PluginMessenger;
 import me.truemb.discordnotify.runnable.DN_DiscordBotConnector;
 import me.truemb.discordnotify.runnable.DN_InactivityChecker;
+import me.truemb.discordnotify.runnable.SubServerHandler;
 import me.truemb.discordnotify.utils.DiscordManager;
 import me.truemb.discordnotify.utils.PermissionsAPI;
 import me.truemb.universal.enums.ServerType;
@@ -56,6 +57,7 @@ public class DiscordNotifyMain {
     
     //RUNNABLE
     private DN_InactivityChecker inactivityChecker;
+    private SubServerHandler subServerHandler;
     
     //PLUGIN MESSAGING
     private PluginMessenger pluginMessenger;
@@ -98,7 +100,6 @@ public class DiscordNotifyMain {
 	//TODO Kick Event
 	//TODO Server Start/Stop
 
-	//Velocity needs Spicord v4.2.1
 	/**
 	 * Enables the DiscordNotify Plugin
 	 */
@@ -134,7 +135,10 @@ public class DiscordNotifyMain {
 		
 		//RUNNABLE
 		if(!this.getUniversalServer().isProxySubServer() && this.getConfigManager().isFeatureEnabled(FeatureType.Inactivity))
-			this.inactivityChecker = new DN_InactivityChecker(this);	
+			this.inactivityChecker = new DN_InactivityChecker(this);
+		
+		if(this.getUniversalServer().isProxy() && this.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
+			this.subServerHandler = new SubServerHandler(this);	
 	}
 	
 	public void onDisable() {
@@ -155,6 +159,9 @@ public class DiscordNotifyMain {
 		
 		if(this.inactivityChecker != null)
 			this.inactivityChecker.cancelTask();
+
+	    if(this.subServerHandler != null)
+	    	this.subServerHandler.cancelTask();
 		
 		if(this.getDiscordManager() != null)
 			this.getDiscordManager().disconnectDiscordBot();
