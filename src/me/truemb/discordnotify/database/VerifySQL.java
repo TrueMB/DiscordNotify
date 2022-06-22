@@ -152,8 +152,8 @@ public class VerifySQL {
 						}
 					}
 					
+					//IF A MINECRAFT RANK WAS SET, THEN GIVE THE PLAYER THAT ONE
 					String verifyGroupS = instance.getConfigManager().getConfig().getString("Options." + FeatureType.Verification.toString() +  ".minecraftRank");
-					
 					if(verifyGroupS != null && !verifyGroupS.equalsIgnoreCase("")) {
 						
 						String[] array = verifyGroupS.split(":");
@@ -171,6 +171,15 @@ public class VerifySQL {
 						}else {
 							instance.getUniversalServer().getLogger().warning("Something went wrong with adding the Verificationsgroup on Minecraft!");
 						}
+					}
+					
+					//RUN COMMANDS ON THE LIST ON THE MAIN SERVER
+					List<String> commands = instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Verification.toString() +  ".commands");
+					if(commands != null) {
+						commands.forEach(command -> instance.getUniversalServer().sendCommandToConsole(command
+								.replaceAll("(?i)%" + "player" + "%", ingameName)
+								.replaceAll("(?i)%" + "uuid" + "%", uuid.toString())
+						));
 					}
 					
 					instance.getUniversalServer().getPlayer(uuid).sendMessage(discordManager.getPlaceholderString(instance.getConfigManager().getMinecraftMessage("verification.accept", true), null));

@@ -34,6 +34,11 @@ public class BukkitServer extends UniversalServer {
 	}
 
 	@Override
+	public void sendCommandToConsole(String command) {
+		Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command);
+	}
+
+	@Override
 	public boolean isProxySubServer() {
 				
 		File oldPaperYml = new File("paper.yml");

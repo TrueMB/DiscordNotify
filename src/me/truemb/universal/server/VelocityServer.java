@@ -44,6 +44,11 @@ public class VelocityServer extends UniversalServer{
 	}
 
 	@Override
+	public void sendCommandToConsole(String command) {
+		this.proxyServer.getCommandManager().executeAsync(this.proxyServer.getConsoleCommandSource(), command);
+	}
+
+	@Override
 	public boolean isOnlineMode() {
 		return this.proxyServer.getConfiguration().isOnlineMode();
 	}

@@ -29,6 +29,11 @@ public class BungeecordServer extends UniversalServer {
 		});
 	}
 
+	@Override
+	public void sendCommandToConsole(String command) {
+		ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
+	}
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public boolean isOnlineMode() {

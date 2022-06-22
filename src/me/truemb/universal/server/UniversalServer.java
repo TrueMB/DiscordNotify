@@ -51,6 +51,8 @@ public abstract class UniversalServer {
 
 	public abstract void broadcast(String message, String permission);
 	
+	public abstract void sendCommandToConsole(String command);
+	
 	//SEVER INSTANCE
 	public static UniversalServer buildServer(ServerType type) {
         if (type.equals(ServerType.BUKKIT)) return new BukkitServer();

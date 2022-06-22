@@ -29,6 +29,11 @@ public class SpongeServer extends UniversalServer {
 
 
 	@Override
+	public void sendCommandToConsole(String command) {
+		//TODO
+	}
+
+	@Override
 	public SpongeServer getSpongeServer() {
 		return this;
 	}

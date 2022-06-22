@@ -117,6 +117,13 @@ Options:
     discordCommandOnlyInChannel: -1
     #Set to true, if you want to notify the player on Join
     reminder: false
+    #Commands which should be sent after Verification
+    #will only be send on the server, where Spicord is located.
+    #f.e. item drops are not possible on a Bungeecord/Velocity Network
+    #commands:
+    #  - 'msg %player% you did it!'
+    #  - 'alert %player% you did it!'
+    commands: {}
   RoleSync:
     #Uses only the Primary Group. Otherwise all groups that are directly connected to the player
     useOnlyPrimaryGroup: false
