@@ -18,19 +18,22 @@ public class OfflineInformationsSQL {
 		this.asyncMysql = asyncMysql;
 		this.offlineInfoManager = offlineInfoManager;
 
-		this.asyncMysql.queryUpdate("CREATE TABLE IF NOT EXISTS " + OfflineInformationsSQL.table + " (uuid VARCHAR(60) PRIMARY KEY)");
+		this.asyncMysql.queryUpdate("CREATE TABLE IF NOT EXISTS " + OfflineInformationsSQL.table + " (uuid VARCHAR(60) PRIMARY KEY, ingamename VARCHAR(18))");
 		this.checkColumnsForUpdates();
 	}
 
 	public void checkColumnsForUpdates(){
-		String columns = "";
+		String columns = "ingamename VARCHAR(16)"; //WASN'T IMPLEMENTED IN THE FIRST VERSIONS OF DISCORDNOTIFY
 		for(InformationType types : InformationType.values())
 			columns += ", " + types.toString() + " " + types.getMysqlTypeAsString();
-		columns = columns.substring(2, columns.length());
 		
 		this.asyncMysql.queryUpdate("ALTER TABLE " + OfflineInformationsSQL.table + " ADD COLUMN IF NOT EXISTS (" + columns + ");");
 	}
 	
+	public void checkForNameChange(UUID uuid, String ingameName) {
+		this.asyncMysql.queryUpdate("INSERT INTO " + OfflineInformationsSQL.table + " (uuid, ingamename) VALUES ('" + uuid.toString() + "', '" + ingameName + "') "
+				+ "ON DUPLICATE KEY UPDATE ingamename='" + ingameName + "';");
+	}
 	
 	public void updateInformation(UUID uuid, InformationType type, String value){
 		this.asyncMysql.queryUpdate("INSERT INTO " + OfflineInformationsSQL.table + " (uuid, " + type.toString() + ") VALUES ('" + uuid.toString() + "', '" + value + "') "

@@ -33,6 +33,9 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		//ALWAYS ON JOIN
 		this.instance.getJoinTime().put(uuid, System.currentTimeMillis());
 		
+		//CHECK FOR NAME CHANGE
+		this.instance.getOfflineInformationsSQL().checkForNameChange(uuid, up.getIngameName());
+		
 		//INACTIVITY
 		if(this.instance.getOfflineInformationManager().getInformationString(uuid, InformationType.Inactivity) != null 
 				&& this.instance.getOfflineInformationsSQL().getOfflineInfoManager().getInformationString(uuid, InformationType.Inactivity).equalsIgnoreCase("true")) {
