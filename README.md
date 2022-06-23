@@ -34,6 +34,11 @@ Pretty much like the name says. Informs the Discord on a Player Connection or Di
 ![grafik](https://user-images.githubusercontent.com/25579052/165936568-3ee12b4f-af49-4f04-8868-5c17e60523e0.png)
 ![grafik](https://user-images.githubusercontent.com/25579052/165936723-adde1f14-d371-48ef-8a65-0e0c46c5c354.png)
 
+### Server Status
+Sends a Message if a server shutsdown or starts. Only works with a Proxy Setup.
+
+![image](https://user-images.githubusercontent.com/25579052/175385173-43d7da6d-2897-4772-9a5a-e41f36b79d0d.png)
+
 ### Player Death
 Should a Player die on the Minecraft Server, there will be a message on the Discord as well.
 
@@ -42,6 +47,9 @@ Synchronisation between the Minecraft Server and Discord. If you want Player to 
 
 ### Staff
 Works the same like the Chat Feature, but can only be triggert ingame with /staff <message>. The players also need the Permission "dn.staff" for it. On Discord you need to change on your own the Permissions for the channel.
+
+### Broadcast Channel
+You can configure discord Channels, that will send every message (also from bots) to the named or all minecraft servers.
 
 ### PlayerInfo
 Allows you to get Player Informations from the Discord!
