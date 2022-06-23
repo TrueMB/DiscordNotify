@@ -31,7 +31,8 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			this.onPlayerJoinFeature(up, serverName);
 		
 		//ALWAYS ON JOIN
-		this.instance.getJoinTime().put(uuid, System.currentTimeMillis());
+		if(!this.instance.getUniversalServer().isProxySubServer())
+			this.instance.getJoinTime().put(uuid, System.currentTimeMillis());
 		
 		//CHECK FOR NAME CHANGE
 		this.instance.getOfflineInformationsSQL().checkForNameChange(uuid, up.getIngameName());
@@ -123,8 +124,8 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		//IF FEATURE ENABLED
 		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.PlayerJoinLeave))
 			this.onPlayerQuitFeature(up, serverName);
-		
-		if(this.instance.getJoinTime().get(uuid) != null) {
+
+		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getJoinTime().get(uuid) != null) {
 			long time = System.currentTimeMillis() - this.instance.getJoinTime().get(uuid);
 			
 			this.instance.getOfflineInformationsSQL().addToInformation(uuid, InformationType.Playtime, time);

@@ -1,6 +1,7 @@
 package me.truemb.discordnotify.main;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.UUID;
@@ -22,7 +23,7 @@ import me.truemb.discordnotify.manager.VerifyManager;
 import me.truemb.discordnotify.messaging.PluginMessenger;
 import me.truemb.discordnotify.runnable.DN_DiscordBotConnector;
 import me.truemb.discordnotify.runnable.DN_InactivityChecker;
-import me.truemb.discordnotify.runnable.SubServerHandler;
+import me.truemb.discordnotify.runnable.DN_SubServerPinger;
 import me.truemb.discordnotify.utils.DiscordManager;
 import me.truemb.discordnotify.utils.PermissionsAPI;
 import me.truemb.universal.enums.ServerType;
@@ -57,7 +58,7 @@ public class DiscordNotifyMain {
     
     //RUNNABLE
     private DN_InactivityChecker inactivityChecker;
-    private SubServerHandler subServerHandler;
+    private DN_SubServerPinger subServerHandler;
     
     //PLUGIN MESSAGING
     private PluginMessenger pluginMessenger;
@@ -96,9 +97,7 @@ public class DiscordNotifyMain {
 		this.onStart();
 	}
 	
-	//TODO SPONGE SUPPORT
-	//TODO Kick Event
-	//TODO Server Start/Stop
+	//TODO SPONGE SUPPORT - Version 9 must be Supported from Spicord first
 
 	/**
 	 * Enables the DiscordNotify Plugin
@@ -129,7 +128,9 @@ public class DiscordNotifyMain {
 			
 			new DN_DiscordBotConnector(this); //TASK WHICH CONNECTS THE DISCORD BOT
 		}
-
+		
+		//SCANS THE SERVER ONCE FOR PLAYTIME OF THE SERVER, TO UPDATE THE DATABASE
+		this.scanOfflinePlayersForData();
 		//If Server gets reloaded, it sets the current time again
 		this.getUniversalServer().getOnlinePlayers().forEach(all -> this.getJoinTime().put(all.getUUID(), System.currentTimeMillis()));
 		
@@ -138,7 +139,7 @@ public class DiscordNotifyMain {
 			this.inactivityChecker = new DN_InactivityChecker(this);
 		
 		if(this.getUniversalServer().isProxy() && this.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
-			this.subServerHandler = new SubServerHandler(this);	
+			this.subServerHandler = new DN_SubServerPinger(this);	
 	}
 	
 	public void onDisable() {
@@ -170,7 +171,39 @@ public class DiscordNotifyMain {
 			this.getAsyncMySql().getMySQL().closeConnection();
 	}
 	
+	private void scanOfflinePlayersForData() {
+		
+		File file = new File(this.getDataDirectory(), "ScanIsDone");
+		
+		if(file.exists())
+			return;
 
+		if(this.getUniversalServer().getServerPlatform() == ServerType.BUKKIT) {
+			for(org.bukkit.OfflinePlayer player : org.bukkit.Bukkit.getOfflinePlayers()){
+				UUID uuid = player.getUniqueId();
+	
+				long lastTimePlayed = player.getLastPlayed();
+				long playtimeInMilli = player.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE) * 50; //Normally / 20 ticks * 1000 Millis, but since a long doesn't have a comma, we wont divide
+				
+				this.getOfflineInformationManager().addInformation(uuid, InformationType.Playtime, playtimeInMilli);
+				this.getOfflineInformationsSQL().addToInformation(uuid, InformationType.Playtime, playtimeInMilli);
+	
+				if(this.getOfflineInformationManager().getInformationLong(uuid, InformationType.LastConnection) < lastTimePlayed) {
+					this.getOfflineInformationManager().setInformation(uuid, InformationType.LastConnection, lastTimePlayed); //ONLY NEWEST
+					this.getOfflineInformationsSQL().updateInformation(uuid, InformationType.LastConnection, lastTimePlayed);
+				}
+			}
+		}
+		//TODO SPONGE METHOD NEEDS TO BE ADDED
+		
+		try {
+			file.createNewFile();
+			this.getUniversalServer().getLogger().warning("Sent the playtime of the players to the main server.");
+		} catch (IOException e) {
+			this.getUniversalServer().getLogger().warning("Couldn't create ScanIsDone File. Please create it manually or look for the Issue. Otherwise the scan will be done on each server start and add the playtime again.");
+		}
+	}
+	
 	//MySQL
 	private void startMySql() {
 		this.getUniversalServer().getLogger().info("{MySQL}  starting MySQL . . .");

@@ -65,7 +65,7 @@ public class DN_InactivityChecker implements Runnable {
 						if(instance.getUniversalServer().getPlayer(uuid) != null && instance.getUniversalServer().getPlayer(uuid).isOnline()) //PLAYER IS ONLINE
 							continue;
 							
-						long playtimeInTicks = rs.getLong(InformationType.Playtime.toString());
+						long playtimeInMilli = rs.getLong(InformationType.Playtime.toString());
 						long lastTimePlayed = rs.getLong(InformationType.LastConnection.toString());
 						String location = rs.getString(InformationType.Location.toString());
 						String ip = rs.getString(InformationType.IP.toString());
@@ -73,7 +73,7 @@ public class DN_InactivityChecker implements Runnable {
 						
 						//MORE SPECIFIC INFORMATIONS
 						Date date = new Date(lastTimePlayed);
-						long playtimeSec = playtimeInTicks / 20;
+						long playtimeSec = playtimeInMilli / 1000;
 						long offlinetimeSec = (System.currentTimeMillis() - lastTimePlayed) / 1000;
 
 						if(server == null) server = "";

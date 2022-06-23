@@ -78,12 +78,6 @@ public class PluginMessenger {
 						String value = (String) rows.get(2);
 						instance.getOfflineInformationManager().setInformation(uuid, type, value);
 					}
-				}else if (subChannel.equalsIgnoreCase("SERVER_STATUS")) {
-					//ONLY SENDS A MESSAGE, IF PLAYER ON SERVER. MAKES NO SENSE FOR SERVER START AND STOP
-					
-					//String server = (String) rows.get(1);
-					//boolean status = (Boolean) rows.get(2);
-					
 				}else if (subChannel.equalsIgnoreCase("GET_GROUPS_REQUEST")) {
 						
 					UUID uuid = message.getTarget();
@@ -189,18 +183,7 @@ public class PluginMessenger {
 		
 		this.pipeline.send(message);
 	}
-	
-	public void sendServerStatus( String server, boolean status) {
-
-		PipelineMessage message = new PipelineMessage();
 		
-		message.write("SERVER_STATUS");
-		message.write(server);
-		message.write(status);
-		
-		this.pipeline.send(message);
-	}
-	
 	public void sendPlayerGroups(UUID uuid, String[] groups) {
 
 		String groupS = "";

@@ -54,7 +54,7 @@ public class OfflineInformationsSQL {
 	 */
 	public void addToInformation(UUID uuid, InformationType type, long value){
 		this.asyncMysql.queryUpdate("INSERT INTO " + OfflineInformationsSQL.table + " (uuid, " + type.toString() + ") VALUES ('" + uuid.toString() + "', '" + value + "') "
-				+ "ON DUPLICATE KEY UPDATE " + type.toString() + "=" + type.toString() + " + '" + value + "';");
+				+ "ON DUPLICATE KEY UPDATE " + type.toString() + "=IFNULL(" + type.toString() + ", 0) + '" + value + "';");
 	}
 	
 	public void setup() {

@@ -72,13 +72,6 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 						//GETTING THE CURRENT LOCATION OF AN ONLINE PLAYER
 						if(up != null && up.isOnline() && !instance.getUniversalServer().isProxy()) {
 							UniversalLocation loc = up.getLocation();
-							/*
-							UniversalLocation loc = null;
-							if(up instanceof BukkitPlayer)
-								 loc = ((BukkitPlayer) up).getLocation();
-							else if(up instanceof SpongePlayer)
-								 loc = ((SpongePlayer) up).getLocation();
-							*/
 							String location = instance.getConfigManager().getConfig().getString("Options.OtherFormats.Location")
 									.replaceAll("(?i)%" + "world" + "%", loc.getWorldname())
 									.replaceAll("(?i)%" + "x" + "%", String.valueOf(loc.getBlockX()))
@@ -94,7 +87,7 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 						}
 							
 						long lastplayed = up != null && up.isOnline() ? System.currentTimeMillis() : instance.getOfflineInformationManager().getInformationLong(uuid, InformationType.LastConnection);
-						long playtimeSec = instance.getOfflineInformationManager().getInformationLong(uuid, InformationType.Playtime) / 20;
+						long playtimeSec = instance.getOfflineInformationManager().getInformationLong(uuid, InformationType.Playtime) / 1000;
 						long offlinetimeSec = (System.currentTimeMillis() - instance.getOfflineInformationManager().getInformationLong(uuid, InformationType.LastConnection)) / 1000;
 						
 						String location = instance.getOfflineInformationManager().getInformationString(uuid, InformationType.Location);
@@ -122,7 +115,6 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 
 						if(instance.getConfigManager().useEmbedMessage(FeatureType.PlayerInfo)) {
 							instance.getDiscordManager().sendEmbedMessage(command.getChannel().getIdLong(), uuid, "PlayerInfoEmbed", placeholder);
-				    		//command.reply(instance.getDiscordManager().getEmbedMessage(uuid, "PlayerInfoEmbed", placeholder).build());
 						}else {
 				    		command.reply(instance.getDiscordManager().getDiscordMessage("PlayerInfo", placeholder));
 						}

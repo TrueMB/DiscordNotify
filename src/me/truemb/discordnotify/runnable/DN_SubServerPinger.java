@@ -11,7 +11,7 @@ import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.universal.player.UniversalPlayer;
 
-public class SubServerHandler implements Runnable{
+public class DN_SubServerPinger implements Runnable{
 
 	private DiscordNotifyMain instance;
 	private ScheduledFuture<?> task;
@@ -20,7 +20,7 @@ public class SubServerHandler implements Runnable{
 	
 	private HashMap<String, Boolean> server_status = new HashMap<String, Boolean>(); //WAS SERVER ON LAST PING ONLINE?
 	
-	public SubServerHandler(DiscordNotifyMain plugin) {
+	public DN_SubServerPinger(DiscordNotifyMain plugin) {
 		this.instance = plugin;
 		this.pingTimeout = this.instance.getConfigManager().getConfig().getInt("Options." + FeatureType.ServerStatus.toString() + ".pingTimeout");
 		
