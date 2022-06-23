@@ -36,4 +36,9 @@ public class BungeePlayer extends UniversalPlayer{
 		this.adventure.player(this.getBungeePlayer()).sendMessage(message);
 	}
 
+	@Override
+	public String getIP() {
+		return this.getBungeePlayer().getSocketAddress().toString().split(":")[0].replace("/", "");
+	}
+
 }

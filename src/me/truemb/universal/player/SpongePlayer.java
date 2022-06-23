@@ -38,4 +38,9 @@ public class SpongePlayer extends UniversalPlayer{
 		this.getSpongePlayer().sendMessage(message);
 	}
 
+	@Override
+	public String getIP() {
+		return this.getSpongePlayer().connection().address().getHostName();
+	}
+
 }

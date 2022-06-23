@@ -39,4 +39,9 @@ public class BukkitPlayer extends UniversalPlayer{
 		this.adventure.player(this.getBukkitPlayer()).sendMessage(message);
 	}
 
+	@Override
+	public String getIP() {
+		return this.getBukkitPlayer().getAddress().getHostName();
+	}
+
 }

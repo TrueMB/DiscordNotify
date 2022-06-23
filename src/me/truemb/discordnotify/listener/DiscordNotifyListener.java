@@ -7,6 +7,7 @@ import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.InformationType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.universal.listener.UniversalEventhandler;
+import me.truemb.universal.player.UniversalLocation;
 import me.truemb.universal.player.UniversalPlayer;
 import net.dv8tion.jda.api.entities.Member;
 
@@ -26,17 +27,22 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 		UUID uuid = up.getUUID();
 		
+		//DO NOTHING - Since Management Server does it already
+		if(this.instance.getUniversalServer().isProxySubServer())
+			return;
+		
 		//IF FEATURE ENABLED
-		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.PlayerJoinLeave))
+		if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.PlayerJoinLeave))
 			this.onPlayerJoinFeature(up, serverName);
 		
 		//ALWAYS ON JOIN
-		if(!this.instance.getUniversalServer().isProxySubServer())
-			this.instance.getJoinTime().put(uuid, System.currentTimeMillis());
+		this.instance.getJoinTime().put(uuid, System.currentTimeMillis());
 		
 		//CHECK FOR NAME CHANGE
 		this.instance.getOfflineInformationsSQL().checkForNameChange(uuid, up.getIngameName());
-		
+			
+		// ========[ OFFLINE DATA ]=======
+			
 		//INACTIVITY
 		if(this.instance.getOfflineInformationManager().getInformationString(uuid, InformationType.Inactivity) != null 
 				&& this.instance.getOfflineInformationsSQL().getOfflineInfoManager().getInformationString(uuid, InformationType.Inactivity).equalsIgnoreCase("true")) {
@@ -45,13 +51,21 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			this.instance.getOfflineInformationsSQL().getOfflineInfoManager().setInformation(uuid, InformationType.Inactivity, "false");
 			this.instance.getPluginMessenger().sendInformationUpdate(uuid, serverName, InformationType.Inactivity, "false"); 
 		}
+	
+		//IP
+		String ipAddress = up.getIP();
+		this.instance.getOfflineInformationsSQL().updateInformation(uuid, InformationType.IP, ipAddress);
+		this.instance.getOfflineInformationManager().setInformation(uuid, InformationType.IP, ipAddress);
+		this.instance.getPluginMessenger().sendInformationUpdate(uuid, InformationType.IP, ipAddress);
 		
+		// ========[ OFFLINE DATA ]=======
+
 		//REMINDER - If not verified
 		if(this.instance.getDiscordManager() != null && this.instance.getDiscordManager().isAddonEnabled("disnotify::verify") && !this.instance.getVerifyManager().isVerified(uuid))
 			up.sendMessage(this.instance.getConfigManager().getMinecraftMessage("verification.reminder", true));
 		
 		//ROLE UPDATES
-		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getVerifyManager().isVerified(uuid) && this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync)) {
+		if(this.instance.getVerifyManager().isVerified(uuid) && this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync)) {
 		
 			if(this.instance.getDiscordManager().getDiscordBot() == null)
 				return;
@@ -115,17 +129,37 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		}
 		
 	}
-
+	
 	@Override
 	public void onPlayerQuit(UniversalPlayer up, String serverName) {
 		
 		UUID uuid = up.getUUID();
+
+		//LOCATION - Needs to be sent from the Bukkit Servers, even if it is a Network.
+		if(!this.instance.getUniversalServer().isProxy()) {
+			UniversalLocation loc = up.getLocation();
+			String location = this.instance.getConfigManager().getConfig().getString("Options.OtherFormats.Location")
+					.replaceAll("(?i)%" + "world" + "%", loc.getWorldname())
+					.replaceAll("(?i)%" + "x" + "%", String.valueOf(loc.getBlockX()))
+					.replaceAll("(?i)%" + "y" + "%", String.valueOf(loc.getBlockY()))
+					.replaceAll("(?i)%" + "z" + "%", String.valueOf(loc.getBlockZ()))
+					.replaceAll("(?i)%" + "yaw" + "%", String.valueOf(Math.round(loc.getYaw() * 100D) / 100D))
+					.replaceAll("(?i)%" + "pitch" + "%", String.valueOf(Math.round(loc.getPitch() * 100D) / 100D));
+			
+			this.instance.getOfflineInformationsSQL().updateInformation(uuid, InformationType.Location, location);
+			this.instance.getOfflineInformationManager().setInformation(uuid, InformationType.Location, location);
+			this.instance.getPluginMessenger().sendInformationUpdate(uuid, InformationType.Location, location);
+		}
+		
+		//DO NOTHING - Since Management Server does it already
+		if(this.instance.getUniversalServer().isProxySubServer())
+			return;
 		
 		//IF FEATURE ENABLED
-		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.PlayerJoinLeave))
+		if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.PlayerJoinLeave))
 			this.onPlayerQuitFeature(up, serverName);
 
-		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getJoinTime().get(uuid) != null) {
+		if(this.instance.getJoinTime().get(uuid) != null) {
 			long time = System.currentTimeMillis() - this.instance.getJoinTime().get(uuid);
 			
 			this.instance.getOfflineInformationsSQL().addToInformation(uuid, InformationType.Playtime, time);
@@ -137,15 +171,21 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 		//VERIFICATION
 		this.instance.getVerifyManager().clearVerficationProgress(uuid);
+
+		// ========[ OFFLINE DATA - START]=======
 		
+		//LAST CONNECTED SERVER
 		this.instance.getOfflineInformationsSQL().updateInformation(uuid, InformationType.Bungee_Server, serverName);
 		this.instance.getOfflineInformationManager().setInformation(uuid, InformationType.Bungee_Server, serverName);
 		this.instance.getPluginMessenger().sendInformationUpdate(uuid, InformationType.Bungee_Server, serverName);
-		
+
+		//LAST CONNECTION
 		long lastConnection = System.currentTimeMillis();
 		this.instance.getOfflineInformationsSQL().updateInformation(uuid, InformationType.LastConnection, lastConnection);
 		this.instance.getOfflineInformationManager().setInformation(uuid, InformationType.LastConnection, lastConnection);
 		this.instance.getPluginMessenger().sendInformationUpdate(uuid, InformationType.LastConnection, lastConnection);
+		
+		// ========[ OFFLINE DATA - END]=======
 		
 	}
 	

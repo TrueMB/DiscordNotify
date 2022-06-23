@@ -43,6 +43,8 @@ public abstract class UniversalPlayer {
         return null;
     }
     
+    public abstract String getIP();
+    
     public abstract UniversalLocation getLocation();
     
     public abstract void sendMessage(String message);
