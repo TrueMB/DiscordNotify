@@ -19,6 +19,7 @@ import me.truemb.discordnotify.discord.commands.DC_PlayerInfoCommand;
 import me.truemb.discordnotify.discord.commands.DC_VerifyCommand;
 import me.truemb.discordnotify.discord.listener.DC_BroadcastListener;
 import me.truemb.discordnotify.discord.listener.DC_ChatListener;
+import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.MinotarTypes;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -73,6 +74,10 @@ public class DiscordManager {
 	public void disconnectDiscordBot() {
         if(this.getDiscordBot() != null && this.getDiscordBot().isReady()) {
         	
+        	//SEND SHUTDOWN MESSAGE TO DISCORD
+    	    if(!this.instance.getUniversalServer().isProxy() && !this.instance.getUniversalServer().isProxySubServer())
+    	    	this.announceServerStatus(false);
+        	
         	//ADDONS
         	if(Spicord.getInstance().getAddonManager().isRegistered(this.playerInfoAddon))
         		Spicord.getInstance().getAddonManager().unregisterAddon(this.playerInfoAddon);
@@ -115,9 +120,26 @@ public class DiscordManager {
 		
 	    this.getDiscordBot().getJda().addEventListener(this.chatListener);
 	    this.getDiscordBot().getJda().addEventListener(this.broadcastListener);
+
+    	//SEND START MESSAGE TO DISCORD
+	    if(!this.instance.getUniversalServer().isProxy() && !this.instance.getUniversalServer().isProxySubServer())
+	    	this.announceServerStatus(true);
 	    	
 		this.instance.getUniversalServer().getLogger().info("Connected with Discord BOT.");
 		
+	}
+	
+	private void announceServerStatus(boolean status) {
+		long channelId = this.instance.getConfigManager().getChannelID(FeatureType.ServerStatus); //CANT BE SEPARATED SINCE IT ONLY TRIGGERS FOR NON NETWORKS
+
+		HashMap<String, String> placeholder = new HashMap<>();
+		placeholder.put("server", "Server");
+		
+		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.ServerStatus)) {
+			this.instance.getDiscordManager().sendEmbedMessage(channelId, null, status ? "ServerStartEmbed" : "ServerStopEmbed", placeholder);
+		}else {
+			this.instance.getDiscordManager().sendDiscordMessage(channelId, status ? "ServerStartMessage" : "ServerStopMessage", placeholder);
+		}
 	}
 	
 	//GETS THE DISCORD BOT
