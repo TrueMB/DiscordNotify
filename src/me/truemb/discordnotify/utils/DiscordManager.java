@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
@@ -136,9 +137,9 @@ public class DiscordManager {
 		placeholder.put("server", "Server");
 		
 		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.ServerStatus)) {
-			this.instance.getDiscordManager().sendEmbedMessage(channelId, null, status ? "ServerStartEmbed" : "ServerStopEmbed", placeholder);
+			this.instance.getDiscordManager().sendEmbedMessageWithNoPictureSync(channelId, status ? "ServerStartEmbed" : "ServerStopEmbed", placeholder);
 		}else {
-			this.instance.getDiscordManager().sendDiscordMessage(channelId, status ? "ServerStartMessage" : "ServerStopMessage", placeholder);
+			this.instance.getDiscordManager().sendDiscordMessageSync(channelId, status ? "ServerStartMessage" : "ServerStopMessage", placeholder);
 		}
 	}
 	
@@ -163,11 +164,6 @@ public class DiscordManager {
 		new Thread(() -> {
 			
 			TextChannel channel = this.getDiscordBot().getJda().getTextChannelById(channelId);
-			
-			if(this.getDiscordBot() == null) {
-	    		this.instance.getUniversalServer().getLogger().warning("The Channel with the ID: " + channelId + " doesn't exists.");
-				return;
-			}
 
 			if(channel == null) {
 				this.instance.getUniversalServer().getLogger().warning("Couldn't send Message to channel: " + channelId);
@@ -207,6 +203,31 @@ public class DiscordManager {
 			channel.sendMessage(eb.build()).queue();
 			
 		}).start();
+	}
+
+	/**
+	 * Doesn't Support Pictures!
+	 * 
+	 * @param channelId - Channel to send the message to
+	 * @param uuid - can be null - only interesting for Minotar Picture
+	 * @param path
+	 * @param placeholder
+	 */
+	public void sendEmbedMessageWithNoPictureSync(long channelId, String path, HashMap<String, String> placeholder) {
+		if(this.getDiscordBot() == null) {
+    		this.instance.getUniversalServer().getLogger().warning("Discord BOT is not ready.");
+			return;
+		}
+
+		TextChannel channel = this.getDiscordBot().getJda().getTextChannelById(channelId);
+
+		if(channel == null) {
+			this.instance.getUniversalServer().getLogger().warning("Couldn't send Message to channel: " + channelId);
+			return;
+		}
+			
+		EmbedBuilder eb = this.getEmbedMessage(null, path, placeholder);
+		channel.sendMessage(eb.build()).complete();
 	}
 	
 	public boolean isAddonEnabled(String addonName) {
@@ -278,6 +299,22 @@ public class DiscordManager {
 	public String getDiscordMessage(String path, HashMap<String, String> placeholder) {
 	   return this.getPlaceholderString(this.instance.getConfigManager().getConfig().getString("DiscordMessages." + path), placeholder);
     }
+
+	public void sendDiscordMessageSync(long channelId, String path, HashMap<String, String> placeholder) {
+
+		if(this.getDiscordBot() == null) {
+    		this.instance.getUniversalServer().getLogger().warning("Discord BOT is not ready.");
+			return;
+		}
+
+	    TextChannel tc = this.getDiscordBot().getJda().getTextChannelById(channelId);
+	    
+	    if(tc == null) {
+			this.instance.getUniversalServer().getLogger().warning("Couldn't find Channel with the ID: " + channelId);
+	    	return;
+	    }
+	    tc.sendMessage(this.getDiscordMessage(path, placeholder)).complete();
+    }
 	
 	public void sendDiscordMessage(long channelId, String path, HashMap<String, String> placeholder) {
 
@@ -292,7 +329,7 @@ public class DiscordManager {
 			this.instance.getUniversalServer().getLogger().warning("Couldn't find Channel with the ID: " + channelId);
 	    	return;
 	    }
-	    tc.sendMessage(this.getDiscordMessage(path, placeholder)).submit();
+	    tc.sendMessage(this.getDiscordMessage(path, placeholder)).queue();
     }
 	
 	public void sendPrivateDiscordMessage(User user, String message) {
