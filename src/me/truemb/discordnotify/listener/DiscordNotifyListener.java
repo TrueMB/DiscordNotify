@@ -262,6 +262,11 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 	
 	@Override
 	public void onPlayerDeath(UniversalPlayer up, String deathMessage) {
+
+		//IF FEATURE ENABLED
+		if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.PlayerDeath))
+			return;
+		
 		if(this.instance.getUniversalServer().isProxySubServer()){
 			this.instance.getPluginMessenger().sendPlayerDeath(up.getUUID(), deathMessage);
 			return;
