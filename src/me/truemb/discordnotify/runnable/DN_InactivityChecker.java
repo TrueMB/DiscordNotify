@@ -46,6 +46,9 @@ public class DN_InactivityChecker implements Runnable {
 		if(channelId < 0)
 			return;
 		
+		if(this.instance.getDiscordManager().getDiscordBot() == null)
+			return;
+		
 		long inactivityLimit = System.currentTimeMillis() - this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.Inactivity.toString() + ".InactivForDays") * 24 * 60 * 60 * 1000;
 		
 		this.instance.getAsyncMySql().prepareStatement("SELECT * FROM " + OfflineInformationsSQL.table + " WHERE " + InformationType.LastConnection.toString() + "<'" + String.valueOf(inactivityLimit) + "'"
