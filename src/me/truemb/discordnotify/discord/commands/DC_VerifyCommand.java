@@ -12,7 +12,6 @@ import me.truemb.discordnotify.enums.DelayType;
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.GroupAction;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
-import me.truemb.discordnotify.utils.PlayerManager;
 import me.truemb.universal.player.UniversalPlayer;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -125,28 +124,32 @@ public class DC_VerifyCommand extends SimpleAddon {
 
 		new Thread(() -> {
 			
-			UUID uuid = null;
+			List<UniversalPlayer> players = this.instance.getUniversalServer().getOnlinePlayers().stream().filter(up -> up.getIngameName().equalsIgnoreCase(args[0])).toList();
+			
+			//PLAYER NOT ONLINE
+			if(players.size() <= 0 || players.get(0) == null || !players.get(0).isOnline()) {
+			   	command.reply(this.instance.getDiscordManager().getDiscordMessage("verification.playerOffline", placeholder));
+				return;
+			}
+			UniversalPlayer up = players.get(0);
+			UUID uuid = up.getUUID();
+			
+			/*
 			if(this.instance.getUniversalServer().isOnlineMode())
 				uuid = PlayerManager.getUUIDOffline(args[0]); //NEEDS SOME TIME
 			else
 				uuid = PlayerManager.generateOfflineUUID(args[0]);
-				
+						
 			//PLAYER DOESNT EXISTS
 			if(uuid == null) {
 			   	command.reply(this.instance.getDiscordManager().getDiscordMessage("verification.notAPlayer", placeholder));
 				return;
 			}
+			*/
 				
 			//PLAYER ALREADY AUTHENTICATING
 			if(this.instance.getVerifyManager().isVerficationInProgress(uuid)) {
 			   	command.reply(this.instance.getDiscordManager().getDiscordMessage("verification.alreadyInProgress", placeholder));
-				return;
-			}
-			
-			//PLAYER NOT ONLINE
-			UniversalPlayer up =  this.instance.getUniversalServer().getPlayer(uuid);
-			if(up == null || !up.isOnline()) {
-			   	command.reply(this.instance.getDiscordManager().getDiscordMessage("verification.playerOffline", placeholder));
 				return;
 			}
 			
