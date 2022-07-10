@@ -75,7 +75,7 @@ public class DiscordManager {
         if(this.getDiscordBot() != null && this.getDiscordBot().isReady()) {
         	
         	//SEND SHUTDOWN MESSAGE TO DISCORD
-    	    if(!this.instance.getUniversalServer().isProxy() && !this.instance.getUniversalServer().isProxySubServer())
+    	    if(!this.instance.getUniversalServer().isProxy() && !this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
     	    	this.announceServerStatus(false);
         	
         	//ADDONS
@@ -122,7 +122,7 @@ public class DiscordManager {
 	    this.getDiscordBot().getJda().addEventListener(this.broadcastListener);
 
     	//SEND START MESSAGE TO DISCORD
-	    if(!this.instance.getUniversalServer().isProxy() && !this.instance.getUniversalServer().isProxySubServer())
+	    if(!this.instance.getUniversalServer().isProxy() && !this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
 	    	this.announceServerStatus(true);
 	    	
 		this.instance.getUniversalServer().getLogger().info("Connected with Discord BOT.");
