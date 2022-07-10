@@ -40,7 +40,7 @@ public class SpongePlayer extends UniversalPlayer{
 
 	@Override
 	public String getIP() {
-		return this.getSpongePlayer().connection().address().getHostName();
+		return this.getSpongePlayer().connection().address().toString().replace("/", "");
 	}
 
 }

@@ -36,7 +36,7 @@ public class VelocityPlayer extends UniversalPlayer{
 
 	@Override
 	public String getIP() {
-		return this.getVelocityPlayer().getRemoteAddress().getHostName();
+		return this.getVelocityPlayer().getRemoteAddress().toString().replace("/", "");
 	}
 
 }

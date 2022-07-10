@@ -41,7 +41,7 @@ public class BukkitPlayer extends UniversalPlayer{
 
 	@Override
 	public String getIP() {
-		return this.getBukkitPlayer().getAddress().getHostName();
+		return this.getBukkitPlayer().getAddress().getAddress().toString().replace("/", "");
 	}
 
 }

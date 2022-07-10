@@ -54,6 +54,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 	
 		//IP
 		String ipAddress = up.getIP();
+		
 		this.instance.getOfflineInformationsSQL().updateInformation(uuid, InformationType.IP, ipAddress);
 		this.instance.getOfflineInformationManager().setInformation(uuid, InformationType.IP, ipAddress);
 		this.instance.getPluginMessenger().sendInformationUpdate(uuid, InformationType.IP, ipAddress);
