@@ -18,6 +18,8 @@ public class AsyncMySQL {
 	
 	private ExecutorService executor;
 	private MySQL sql;
+	
+	private String databaseName;
 
 	public AsyncMySQL(Logger logger, ConfigManager configManager) throws Exception {
 				
@@ -26,7 +28,7 @@ public class AsyncMySQL {
 		boolean useSSL = configManager.getConfig().getBoolean("Database.useSSL");
 		String user = configManager.getConfig().getString("Database.user");
 		String password = configManager.getConfig().getString("Database.password");
-		String database = configManager.getConfig().getString("Database.database");
+		this.databaseName = configManager.getConfig().getString("Database.database");
 		
 		if (host.equalsIgnoreCase("ipaddress")) {
 			
@@ -37,9 +39,29 @@ public class AsyncMySQL {
 			throw new Exception("No Database connected.");
 		} else {
 		
-			this.sql = new MySQL(host, port, user, password, database, useSSL);
+			this.sql = new MySQL(host, port, user, password, this.databaseName, useSSL);
 			this.executor = Executors.newCachedThreadPool();
 		}
+	}
+	
+	public void addColumnIfNotExists(String table, String column, String type) {
+		
+		String checkQuery = "SELECT count(*) AS Counter FROM information_schema.columns WHERE table_schema = '" + this.databaseName + "' and COLUMN_NAME = '" + column + "' AND table_name = '" + table + "' LIMIT 1;";
+		String executeQuery = "ALTER TABLE " + this.databaseName + ".`" + table + "` ADD COLUMN `" + column + "` " + type + ";";
+		
+		this.prepareStatement(checkQuery, new Consumer<ResultSet>() {
+			
+			@Override
+			public void accept(ResultSet rs) {
+				try {
+					while(rs.next())
+						if(rs.getInt("Counter") == 0)
+							queryUpdate(executeQuery);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 	public void queryUpdate(PreparedStatement statement) {

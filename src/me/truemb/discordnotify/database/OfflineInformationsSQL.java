@@ -23,12 +23,21 @@ public class OfflineInformationsSQL {
 	}
 
 	public void checkColumnsForUpdates(){
+		this.asyncMysql.addColumnIfNotExists(OfflineInformationsSQL.table, "ingamename", "VARCHAR(16)"); //WASN'T IMPLEMENTED IN THE FIRST VERSIONS OF DISCORDNOTIFY
+		
+		for(InformationType types : InformationType.values())
+			this.asyncMysql.addColumnIfNotExists(OfflineInformationsSQL.table, types.toString(),types.getMysqlTypeAsString());
+	}
+	
+	/* OLD
+	public void checkColumnsForUpdates(){
 		String columns = "ingamename VARCHAR(16)"; //WASN'T IMPLEMENTED IN THE FIRST VERSIONS OF DISCORDNOTIFY
 		for(InformationType types : InformationType.values())
 			columns += ", " + types.toString() + " " + types.getMysqlTypeAsString();
 		
 		this.asyncMysql.queryUpdate("ALTER TABLE " + OfflineInformationsSQL.table + " ADD COLUMN IF NOT EXISTS (" + columns + ");");
 	}
+	*/
 	
 	public void checkForNameChange(UUID uuid, String ingameName) {
 		this.asyncMysql.queryUpdate("INSERT INTO " + OfflineInformationsSQL.table + " (uuid, ingamename) VALUES ('" + uuid.toString() + "', '" + ingameName + "') "
