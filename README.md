@@ -35,7 +35,7 @@ Pretty much like the name says. Informs the Discord on a Player Connection or Di
 ![grafik](https://user-images.githubusercontent.com/25579052/165936723-adde1f14-d371-48ef-8a65-0e0c46c5c354.png)
 
 ### Server Status
-Sends a Message if a server shutsdown or starts. Only works with a Proxy Setup.
+On a server shutsdown or start a message will be send. For Networks the Bungeecord Server needs to be running first to check the Server-Status changes.
 
 ![image](https://user-images.githubusercontent.com/25579052/175385173-43d7da6d-2897-4772-9a5a-e41f36b79d0d.png)
 
