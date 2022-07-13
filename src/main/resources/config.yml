@@ -146,6 +146,12 @@ Options:
     serverSeperatedStatus:
       lobby: -1
       freebuild: -1
+#Add the discord Groups in the Lists. If there is a group set, it wont be public for everybody anymore.
+DiscordCommandAllowedGroups:
+  Verify:
+    - ''
+  PlayerInfo:
+    - ''
 Permissions:
   StaffChat: 'dn.staff'
   #Doesnt send the Discord Messages
@@ -215,6 +221,7 @@ DiscordMessages:
   StaffMessage: '%Player%: %Message%'
   PlayerInfoHelp: 'Please use %Prefix%playerinfo <IngameName>'
   PlayerInfo: "%Player%'s UUID is %UUID%"
+  NotAllowedToUse: 'You are not allowed to use this command.'
   verification:
     cooldown: 'You got a cooldown. Please try in %Sec% Sec again.'
     discordAlreadyAuthenticated: 'You are already authenticated. Please use **%Prefix%verify unlink** to reset the linking.'
@@ -373,4 +380,4 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
 
   #Do NOT touch
-ConfigVersion: 18
+ConfigVersion: 19

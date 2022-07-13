@@ -3,6 +3,7 @@ package me.truemb.discordnotify.discord.commands;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -18,6 +19,7 @@ import me.truemb.discordnotify.utils.TimeFormatter;
 import me.truemb.universal.player.UniversalLocation;
 import me.truemb.universal.player.UniversalPlayer;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 
 public class DC_PlayerInfoCommand extends SimpleAddon {
 
@@ -40,6 +42,24 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
     	placeholder.put("Prefix", command.getPrefix());
     	placeholder.put("Tag", member.getUser().getAsTag());
 
+    	List<String> allowedRoles = this.instance.getConfigManager().getConfig().getStringList("DiscordCommandAllowedGroups.PlayerInfo").stream().filter(role -> role != null && !role.equalsIgnoreCase("")).toList();
+    	
+    	if(allowedRoles.size() > 0) {
+    		boolean isAllowed = false;
+	    	outer: for(Role role : member.getRoles()) {
+	    		for(String allowedRole : allowedRoles) {
+	    			if(role.getName().equalsIgnoreCase(allowedRole)) {
+	    				isAllowed = true;
+	    				break outer;
+	    			}
+	    		}
+	    	}
+	    	if(!isAllowed){
+	    		command.reply(this.instance.getDiscordManager().getDiscordMessage("NotAllowedToUse", placeholder));
+	    		return;
+	    	}
+	    }
+    	
     	
     	long commandAllowedChannelID = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.PlayerInfo.toString() + ".discordCommandOnlyInChannel");
     	

@@ -34,10 +34,28 @@ public class DC_VerifyCommand extends SimpleAddon {
     	
     	long disUUID = member.getUser().getIdLong();
     	long channelID = command.getChannel().getIdLong();
-    	
+
     	HashMap<String, String> placeholder = new HashMap<>();
     	placeholder.put("Prefix", command.getPrefix());
     	placeholder.put("Tag", member.getUser().getAsTag());
+    	
+    	List<String> allowedRoles = this.instance.getConfigManager().getConfig().getStringList("DiscordCommandAllowedGroups.Verify").stream().filter(role -> role != null && !role.equalsIgnoreCase("")).toList();
+    	
+    	if(allowedRoles.size() > 0) {
+    		boolean isAllowed = false;
+	    	outer: for(Role role : member.getRoles()) {
+	    		for(String allowedRole : allowedRoles) {
+	    			if(role.getName().equalsIgnoreCase(allowedRole)) {
+	    				isAllowed = true;
+	    				break outer;
+	    			}
+	    		}
+	    	}
+	    	if(!isAllowed){
+	    		command.reply(this.instance.getDiscordManager().getDiscordMessage("NotAllowedToUse", placeholder));
+	    		return;
+	    	}
+	    }
     	
     	long commandAllowedChannelID = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.Verification.toString() + ".discordCommandOnlyInChannel");
     	
