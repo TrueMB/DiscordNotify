@@ -32,8 +32,9 @@ import me.truemb.universal.server.UniversalServer;
 
 @Getter
 public class DiscordNotifyMain {
-	
+		
 	private final File dataDirectory;
+	private PluginDescription pluginDescription;
 	private ScheduledExecutorService executor;
 
 	//DATA
@@ -71,8 +72,10 @@ public class DiscordNotifyMain {
 	private DiscordNotifyListener listener;
 
 	//OWN CONSTRUCTER FOR VELOCITY SINCE THE PROXYSERVER INSTANCE IS NEED ON START
-	public DiscordNotifyMain(File dataDirectory, com.velocitypowered.api.proxy.ProxyServer proxy) {
+	public DiscordNotifyMain(File dataDirectory, com.velocitypowered.api.proxy.ProxyServer proxy, PluginDescription pluginDescription) {
 		this.dataDirectory = dataDirectory;
+		this.pluginDescription = pluginDescription;
+		
 		int cores = Runtime.getRuntime().availableProcessors();
 		int usedCores = 2;
 		if(usedCores > cores) usedCores = cores;
@@ -85,8 +88,10 @@ public class DiscordNotifyMain {
 		this.onStart();
 	}
 	
-	public DiscordNotifyMain(File dataDirectory, ServerType type) {
+	public DiscordNotifyMain(File dataDirectory, ServerType type, PluginDescription pluginDescription) {
 		this.dataDirectory = dataDirectory;
+		this.pluginDescription = pluginDescription;
+		
 		int cores = Runtime.getRuntime().availableProcessors();
 		int usedCores = 2;
 		if(usedCores > cores) usedCores = cores;

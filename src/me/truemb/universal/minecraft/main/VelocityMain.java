@@ -28,6 +28,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
+import me.truemb.discordnotify.main.PluginDescription;
 import me.truemb.universal.messenger.IMessageChannel;
 import me.truemb.universal.messenger.IRelay;
 import me.truemb.universal.messenger.MessageChannelAPI;
@@ -41,8 +42,8 @@ import me.truemb.universal.minecraft.events.VelocityEventsListener;
 import me.truemb.universal.player.UniversalPlayer;
 import me.truemb.universal.player.VelocityPlayer;
 
-//@Plugin(id = "discordnotify", name = "${project.name}", version = "${project.version}", authors = {"TrueMB"}, dependencies = { @Dependency(id = "spicord")} )
-@Plugin(id = "discordnotify", name = "DiscordNotify", version = "3.2.0", authors = {"TrueMB"}, dependencies = { @Dependency(id = "spicord")} )
+@Plugin(id = "discordnotify", name = "${project.name}", version = "${project.version}", authors = {"TrueMB"}, dependencies = { @Dependency(id = "spicord")} )
+//@Plugin(id = "discordnotify", name = "DiscordNotify", version = "3.2.2", authors = {"TrueMB"}, dependencies = { @Dependency(id = "spicord")} )
 public class VelocityMain implements IRelay {
 	
 	private DiscordNotifyMain instance;
@@ -76,7 +77,8 @@ public class VelocityMain implements IRelay {
 
     @Subscribe
     public void onProxyInitialize(ProxyInitializeEvent e) {
-		this.instance = new DiscordNotifyMain(this.dataDirectory, this.proxy);
+    	com.velocitypowered.api.plugin.PluginDescription pluginDescription = this.proxy.getPluginManager().fromInstance(this).get().getDescription();
+		this.instance = new DiscordNotifyMain(this.dataDirectory, this.proxy, new PluginDescription(pluginDescription.getId(), pluginDescription.getAuthors().get(0), pluginDescription.getVersion().get()));
 		
 		//MESSAGING CHANNEL
         this.proxy.getChannelRegistrar().register(INCOMING = MinecraftChannelIdentifier.create("messagechannel", "proxy"));

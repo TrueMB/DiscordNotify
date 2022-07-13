@@ -22,7 +22,7 @@ public class DC_VerifyCommand extends SimpleAddon {
 	private DiscordNotifyMain instance;
 	
     public DC_VerifyCommand(DiscordNotifyMain plugin) {
-        super("Disnotify Verify", "disnotify::verify", "TrueMB", "3.0.0", new String[] { "verify" }); //TODO BESSERES VERSIONS MANAGEMENT VELOCITY UND HIER
+        super("Disnotify Verify", "disnotify::verify", plugin.getPluginDescription().getAuthor(), plugin.getPluginDescription().getVersion(), new String[] { "verify" });
         this.instance = plugin;
     }
     

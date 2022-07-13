@@ -13,6 +13,7 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import lombok.Getter;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
+import me.truemb.discordnotify.main.PluginDescription;
 import me.truemb.universal.enums.ServerType;
 import me.truemb.universal.messenger.IMessageChannel;
 import me.truemb.universal.messenger.IRelay;
@@ -38,7 +39,7 @@ public class BukkitMain extends JavaPlugin implements IRelay {
 
 	@Override
 	public void onEnable() {
-		this.instance = new DiscordNotifyMain(this.getDataFolder(), ServerType.BUKKIT);
+		this.instance = new DiscordNotifyMain(this.getDataFolder(), ServerType.BUKKIT, new PluginDescription(this.getDescription().getName(), this.getDescription().getAuthors().get(0), this.getDescription().getVersion()));
 	    this.adventure = BukkitAudiences.create(this);
 		
 		//MESSAGING CHANNEL

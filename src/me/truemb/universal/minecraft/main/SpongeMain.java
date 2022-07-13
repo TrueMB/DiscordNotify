@@ -25,6 +25,7 @@ import org.spongepowered.plugin.builtin.jvm.Plugin;
 import com.google.inject.Inject;
 
 import me.truemb.discordnotify.main.DiscordNotifyMain;
+import me.truemb.discordnotify.main.PluginDescription;
 import me.truemb.universal.enums.ServerType;
 import me.truemb.universal.messenger.IMessageChannel;
 import me.truemb.universal.messenger.IRelay;
@@ -79,7 +80,7 @@ public class SpongeMain implements IRelay {
     @Listener
     public void onServerStart(LoadedGameEvent e) {
     	Game game = e.game();
-		this.instance = new DiscordNotifyMain(this.configDir.toFile(), ServerType.SPONGE);
+		this.instance = new DiscordNotifyMain(this.configDir.toFile(), ServerType.SPONGE, new PluginDescription(null, null, null));
 		
 		//LOAD PLAYERS
 		Collection<UniversalPlayer> players = new ArrayList<>();

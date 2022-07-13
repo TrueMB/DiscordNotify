@@ -8,6 +8,7 @@ import java.util.HashMap;
 import lombok.Getter;
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
+import me.truemb.discordnotify.main.PluginDescription;
 import me.truemb.universal.enums.ServerType;
 import me.truemb.universal.messenger.IMessageChannel;
 import me.truemb.universal.messenger.IRelay;
@@ -40,7 +41,7 @@ public class BungeeMain extends Plugin implements IRelay, Listener {
 
 	@Override
 	public void onEnable() {
-		this.instance = new DiscordNotifyMain(this.getDataFolder(), ServerType.BUNGEECORD);
+		this.instance = new DiscordNotifyMain(this.getDataFolder(), ServerType.BUNGEECORD, new PluginDescription(this.getDescription().getName(), this.getDescription().getAuthor(), this.getDescription().getVersion()));
 	    this.adventure = BungeeAudiences.create(this);
 		
 		//MESSAGING CHANNEL
