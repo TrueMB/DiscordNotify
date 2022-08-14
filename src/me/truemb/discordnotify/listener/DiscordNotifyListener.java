@@ -301,6 +301,9 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 
 	@Override
 	public void onPlayerServerChange(UniversalPlayer up, String oldServerName, String newServerName) {
+		
+		if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enablePlayerServerSwitch"))
+			return;
 
 		UUID uuid = up.getUUID();
 		

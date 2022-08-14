@@ -53,6 +53,8 @@ Options:
     useEmbedMessage: true
   PlayerJoinLeave:
     useEmbedMessage: false
+    #(Bungeecord only) If false, only a connect Message to the bungeecord will be send. And not on every Server Change.
+    enablePlayerServerSwitch: true
     enableServerSeperatedJoinLeave: false
     serverSeperatedJoinLeave:
       lobby: -1
