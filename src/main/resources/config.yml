@@ -42,6 +42,7 @@ Options:
     noPlaytime: 'Unknown'
     noOfflinetime: 'Unknown'
     noLastSeen: 'Never'
+    notVerified: 'not Verfied'
   OtherFormats:
     Location: '%world%, x=%x%, y=%y%, z=%z%, yaw=%yaw%, pitch=%pitch%'
   DefaultPlaceholder:
@@ -353,6 +354,7 @@ DiscordEmbedMessages:
       - 'User Name : %Player%'
       - 'Location : %Location%'
       - 'IP : %IP%'
+      - 'Discord : %Discordname%'
       - 'Playtime : %Playtime%'
       - 'Offlinetime : %Offlinetime%'
       - 'Last Played: %LastSeen%'
