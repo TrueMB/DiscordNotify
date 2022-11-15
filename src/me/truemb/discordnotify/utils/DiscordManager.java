@@ -75,8 +75,9 @@ public class DiscordManager {
         if(this.getDiscordBot() != null && this.getDiscordBot().isReady()) {
         	
         	//SEND SHUTDOWN MESSAGE TO DISCORD
-    	    if(!this.instance.getUniversalServer().isProxy() && !this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
-    	    	this.announceServerStatus(false);
+        	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
+        		if(!this.instance.getUniversalServer().isProxySubServer())
+        			this.announceServerStatus(false);
         	
         	//ADDONS
         	if(Spicord.getInstance().getAddonManager().isRegistered(this.playerInfoAddon))
@@ -122,18 +123,24 @@ public class DiscordManager {
 	    this.getDiscordBot().getJda().addEventListener(this.broadcastListener);
 
     	//SEND START MESSAGE TO DISCORD
-	    if(!this.instance.getUniversalServer().isProxy() && !this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
-	    	this.announceServerStatus(true);
+    	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
+    		if(!this.instance.getUniversalServer().isProxySubServer())
+    			this.announceServerStatus(true);
 	    	
 		this.instance.getUniversalServer().getLogger().info("Connected with Discord BOT.");
 		
 	}
 	
 	private void announceServerStatus(boolean status) {
-		long channelId = this.instance.getConfigManager().getChannelID(FeatureType.ServerStatus); //CANT BE SEPARATED SINCE IT ONLY TRIGGERS FOR NON NETWORKS
+		String server = this.instance.getUniversalServer().isProxy() ? "Proxy" : "Server";
+		long channelId;
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.ServerStatus.toString() + ".enableServerSeperatedStatus"))
+			channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.ServerStatus.toString() + ".serverSeperatedStatus." + server);
+		else
+			channelId = this.instance.getConfigManager().getChannelID(FeatureType.ServerStatus);
 
 		HashMap<String, String> placeholder = new HashMap<>();
-		placeholder.put("server", "Server");
+		placeholder.put("server", server);
 		
 		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.ServerStatus)) {
 			this.instance.getDiscordManager().sendEmbedMessageWithNoPictureSync(channelId, status ? "ServerStartEmbed" : "ServerStopEmbed", placeholder);
