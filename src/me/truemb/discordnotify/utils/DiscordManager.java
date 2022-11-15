@@ -181,17 +181,21 @@ public class DiscordManager {
 			//PICTURE ADDING TO MESSAGE - Only if uuid not null and Pictures are on
 			if(uuid != null && this.instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithPicture")) {
 				String minotarTypeS = this.instance.getConfigManager().getConfig().getString("DiscordEmbedMessages." + path + ".PictureType");
+				int size = this.instance.getConfigManager().getConfig().getInt("DiscordEmbedMessages." + path + ".PictureSize");
+				if(size <= 0)
+					size = 100;
+				
 				MinotarTypes minotarType = MinotarTypes.BUST;
 				try {
 					minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
 				}catch(Exception ex) { /* NOTING */ }
 				
 				InputStream file = null;
-				String filename = minotarType.toString().toLowerCase() + "_" + uuid.toString() + ".jpg";
+				String filename = minotarType.toString().toLowerCase() + "_" + uuid.toString() + ".png";
 				
 				eb.setImage("attachment://" + filename);
 				try {
-					URL url = new URL("https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString());
+					URL url = new URL("https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString() + "/" + String.valueOf(size) + ".png");
 					URLConnection urlConn = url.openConnection();
 					file = urlConn.getInputStream();
 				}catch (IOException e) {
@@ -264,7 +268,7 @@ public class DiscordManager {
 
 		if(author != null && !author.equalsIgnoreCase("")) {
 			if(uuid != null && this.instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithAuthorPicture"))
-				eb.setAuthor(author, null, "https://minotar.net/" + "avatar" + "/" + uuid.toString());
+				eb.setAuthor(author, null, "https://minotar.net/" + "avatar" + "/" + uuid.toString() + "/100.png");
 			else
 				eb.setAuthor(author);
 		}
