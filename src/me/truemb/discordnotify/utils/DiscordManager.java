@@ -75,8 +75,9 @@ public class DiscordManager {
         if(this.getDiscordBot() != null && this.getDiscordBot().isReady()) {
         	
         	//SEND SHUTDOWN MESSAGE TO DISCORD
-    	    if(!this.instance.getUniversalServer().isProxy() && !this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
-    	    	this.announceServerStatus(false);
+        	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
+        		if(!this.instance.getUniversalServer().isProxySubServer())
+        			this.announceServerStatus(false);
         	
         	//ADDONS
         	if(Spicord.getInstance().getAddonManager().isRegistered(this.playerInfoAddon))
@@ -122,18 +123,24 @@ public class DiscordManager {
 	    this.getDiscordBot().getJda().addEventListener(this.broadcastListener);
 
     	//SEND START MESSAGE TO DISCORD
-	    if(!this.instance.getUniversalServer().isProxy() && !this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
-	    	this.announceServerStatus(true);
+    	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
+    		if(!this.instance.getUniversalServer().isProxySubServer())
+    			this.announceServerStatus(true);
 	    	
 		this.instance.getUniversalServer().getLogger().info("Connected with Discord BOT.");
 		
 	}
 	
 	private void announceServerStatus(boolean status) {
-		long channelId = this.instance.getConfigManager().getChannelID(FeatureType.ServerStatus); //CANT BE SEPARATED SINCE IT ONLY TRIGGERS FOR NON NETWORKS
+		String server = this.instance.getUniversalServer().isProxy() ? "Proxy" : "Server";
+		long channelId;
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.ServerStatus.toString() + ".enableServerSeperatedStatus"))
+			channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.ServerStatus.toString() + ".serverSeperatedStatus." + server);
+		else
+			channelId = this.instance.getConfigManager().getChannelID(FeatureType.ServerStatus);
 
 		HashMap<String, String> placeholder = new HashMap<>();
-		placeholder.put("server", "Server");
+		placeholder.put("server", server);
 		
 		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.ServerStatus)) {
 			this.instance.getDiscordManager().sendEmbedMessageWithNoPictureSync(channelId, status ? "ServerStartEmbed" : "ServerStopEmbed", placeholder);
@@ -174,17 +181,21 @@ public class DiscordManager {
 			//PICTURE ADDING TO MESSAGE - Only if uuid not null and Pictures are on
 			if(uuid != null && this.instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithPicture")) {
 				String minotarTypeS = this.instance.getConfigManager().getConfig().getString("DiscordEmbedMessages." + path + ".PictureType");
+				int size = this.instance.getConfigManager().getConfig().getInt("DiscordEmbedMessages." + path + ".PictureSize");
+				if(size <= 0)
+					size = 100;
+				
 				MinotarTypes minotarType = MinotarTypes.BUST;
 				try {
 					minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
 				}catch(Exception ex) { /* NOTING */ }
 				
 				InputStream file = null;
-				String filename = minotarType.toString().toLowerCase() + "_" + uuid.toString() + ".jpg";
+				String filename = minotarType.toString().toLowerCase() + "_" + uuid.toString() + ".png";
 				
 				eb.setImage("attachment://" + filename);
 				try {
-					URL url = new URL("https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString());
+					URL url = new URL("https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString() + "/" + String.valueOf(size) + ".png");
 					URLConnection urlConn = url.openConnection();
 					file = urlConn.getInputStream();
 				}catch (IOException e) {
@@ -257,7 +268,7 @@ public class DiscordManager {
 
 		if(author != null && !author.equalsIgnoreCase("")) {
 			if(uuid != null && this.instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithAuthorPicture"))
-				eb.setAuthor(author, null, "https://minotar.net/" + "avatar" + "/" + uuid.toString());
+				eb.setAuthor(author, null, "https://minotar.net/" + "avatar" + "/" + uuid.toString() + "/100.png");
 			else
 				eb.setAuthor(author);
 		}

@@ -256,6 +256,7 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
     WithPicture: true
     PictureType: HELM
+    PictureSize: 100
   PlayerJoinEmbed:
     Title: '**%Player%** joined the server.'
     Description: ''
@@ -267,6 +268,7 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
     WithPicture: true
     PictureType: AVATAR
+    PictureSize: 150
   PlayerLeaveEmbed:
     Title: '**%Player%** left the server.'
     Description: ''
@@ -278,6 +280,7 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
     WithPicture: false
     PictureType: AVATAR
+    PictureSize: 100
   #Triggers if no seperated Channels are active
   PlayerServerChangeEmbed:
     Title: '**%Player%** went from **%old%** to **%target%**.'
@@ -290,6 +293,7 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
     WithPicture: true
     PictureType: AVATAR
+    PictureSize: 100
   PlayerServerChangeJoinEmbed:
     Title: '**%Player%** joined the server from %old%.'
     Description: ''
@@ -301,6 +305,7 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
     WithPicture: true
     PictureType: AVATAR
+    PictureSize: 100
   PlayerServerChangeLeaveEmbed:
     Title: '**%Player%** left the server and went to %target%.'
     Description: ''
@@ -312,6 +317,7 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
     WithPicture: false
     PictureType: AVATAR
+    PictureSize: 100
   DeathEmbed:
     Title: '**%Player%** died.'
     Description: '%DeathMessage%'
@@ -323,6 +329,7 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
     WithPicture: true
     PictureType: BUST
+    PictureSize: 100
   ChatEmbed:
     Title: '**%Player%** wrote:'
     Description: '%Message%'
@@ -334,6 +341,7 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
     WithPicture: true
     PictureType: BUST
+    PictureSize: 100
   StaffEmbed:
     Title: '**%Player%** wrote:'
     Description: '%Message%'
@@ -344,6 +352,7 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
     WithPicture: true
     PictureType: BUST
+    PictureSize: 100
   #Placeholder %livelocation% is not Supported on Bungeecord. It shows the exact Location of a Online Player
   PlayerInfoEmbed:
     Title: '**%Player%** Information'
@@ -363,6 +372,7 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
     WithPicture: true
     PictureType: BODY
+    PictureSize: 100
   ServerStartEmbed:
     Title: ':green_circle: **%Server%**'
     Description: The Server is now Online again!
