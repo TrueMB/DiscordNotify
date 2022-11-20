@@ -43,10 +43,9 @@ Options:
     noOfflinetime: 'Unknown'
     noLastSeen: 'Never'
     notVerified: 'not Verfied'
+    NotOnline: 'Currently Offline'
   OtherFormats:
     Location: '%world%, x=%x%, y=%y%, z=%z%, yaw=%yaw%, pitch=%pitch%'
-  DefaultPlaceholder:
-    NotOnline: 'Currently Offline'
   Inactivity:
     #Checking, if players are inactive (in Minutes)
     CheckTimer: 60
@@ -384,4 +383,4 @@ DiscordEmbedMessages:
     WithAuthorPicture: false
 
   #Do NOT touch
-ConfigVersion: 19
+ConfigVersion: 20
