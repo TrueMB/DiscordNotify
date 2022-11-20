@@ -129,8 +129,10 @@ Options:
   RoleSync:
     #Uses only the Primary Group. Otherwise all groups that are directly connected to the player
     useOnlyPrimaryGroup: false
-    #Uses the Ingame Group Names. If false, it only synces the given groups
+    #Uses the Ingame Group Names. If false, it only synces the given groups in customGroupSync
     useIngameGroupNames: true
+    #Changes the sync direction to Discord -> Minecraft.
+    syncDiscordToMinecraft: false
     #You can add as many entrys you need. The Key is the Minecraft Group and the Value the Discord Group Name
     #Please use lower case for the key (minecraft group)
     customGroupSync:
