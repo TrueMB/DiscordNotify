@@ -26,6 +26,8 @@ Options:
   DiscordBot:
     #Please enter the Name of the Bot, that you defined in the config.toml of Spicord
     Name: 'default'
+    #Enter a specific Server. Leave it to -1 if you use the bot only for Spicord. Otherwise the Server ID
+    ServerID: -1
   DateFormat:
     Date: dd.MM.yyyy
     Time: HH:mm:ss
@@ -131,7 +133,7 @@ Options:
     useOnlyPrimaryGroup: false
     #Uses the Ingame Group Names. If false, it only synces the given groups in customGroupSync
     useIngameGroupNames: true
-    #Changes the sync direction to Discord -> Minecraft.
+    #Changes the sync direction to Discord -> Minecraft. If enabled, all listed groups will be used. The Settings above will be ignored.
     syncDiscordToMinecraft: false
     #You can add as many entrys you need. The Key is the Minecraft Group and the Value the Discord Group Name
     #Please use lower case for the key (minecraft group)

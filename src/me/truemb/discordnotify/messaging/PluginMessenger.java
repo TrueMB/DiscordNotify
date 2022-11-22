@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import org.spicord.bot.DiscordBot;
+
 import me.truemb.discordnotify.enums.GroupAction;
 import me.truemb.discordnotify.enums.InformationType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
@@ -12,6 +14,7 @@ import me.truemb.universal.messenger.IPipelineRegistry;
 import me.truemb.universal.messenger.MessageChannelAPI;
 import me.truemb.universal.messenger.PipelineMessage;
 import me.truemb.universal.player.UniversalPlayer;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 
 public class PluginMessenger {
@@ -58,10 +61,17 @@ public class PluginMessenger {
 					
 					long disuuid = instance.getVerifyManager().getVerfiedWith(uuid);
 					
+					DiscordBot discordBot = instance.getDiscordManager().getDiscordBot();
+					if(discordBot == null)
+						return;
+				
+					long discordServerId = instance.getConfigManager().getConfig().getLong("Options.DiscordBot.ServerID");
+					Guild guild = discordServerId <= 0 ? discordBot.getJda().getGuilds().get(0) : discordBot.getJda().getGuildById(discordServerId);
+					
 					//ACCEPTING REQUEST
-					Member member = instance.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
+					Member member = guild.getMemberById(disuuid);
 					if(member == null)
-						instance.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem ->  
+						guild.retrieveMemberById(disuuid).queue(mem ->  
 							instance.getVerifyManager().checkForRolesUpdate(uuid, mem, currentGroupList));
 					else
 						instance.getVerifyManager().checkForRolesUpdate(uuid, member, currentGroupList);

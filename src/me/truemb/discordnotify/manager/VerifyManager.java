@@ -5,8 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import org.spicord.bot.DiscordBot;
+
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 
@@ -98,11 +101,20 @@ public class VerifyManager {
 	
 	//ROLESYNC
 	public void checkForRolesUpdate(UUID uuid, long disuuid, String[] currentGroupList) {
-		if(this.instance.getDiscordManager() == null) return;
-		Member member = this.instance.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
+		if(this.instance.getDiscordManager() == null)
+			return;
+		
+		DiscordBot discordBot = this.instance.getDiscordManager().getDiscordBot();
+		if(discordBot == null) 
+			return;
+
+		long discordServerId = this.instance.getConfigManager().getConfig().getLong("Options.DiscordBot.ServerID");
+		Guild guild = discordServerId <= 0 ? discordBot.getJda().getGuilds().get(0) : discordBot.getJda().getGuildById(discordServerId);
+		
+		Member member = guild.getMemberById(disuuid);
 
 		if(member == null) {
-			this.instance.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
+			guild.retrieveMemberById(disuuid).queue(mem -> {
 				this.checkForRolesUpdate(uuid, mem, currentGroupList);
 			});
 		}else
@@ -111,7 +123,12 @@ public class VerifyManager {
 
 	//CHECK FOR UPDATES
 	public void checkForRolesUpdate(UUID uuid, Member member, String[] currentGroupList) {
-		if(this.instance.getDiscordManager() == null) return;
+		if(this.instance.getDiscordManager() == null) 
+			return;
+		
+		DiscordBot discordBot = this.instance.getDiscordManager().getDiscordBot();
+		if(discordBot == null) 
+			return;
 
 		if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync))
 			return;
@@ -129,14 +146,14 @@ public class VerifyManager {
 		for(String group : currentGroupList) {
 			List<Role> roles = new ArrayList<>();
 			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
-				roles = this.instance.getDiscordManager().getDiscordBot().getJda().getRolesByName(group, true);
+				roles = discordBot.getJda().getRolesByName(group, true);
 			else {
 				String groupConfig = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group.toLowerCase());
 				
 				if(groupConfig == null)
 					continue;
 				
-				roles = this.instance.getDiscordManager().getDiscordBot().getJda().getRolesByName(groupConfig, true);
+				roles = discordBot.getJda().getRolesByName(groupConfig, true);
 			}
 			
 			if(roles.size() <= 0)
@@ -164,14 +181,14 @@ public class VerifyManager {
 			if(!isInGroup) {
 				List<Role> roles = new ArrayList<>();
 				if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
-					roles = this.instance.getDiscordManager().getDiscordBot().getJda().getRolesByName(backupRoles, true);
+					roles = discordBot.getJda().getRolesByName(backupRoles, true);
 				else {
 					String groupConfig = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + backupRoles.toLowerCase());
 					
 					if(groupConfig == null)
 						continue;
 					
-					roles = this.instance.getDiscordManager().getDiscordBot().getJda().getRolesByName(groupConfig, true);
+					roles = discordBot.getJda().getRolesByName(groupConfig, true);
 				}
 				if(roles.size() <= 0)
 					continue;
@@ -192,7 +209,12 @@ public class VerifyManager {
 	}
 
 	public void resetRoles(UUID uuid, Member member) {
-		if(this.instance.getDiscordManager() == null) return;
+		if(this.instance.getDiscordManager() == null) 
+			return;
+		
+		DiscordBot discordBot = this.instance.getDiscordManager().getDiscordBot();
+		if(discordBot == null) 
+			return;
 		
 		if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync))
 			return;
@@ -204,14 +226,14 @@ public class VerifyManager {
 		for(String backupRoles : rolesBackup) {
 			List<Role> roles = new ArrayList<>();
 			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
-				roles = this.instance.getDiscordManager().getDiscordBot().getJda().getRolesByName(backupRoles, true);
+				roles = discordBot.getJda().getRolesByName(backupRoles, true);
 			else {
 				String groupConfig = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + backupRoles.toLowerCase());
 				
 				if(groupConfig == null)
 					continue;
 				
-				roles = this.instance.getDiscordManager().getDiscordBot().getJda().getRolesByName(groupConfig, true);
+				roles = discordBot.getJda().getRolesByName(groupConfig, true);
 			}
 			if(roles.size() <= 0)
 				continue;

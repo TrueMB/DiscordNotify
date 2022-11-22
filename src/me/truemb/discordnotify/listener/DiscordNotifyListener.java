@@ -1,7 +1,11 @@
 package me.truemb.discordnotify.listener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
+
+import org.spicord.bot.DiscordBot;
 
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.InformationType;
@@ -9,7 +13,9 @@ import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.universal.listener.UniversalEventhandler;
 import me.truemb.universal.player.UniversalLocation;
 import me.truemb.universal.player.UniversalPlayer;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 
 public class DiscordNotifyListener extends UniversalEventhandler{
 	
@@ -68,36 +74,67 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		//ROLE UPDATES
 		if(this.instance.getVerifyManager().isVerified(uuid) && this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync)) {
 		
-			if(this.instance.getDiscordManager().getDiscordBot() == null)
+			DiscordBot discordBot = this.instance.getDiscordManager().getDiscordBot();
+			if(discordBot == null)
 				return;
 		
 			long disuuid = this.instance.getVerifyManager().getVerfiedWith(uuid);
+			long discordServerId = this.instance.getConfigManager().getConfig().getLong("Options.DiscordBot.ServerID");
+			Guild guild = discordServerId <= 0 ? discordBot.getJda().getGuilds().get(0) : discordBot.getJda().getGuildById(discordServerId);
 
-			boolean usePrimaryGroup = this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useOnlyPrimaryGroup");
-			String[] currentGroupList;
+			boolean syncDiscordToMinecraft = this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".syncDiscordToMinecraft");
 			
-			if(this.instance.getPermsAPI().usePluginBridge) {
-				if(usePrimaryGroup)
-					this.instance.getPluginMessenger().askForPrimaryGroup(uuid);
-				else
-					this.instance.getPluginMessenger().askForGroups(uuid);
-			}else {
+			if(syncDiscordToMinecraft) {
 				
-				if(usePrimaryGroup)
-					currentGroupList = new String[]{ this.instance.getPermsAPI().getPrimaryGroup(uuid) };
-				else
-					currentGroupList = this.instance.getPermsAPI().getGroups(uuid);
-				
-				
-				Member member = this.instance.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
+				List<String> groups = new ArrayList<>();
+				Member member = guild.getMemberById(disuuid);
 				if(member == null) {
-					this.instance.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).queue(mem -> {
-						this.instance.getVerifyManager().checkForRolesUpdate(uuid, mem, currentGroupList);
+					guild.retrieveMemberById(disuuid).queue(mem -> {
+						outer: for(Role r : mem.getRoles())
+							for(String group : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
+								if(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group).equalsIgnoreCase(r.getName())) {
+									groups.add(group);
+									continue outer;
+								}
 					});
-				}else
-					this.instance.getVerifyManager().checkForRolesUpdate(uuid, member, currentGroupList);
+				}else {
+					outer: for(Role r : member.getRoles())
+						for(String group : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
+							if(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group).equalsIgnoreCase(r.getName())) {
+								groups.add(group);
+								continue outer;
+							}
+				}
+				
+				//TODO BUNGEECORD PLUGIN MESSAGING CHANNEL?
+				groups.forEach(group -> this.instance.getPermsAPI().addGroup(uuid, group));
+				
+			}else {
+				boolean usePrimaryGroup = this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useOnlyPrimaryGroup");
+				String[] currentGroupList;
+				
+				if(this.instance.getPermsAPI().usePluginBridge) {
+					if(usePrimaryGroup)
+						this.instance.getPluginMessenger().askForPrimaryGroup(uuid);
+					else
+						this.instance.getPluginMessenger().askForGroups(uuid);
+				}else {
+					
+					if(usePrimaryGroup)
+						currentGroupList = new String[]{ this.instance.getPermsAPI().getPrimaryGroup(uuid) };
+					else
+						currentGroupList = this.instance.getPermsAPI().getGroups(uuid);
+					
+					
+					Member member = guild.getMemberById(disuuid);
+					if(member == null) {
+						guild.retrieveMemberById(disuuid).queue(mem -> {
+							this.instance.getVerifyManager().checkForRolesUpdate(uuid, mem, currentGroupList);
+						});
+					}else
+						this.instance.getVerifyManager().checkForRolesUpdate(uuid, member, currentGroupList);
+				}
 			}
-
 		}
 		
 	}

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import org.spicord.bot.DiscordBot;
 import org.spicord.bot.command.DiscordBotCommand;
 
 import me.truemb.discordnotify.enums.DelayType;
@@ -15,6 +16,7 @@ import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.GroupAction;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.discordnotify.utils.DiscordManager;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
@@ -117,6 +119,12 @@ public class VerifySQL {
 			@Override
 			public void accept(ResultSet rs) {
 				try {
+					DiscordBot discordBot = discordManager.getDiscordBot();
+					if(discordBot == null)
+						return;
+				
+					long discordServerId = instance.getConfigManager().getConfig().getLong("Options.DiscordBot.ServerID");
+					Guild guild = discordServerId <= 0 ? discordBot.getJda().getGuilds().get(0) : discordBot.getJda().getGuildById(discordServerId);
 					
 					while (rs.next()) {
 						//SOMETHING GOT AUTHENTICATED
@@ -129,12 +137,12 @@ public class VerifySQL {
 					instance.getVerifyManager().setVerified(uuid, disuuid);
 					instance.getVerifyManager().clearVerficationProgress(uuid);
 					
-					Member member = discordManager.getDiscordBot().getJda().getGuilds().get(0).getMemberById(disuuid);
+					Member member = guild.getMemberById(disuuid);
 					if(member == null)
-						member = discordManager.getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).complete();
+						member = guild.retrieveMemberById(disuuid).complete();
 
 					String verfiedGroupS = instance.getConfigManager().getConfig().getString("Options." + FeatureType.Verification.toString() +  ".discordRole");
-					List<Role> verifyRoles = discordManager.getDiscordBot().getJda().getRolesByName(verfiedGroupS, true);
+					List<Role> verifyRoles = discordBot.getJda().getRolesByName(verfiedGroupS, true);
 					if(verifyRoles.size() <= 0)
 						return;
 					
