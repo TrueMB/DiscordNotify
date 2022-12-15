@@ -1,6 +1,6 @@
 package me.truemb.universal.minecraft.commands;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.UUID;
 
 import org.bukkit.command.CommandSender;
@@ -16,7 +16,7 @@ public class BukkitCommandExecutor_Staff extends BukkitCommand {
 	private DN_StaffCommand staffCommand;
 
 	public BukkitCommandExecutor_Staff(DiscordNotifyMain plugin) {
-		super("staff", null, null, List.of("s"));
+		super("staff", null, null, Arrays.asList("Options.Broadcast"));
 		this.instance = plugin;
 		this.staffCommand = new DN_StaffCommand(plugin);
 	}

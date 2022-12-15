@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import me.truemb.universal.enums.ServerType;
@@ -32,7 +33,7 @@ public abstract class UniversalServer {
 	public UniversalPlayer getPlayer(UUID uuid) {
 		List<UniversalPlayer> players = this.onlinePlayers.stream()
 											.filter(up -> up.getUUID().equals(uuid))
-											.toList();
+											.collect(Collectors.toList());
 		
 		return players.size() > 0 ? players.get(0) : null;
 	}

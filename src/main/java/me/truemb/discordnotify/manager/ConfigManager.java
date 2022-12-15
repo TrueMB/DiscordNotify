@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.List;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,7 +46,7 @@ public class ConfigManager {
 		if(!this.config.isSet("ConfigVersion") || this.config.getInt("ConfigVersion") < configVersion) {
 			logger.info("Updating Config!");
 			try {
-				ConfigUpdater.update(pluginConfig, this.configFile, List.of("Options.Broadcast"));
+				ConfigUpdater.update(pluginConfig, this.configFile, Arrays.asList("Options.Broadcast"));
 				this.config = new UTF8YamlConfiguration(this.configFile);
 			} catch (IOException e) {
 				e.printStackTrace();

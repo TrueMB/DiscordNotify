@@ -3,6 +3,7 @@ package me.truemb.discordnotify.discord.commands;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.spicord.api.addon.SimpleAddon;
 import org.spicord.bot.DiscordBot;
@@ -39,7 +40,7 @@ public class DC_VerifyCommand extends SimpleAddon {
     	placeholder.put("Prefix", command.getPrefix());
     	placeholder.put("Tag", member.getUser().getAsTag());
     	
-    	List<String> allowedRoles = this.instance.getConfigManager().getConfig().getStringList("DiscordCommandAllowedGroups.Verify").stream().filter(role -> role != null && !role.equalsIgnoreCase("")).toList();
+    	List<String> allowedRoles = this.instance.getConfigManager().getConfig().getStringList("DiscordCommandAllowedGroups.Verify").stream().filter(role -> role != null && !role.equalsIgnoreCase("")).collect(Collectors.toList());
     	
     	if(allowedRoles.size() > 0) {
     		boolean isAllowed = false;
@@ -142,7 +143,7 @@ public class DC_VerifyCommand extends SimpleAddon {
 
 		new Thread(() -> {
 			
-			List<UniversalPlayer> players = this.instance.getUniversalServer().getOnlinePlayers().stream().filter(up -> up.getIngameName().equalsIgnoreCase(args[0])).toList();
+			List<UniversalPlayer> players = this.instance.getUniversalServer().getOnlinePlayers().stream().filter(up -> up.getIngameName().equalsIgnoreCase(args[0])).collect(Collectors.toList());
 			
 			//PLAYER NOT ONLINE
 			if(players.size() <= 0 || players.get(0) == null || !players.get(0).isOnline()) {

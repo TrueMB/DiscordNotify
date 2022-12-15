@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import org.spicord.api.addon.SimpleAddon;
 import org.spicord.bot.DiscordBot;
@@ -42,7 +43,7 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
     	placeholder.put("Prefix", command.getPrefix());
     	placeholder.put("Tag", member.getUser().getAsTag());
 
-    	List<String> allowedRoles = this.instance.getConfigManager().getConfig().getStringList("DiscordCommandAllowedGroups.PlayerInfo").stream().filter(role -> role != null && !role.equalsIgnoreCase("")).toList();
+    	List<String> allowedRoles = this.instance.getConfigManager().getConfig().getStringList("DiscordCommandAllowedGroups.PlayerInfo").stream().filter(role -> role != null && !role.equalsIgnoreCase("")).collect(Collectors.toList());
     	
     	if(allowedRoles.size() > 0) {
     		boolean isAllowed = false;
