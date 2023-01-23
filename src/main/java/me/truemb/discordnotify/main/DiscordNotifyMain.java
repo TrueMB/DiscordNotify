@@ -3,11 +3,17 @@ package me.truemb.discordnotify.main;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 
 import lombok.Getter;
 import me.truemb.discordnotify.database.AsyncMySQL;
@@ -184,20 +190,25 @@ public class DiscordNotifyMain {
 			return;
 
 		if(this.getUniversalServer().getServerPlatform() == ServerType.BUKKIT) {
-			for(org.bukkit.OfflinePlayer player : org.bukkit.Bukkit.getOfflinePlayers()){
-				UUID uuid = player.getUniqueId();
-	
-				long lastTimePlayed = player.getLastPlayed();
-				long playtimeInMilli = player.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE) * 50; //Normally / 20 ticks * 1000 Millis, but since a long doesn't have a comma, we wont divide
-				
-				this.getOfflineInformationManager().addInformation(uuid, InformationType.Playtime, playtimeInMilli);
-				this.getOfflineInformationsSQL().addToInformation(uuid, InformationType.Playtime, playtimeInMilli);
-	
-				if(this.getOfflineInformationManager().getInformationLong(uuid, InformationType.LastConnection) < lastTimePlayed) {
-					this.getOfflineInformationManager().setInformation(uuid, InformationType.LastConnection, lastTimePlayed); //ONLY NEWEST
-					this.getOfflineInformationsSQL().updateInformation(uuid, InformationType.LastConnection, lastTimePlayed);
-				}
-			}
+			org.bukkit.OfflinePlayer[] players = org.bukkit.Bukkit.getOfflinePlayers();
+			Collection<OfflinePlayer> all = Arrays.asList(players);
+			
+			new Thread(() -> {
+				all.forEach(player -> {
+					UUID uuid = player.getUniqueId();
+		
+					long lastTimePlayed = player.getLastPlayed();
+					long playtimeInMilli = player.getStatistic(org.bukkit.Statistic.PLAY_ONE_MINUTE) * 50; //Normally / 20 ticks * 1000 Millis, but since a long doesn't have a comma, we wont divide
+					
+					this.getOfflineInformationManager().addInformation(uuid, InformationType.Playtime, playtimeInMilli);
+					this.getOfflineInformationsSQL().addToInformation(uuid, InformationType.Playtime, playtimeInMilli);
+		
+					if(this.getOfflineInformationManager().getInformationLong(uuid, InformationType.LastConnection) < lastTimePlayed) {
+						this.getOfflineInformationManager().setInformation(uuid, InformationType.LastConnection, lastTimePlayed); //ONLY NEWEST
+						this.getOfflineInformationsSQL().updateInformation(uuid, InformationType.LastConnection, lastTimePlayed);
+					}
+				});
+			}).start();
 		}
 		//TODO SPONGE METHOD NEEDS TO BE ADDED
 		
