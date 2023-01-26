@@ -133,9 +133,9 @@ public class DN_InactivityChecker implements Runnable {
 							
 							//SEND MESSAGE
 							if(file != null)
-								tc.sendMessage(eb.build()).addFile(file, filename).queue();
+								tc.sendMessageEmbeds(eb.build()).addFile(file, filename).queue();
 							else
-								tc.sendMessage(eb.build()).queue();
+								tc.sendMessageEmbeds(eb.build()).queue();
 						}
 							
 						//ADD TO CACHE

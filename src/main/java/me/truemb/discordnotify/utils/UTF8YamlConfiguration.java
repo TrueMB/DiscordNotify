@@ -77,6 +77,7 @@ public class UTF8YamlConfiguration extends YamlConfiguration {
 		return null;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void load(File file) throws FileNotFoundException, IOException, InvalidConfigurationException {
 		Validate.notNull(file, "File cannot be null");

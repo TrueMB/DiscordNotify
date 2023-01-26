@@ -1,6 +1,7 @@
 package me.truemb.universal.server;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -46,15 +47,23 @@ public class BukkitServer extends UniversalServer {
 		
 		//VELOCITY BUNGEE SERVER?
 		if(oldPaperYml.exists()) {
-			YamlConfiguration oldPaperCfg = YamlConfiguration.loadConfiguration(oldPaperYml);
-			boolean paperBungee = oldPaperCfg.getBoolean("settings.velocity-support.enabled");
-			if(paperBungee)
-				return true;
+			try {
+				YamlConfiguration oldPaperCfg = YamlConfiguration.loadConfiguration(oldPaperYml);
+				boolean paperBungee = oldPaperCfg.getBoolean("settings.velocity-support.enabled");
+				if(paperBungee)
+					return true;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}else if(newPaperYml.exists()) {
-			YamlConfiguration newPaperCfg = YamlConfiguration.loadConfiguration(newPaperYml);
-			boolean paperBungee = newPaperCfg.getBoolean("proxies.velocity.enabled");
-			if(paperBungee)
-				return true;
+			try {
+				YamlConfiguration newPaperCfg = YamlConfiguration.loadConfiguration(newPaperYml);
+				boolean paperBungee = newPaperCfg.getBoolean("proxies.velocity.enabled");
+				if(paperBungee)
+					return true;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		//FALLBACK, IF NO PAPER SERVER

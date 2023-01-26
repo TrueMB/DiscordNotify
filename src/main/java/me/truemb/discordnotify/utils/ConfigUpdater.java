@@ -26,7 +26,7 @@ public class ConfigUpdater {
         update(stream, toUpdate, Arrays.asList(ignoredSections));
     }
 
-    public static void update(InputStream resource, File toUpdate, List<String> ignoredSections) throws IOException {
+	public static void update(InputStream resource, File toUpdate, List<String> ignoredSections) throws IOException {
         Preconditions.checkArgument(toUpdate.exists(), "The toUpdate file doesn't exist!");
         
         /* JAVA 9
@@ -35,7 +35,8 @@ public class ConfigUpdater {
         InputStream inputStreamClone1 = new ByteArrayInputStream(baos.toByteArray()); 
         InputStream inputStreamClone2 = new ByteArrayInputStream(baos.toByteArray()); 
 		*/
-        
+
+        @SuppressWarnings("deprecation")
         FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(resource, StandardCharsets.UTF_8));
         FileConfiguration currentConfig = YamlConfiguration.loadConfiguration(toUpdate);
         Map<String, String> comments = parseComments(resource, defaultConfig);

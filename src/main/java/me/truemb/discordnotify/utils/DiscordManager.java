@@ -209,13 +209,13 @@ public class DiscordManager {
 
 				//SENDING MESSAGE WITH PICTURE
 				if(file != null) {
-					channel.sendMessage(eb.build()).addFile(file, filename).queue();
+					channel.sendMessageEmbeds(eb.build()).addFile(file, filename).queue();
 					return;
 				}
 			}
 			
 			//SENDS MESSAGE - if no Pictures are enabled
-			channel.sendMessage(eb.build()).queue();
+			channel.sendMessageEmbeds(eb.build()).queue();
 			
 		}).start();
 	}
@@ -242,7 +242,7 @@ public class DiscordManager {
 		}
 			
 		EmbedBuilder eb = this.getEmbedMessage(null, path, placeholder);
-		channel.sendMessage(eb.build()).complete();
+		channel.sendMessageEmbeds(eb.build()).queue();
 	}
 	
 	public boolean isAddonEnabled(String addonName) {
