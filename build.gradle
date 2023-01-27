@@ -9,6 +9,7 @@ plugins {
     id 'maven-publish'
     
     id 'net.minecrell.plugin-yml.bukkit' version '0.5.2'
+    id 'net.minecrell.plugin-yml.bungee' version '0.5.2'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
@@ -56,6 +57,8 @@ repositories {
 }
 
 dependencies {
+    library 'com.google.code.gson:gson:2.8.7' // All platforms plugin.yml
+    
     api 'net.kyori:adventure-api:4.12.0'
     api 'net.kyori:adventure-text-serializer-plain:4.12.0'
     api 'net.kyori:adventure-platform-bukkit:4.2.0'
@@ -81,7 +84,6 @@ dependencies {
 group = 'DiscordNotify'
 version = '3.2.2'
 description = 'DiscordNotify'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 sourceSets {
     main { 
@@ -112,6 +114,17 @@ tasks.withType(Copy).all {
 
 tasks.withType(Jar).all { 
 	duplicatesStrategy 'exclude' 
+}
+
+bungee {
+    name = "${project.name}"
+    version = "${project.version}"
+    description = 'Multifunctional Discord Plugin'
+    
+    author = 'TrueMB'
+    main = 'me.truemb.universal.minecraft.main.BungeeMain'
+    
+    softDepends = ['Spicord']
 }
 
 bukkit {
