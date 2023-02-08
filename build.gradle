@@ -8,6 +8,8 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     
+    id "io.freefair.lombok" version "6.6.1"
+    
     id 'net.minecrell.plugin-yml.bukkit' version '0.5.2'
     id 'net.minecrell.plugin-yml.bungee' version '0.5.2'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
@@ -84,6 +86,7 @@ dependencies {
 group = 'DiscordNotify'
 version = '3.2.2'
 description = 'DiscordNotify'
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 sourceSets {
     main { 
@@ -117,8 +120,8 @@ tasks.withType(Jar).all {
 }
 
 bungee {
-    name = "${project.name}"
-    version = "${project.version}"
+    name = rootProject.name
+    version = rootProject.version
     description = 'Multifunctional Discord Plugin'
     
     author = 'TrueMB'
@@ -128,8 +131,8 @@ bungee {
 }
 
 bukkit {
-    name = "${project.name}"
-    version = "${project.version}"
+    name = rootProject.name
+    version = rootProject.version
     description = 'Multifunctional Discord Plugin'
     
     website = 'https://github.com/TrueMB/DiscordNotify/'

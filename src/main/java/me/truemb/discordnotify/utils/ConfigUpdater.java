@@ -29,17 +29,15 @@ public class ConfigUpdater {
 	public static void update(InputStream resource, File toUpdate, List<String> ignoredSections) throws IOException {
         Preconditions.checkArgument(toUpdate.exists(), "The toUpdate file doesn't exist!");
         
-        /* JAVA 9
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         resource.transferTo(baos);
         InputStream inputStreamClone1 = new ByteArrayInputStream(baos.toByteArray()); 
         InputStream inputStreamClone2 = new ByteArrayInputStream(baos.toByteArray()); 
-		*/
 
         @SuppressWarnings("deprecation")
-        FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(resource, StandardCharsets.UTF_8));
+		FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(inputStreamClone1, StandardCharsets.UTF_8));
         FileConfiguration currentConfig = YamlConfiguration.loadConfiguration(toUpdate);
-        Map<String, String> comments = parseComments(resource, defaultConfig);
+        Map<String, String> comments = parseComments(inputStreamClone2, defaultConfig);
         Map<String, String> ignoredSectionsValues = parseIgnoredSections(toUpdate, currentConfig, comments, ignoredSections == null ? Collections.emptyList() : ignoredSections);
 
         // will write updated config file "contents" to a string

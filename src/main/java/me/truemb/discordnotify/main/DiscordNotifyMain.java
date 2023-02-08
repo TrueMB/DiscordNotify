@@ -212,7 +212,7 @@ public class DiscordNotifyMain {
 		
 		try {
 			file.createNewFile();
-			this.getUniversalServer().getLogger().warning("Sent the playtime of the players to the main server.");
+			this.getUniversalServer().getLogger().info("Sent the playtime of the players to the main server.");
 		} catch (IOException e) {
 			this.getUniversalServer().getLogger().warning("Couldn't create ScanIsDone File. Please create it manually or look for the Issue. Otherwise the scan will be done on each server start and add the playtime again.");
 		}
