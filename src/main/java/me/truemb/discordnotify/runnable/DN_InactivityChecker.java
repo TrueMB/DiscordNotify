@@ -55,7 +55,7 @@ public class DN_InactivityChecker implements Runnable {
 			+ " AND (" + InformationType.Inactivity.toString() + " IS NULL OR " + InformationType.Inactivity.toString() + "='false');", new Consumer<ResultSet>() {
 			
 			
-			//All Players that are longer than given Days Inactive and didnt get checked already.
+			//All Players that are longer than given Days Inactive and didn't get checked already.
 			
 			@Override
 			public void accept(ResultSet rs) {

@@ -279,9 +279,13 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		String group = this.instance.getPermsAPI().getPrimaryGroup(uuid);
 		
 		long channelId;
-		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat"))
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat")) {
 			channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat." + server);
-		else
+			
+			//Server should not send Messages
+			if(channelId <= 0)
+				return;
+		}else
 			channelId = this.instance.getConfigManager().getChannelID(FeatureType.Chat);
 			
 		HashMap<String, String> placeholder = new HashMap<>();
@@ -319,9 +323,13 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		//DISCORD DEATH MESSAGE
 		String server = up.getServer();
 		long channelId;
-		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerDeath.toString() + ".enableServerSeperatedDeath"))
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerDeath.toString() + ".enableServerSeperatedDeath")) {
 			channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.PlayerDeath.toString() + ".serverSeperatedDeath." + server);
-		else
+
+			//Server should not send Messages
+			if(channelId <= 0)
+				return;
+		}else
 			channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerDeath);
 		
 		HashMap<String, String> placeholder = new HashMap<>();
@@ -357,10 +365,12 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 					if(server.equalsIgnoreCase(oldServerName)) {
 						long channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + server);
 						
-						if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
-							this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerServerChangeLeaveEmbed", placeholder);
-						}else {
-							this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerServerChangeLeaveMessage", placeholder);
+						if(channelId > 0) {
+							if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
+								this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerServerChangeLeaveEmbed", placeholder);
+							}else {
+								this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerServerChangeLeaveMessage", placeholder);
+							}
 						}
 						break;
 					}
@@ -372,11 +382,13 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 				for(String server : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave").getKeys(false)){
 					if(server.equalsIgnoreCase(newServerName)) {
 						long channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + server);
-						
-						if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
-							this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerServerChangeJoinEmbed", placeholder);
-						}else {
-							this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerServerChangeJoinMessage", placeholder);
+
+						if(channelId > 0) {
+							if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
+								this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerServerChangeJoinEmbed", placeholder);
+							}else {
+								this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerServerChangeJoinMessage", placeholder);
+							}
 						}
 						break;
 					}
