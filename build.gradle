@@ -71,6 +71,7 @@ dependencies {
     api 'org.bstats:bstats-bukkit:3.0.0'
     api 'com.vdurmont:emoji-java:5.1.1'
     api 'com.google.code.gson:gson:2.10'
+    api 'club.minnced:discord-webhooks:0.2.0'
     compileOnly 'net.md-5:bungeecord-api:1.18-R0.1-SNAPSHOT'
     compileOnly 'com.velocitypowered:velocity-api:3.1.0'
     compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'

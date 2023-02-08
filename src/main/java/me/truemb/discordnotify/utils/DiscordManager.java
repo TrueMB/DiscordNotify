@@ -15,6 +15,12 @@ import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.bot.DiscordBot;
 
+import club.minnced.discord.webhook.WebhookClient;
+import club.minnced.discord.webhook.WebhookClientBuilder;
+import club.minnced.discord.webhook.WebhookCluster;
+import club.minnced.discord.webhook.send.WebhookEmbed;
+import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
+import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import me.truemb.discordnotify.discord.commands.DC_PlayerInfoCommand;
 import me.truemb.discordnotify.discord.commands.DC_VerifyCommand;
 import me.truemb.discordnotify.discord.listener.DC_BroadcastListener;
@@ -24,14 +30,19 @@ import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.MinotarTypes;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import okhttp3.OkHttpClient;
 
 public class DiscordManager {
 	
 	private DiscordBot discordBot = null;
 	private boolean discordBotHooked = false;
 	private int hookSchedulerId = -1; //IS THE SCHEDULER ID, WHICH HOOKS INTO THE DISCORD BOT
+	
+	private Guild guild;
+	private WebhookCluster webookCluster;
 
 	private DiscordNotifyMain instance;
 	
@@ -117,6 +128,9 @@ public class DiscordManager {
 	    	this.instance.getUniversalServer().getLogger().warning("Discord Bot is not Connected with a Server.");
 	    	return;
 	    }
+	    
+		long discordServerId = this.instance.getConfigManager().getConfig().getLong("Options.DiscordBot.ServerID");
+		this.guild = discordServerId <= 0 ? discordBot.getJda().getGuilds().get(0) : discordBot.getJda().getGuildById(discordServerId);
 	
 	    //REGISTER LISTENER
 		this.chatListener = new DC_ChatListener(this.instance);
@@ -158,7 +172,74 @@ public class DiscordManager {
 	public DiscordBot getDiscordBot(){
 		return this.discordBot;
 	}
+	
+	public Guild getCurrentGuild(){
+		return this.guild;
+	}
+	
+	private void createCluster() {
 
+		// Create and initialize the cluster
+		this.webookCluster = new WebhookCluster(5); // create an initial 5 slots (dynamic like lists)
+		webookCluster.setDefaultHttpClient(new OkHttpClient());
+		webookCluster.setDefaultDaemon(true);
+
+		// Create a webhook client
+		//cluster.buildWebhook(id, token);
+
+		// Add an existing webhook client
+		//cluster.addWebhook(client);
+	}
+
+	public void sendWebhookMessage() {
+		
+		WebhookClientBuilder cbuilder = new WebhookClientBuilder("url"); // or id, token
+		cbuilder.setThreadFactory((job) -> {
+		    Thread thread = new Thread(job);
+		    thread.setName("Hello");
+		    thread.setDaemon(true);
+		    return thread;
+		});
+		cbuilder.setWait(true);
+		WebhookClient client = cbuilder.build();
+		
+		// Send and forget
+		client.send("Hello World");
+
+		// Send and log (using embed)
+		WebhookEmbed embed = new WebhookEmbedBuilder()
+		        .setColor(0xFF00EE)
+		        .setDescription("Hello World")
+		        .build();
+
+		client.send(embed)
+		      .thenAccept((message) -> System.out.printf("Message with embed has been sent [%s]%n", message.getId()));
+
+		// Change appearance of webhook message
+		WebhookMessageBuilder builder = new WebhookMessageBuilder();
+		builder.setUsername("Minn"); // use this username
+		builder.setAvatarUrl(""); // use this avatar
+		builder.setContent("Hello World");
+		client.send(builder.build());
+		
+		/*
+		WebhookMessageBuilder builder = new WebhookMessageBuilder();
+		builder.setContent("This is a normal message content");
+		WebhookEmbed firstEmbed = new WebhookEmbedBuilder().setColor(Color.RED.getRGB()).setDescription("This is one embed").build();
+		WebhookEmbed secondEmbed = new WebhookEmbedBuilder().setColor(Color.GREEN.getRGB()).setDescription("This is another embed").build();
+		
+		Collection<WebhookEmbed> embeds = Arrays.asList(firstEmbed, secondEmbed);
+		builder.addEmbeds(embeds)
+		       .setUsername("Tester");
+		
+		WebhookMessage message = builder.build();
+		
+		client.send(message);
+		*/
+		
+		client.close();
+	}
+	
 	/**
 	 * 
 	 * @param channelId - Channel to send the message to

@@ -79,17 +79,15 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 				return;
 		
 			long disuuid = this.instance.getVerifyManager().getVerfiedWith(uuid);
-			long discordServerId = this.instance.getConfigManager().getConfig().getLong("Options.DiscordBot.ServerID");
-			Guild guild = discordServerId <= 0 ? discordBot.getJda().getGuilds().get(0) : discordBot.getJda().getGuildById(discordServerId);
 
 			boolean syncDiscordToMinecraft = this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".syncDiscordToMinecraft");
 			
 			if(syncDiscordToMinecraft) {
 				
 				List<String> groups = new ArrayList<>();
-				Member member = guild.getMemberById(disuuid);
+				Member member = this.instance.getDiscordManager().getCurrentGuild().getMemberById(disuuid);
 				if(member == null) {
-					guild.retrieveMemberById(disuuid).queue(mem -> {
+					this.instance.getDiscordManager().getCurrentGuild().retrieveMemberById(disuuid).queue(mem -> {
 						outer: for(Role r : mem.getRoles())
 							for(String group : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
 								if(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group).equalsIgnoreCase(r.getName())) {
@@ -126,9 +124,9 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 						currentGroupList = this.instance.getPermsAPI().getGroups(uuid);
 					
 					
-					Member member = guild.getMemberById(disuuid);
+					Member member = this.instance.getDiscordManager().getCurrentGuild().getMemberById(disuuid);
 					if(member == null) {
-						guild.retrieveMemberById(disuuid).queue(mem -> {
+						this.instance.getDiscordManager().getCurrentGuild().retrieveMemberById(disuuid).queue(mem -> {
 							this.instance.getVerifyManager().checkForRolesUpdate(uuid, mem, currentGroupList);
 						});
 					}else
