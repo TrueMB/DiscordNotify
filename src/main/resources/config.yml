@@ -425,5 +425,19 @@ DiscordWebhookMessages:
     Description: '%Message%'
     PictureType: BODY
 
+#This will send a message to the channel and remove it after shutdown.
+#While the plugin is runnings, it keeps the embed updated.
+StaticEmbeds:
+  Example:
+    Channel: -1
+    Title: '**Server Information**'
+    Description: 'There are currently %online%/%onlineMax% Players online. \n\n%players%'
+    Fields:
+      - 'Online : %online%'
+      - 'Motd : %motd%'
+    Author: 'STATIC EMBED'
+    Color: 'WHITE'
+    DisableTimestamp: false
+
   #Do NOT touch
 ConfigVersion: 21
