@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import org.spicord.Spicord;
 import org.spicord.SpicordLoader;
 import org.spicord.bot.DiscordBot;
@@ -18,8 +20,6 @@ import org.spicord.bot.DiscordBot;
 import club.minnced.discord.webhook.WebhookClient;
 import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.WebhookCluster;
-import club.minnced.discord.webhook.send.WebhookEmbed;
-import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import club.minnced.discord.webhook.send.WebhookMessageBuilder;
 import me.truemb.discordnotify.discord.commands.DC_PlayerInfoCommand;
 import me.truemb.discordnotify.discord.commands.DC_VerifyCommand;
@@ -43,6 +43,7 @@ public class DiscordManager {
 	
 	private Guild guild;
 	private WebhookCluster webookCluster;
+	private HashMap<String, WebhookClient> webhookClients = new HashMap<>();
 
 	private DiscordNotifyMain instance;
 	
@@ -106,6 +107,8 @@ public class DiscordManager {
         	
         	//SHUTDOWN
         	this.getDiscordBot().getJda().shutdownNow();
+    		
+    		this.webookCluster.close();
     		this.instance.getUniversalServer().getLogger().info("Disconnected from Discord BOT.");
         }
 	}
@@ -129,8 +132,11 @@ public class DiscordManager {
 	    	return;
 	    }
 	    
+	    //Create Cluster
+	    this.createCluster();
+	    
 		long discordServerId = this.instance.getConfigManager().getConfig().getLong("Options.DiscordBot.ServerID");
-		this.guild = discordServerId <= 0 ? discordBot.getJda().getGuilds().get(0) : discordBot.getJda().getGuildById(discordServerId);
+		this.guild = discordServerId <= 0 ? this.discordBot.getJda().getGuilds().get(0) : this.discordBot.getJda().getGuildById(discordServerId);
 	
 	    //REGISTER LISTENER
 		this.chatListener = new DC_ChatListener(this.instance);
@@ -181,63 +187,48 @@ public class DiscordManager {
 
 		// Create and initialize the cluster
 		this.webookCluster = new WebhookCluster(5); // create an initial 5 slots (dynamic like lists)
-		webookCluster.setDefaultHttpClient(new OkHttpClient());
-		webookCluster.setDefaultDaemon(true);
-
-		// Create a webhook client
-		//cluster.buildWebhook(id, token);
-
-		// Add an existing webhook client
-		//cluster.addWebhook(client);
+		this.webookCluster.setDefaultHttpClient(new OkHttpClient());
+		this.webookCluster.setDefaultDaemon(true);
 	}
 
-	public void sendWebhookMessage() {
+	public WebhookClient createOrLoadWebhook(FeatureType type, String url) {
+		return this.createOrLoadWebhook(type, null, url);
+	}
+	
+	public WebhookClient createOrLoadWebhook(FeatureType type, @Nullable String server, String url) {
 		
-		WebhookClientBuilder cbuilder = new WebhookClientBuilder("url"); // or id, token
+		String id = server == null ? type.toString() : type.toString() + "_" + server;
+		if(this.webhookClients.containsKey(id))
+			return this.webhookClients.get(id);
+		
+		WebhookClientBuilder cbuilder = new WebhookClientBuilder(url);
 		cbuilder.setThreadFactory((job) -> {
 		    Thread thread = new Thread(job);
-		    thread.setName("Hello");
+		    thread.setName("Webhook");
 		    thread.setDaemon(true);
 		    return thread;
 		});
 		cbuilder.setWait(true);
+		
+		// Build client
 		WebhookClient client = cbuilder.build();
 		
-		// Send and forget
-		client.send("Hello World");
-
-		// Send and log (using embed)
-		WebhookEmbed embed = new WebhookEmbedBuilder()
-		        .setColor(0xFF00EE)
-		        .setDescription("Hello World")
-		        .build();
-
-		client.send(embed)
-		      .thenAccept((message) -> System.out.printf("Message with embed has been sent [%s]%n", message.getId()));
-
-		// Change appearance of webhook message
+		// Add to cluster
+		this.webookCluster.addWebhooks(client);
+		this.webhookClients.put(id, client);
+		
+		return client;
+	}
+	
+	public void sendWebhookMessage(WebhookClient client, String username, String avatarUrl, String content) {
+		
 		WebhookMessageBuilder builder = new WebhookMessageBuilder();
-		builder.setUsername("Minn"); // use this username
-		builder.setAvatarUrl(""); // use this avatar
-		builder.setContent("Hello World");
+		
+		builder.setUsername(username);
+		builder.setAvatarUrl(avatarUrl);
+		builder.setContent(content);
+		
 		client.send(builder.build());
-		
-		/*
-		WebhookMessageBuilder builder = new WebhookMessageBuilder();
-		builder.setContent("This is a normal message content");
-		WebhookEmbed firstEmbed = new WebhookEmbedBuilder().setColor(Color.RED.getRGB()).setDescription("This is one embed").build();
-		WebhookEmbed secondEmbed = new WebhookEmbedBuilder().setColor(Color.GREEN.getRGB()).setDescription("This is another embed").build();
-		
-		Collection<WebhookEmbed> embeds = Arrays.asList(firstEmbed, secondEmbed);
-		builder.addEmbeds(embeds)
-		       .setUsername("Tester");
-		
-		WebhookMessage message = builder.build();
-		
-		client.send(message);
-		*/
-		
-		client.close();
 	}
 	
 	/**

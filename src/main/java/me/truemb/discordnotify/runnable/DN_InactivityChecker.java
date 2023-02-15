@@ -15,6 +15,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+import club.minnced.discord.webhook.WebhookClient;
 import me.truemb.discordnotify.database.OfflineInformationsSQL;
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.InformationType;
@@ -33,8 +34,7 @@ public class DN_InactivityChecker implements Runnable {
 	
 	public DN_InactivityChecker(DiscordNotifyMain plugin) {
 		this.instance = plugin;
-		
-		this.task = plugin.getExecutor().scheduleAtFixedRate(this, 15, 60 * plugin.getConfigManager().getConfig().getInt("Options.Inactivity.CheckTimer"), TimeUnit.SECONDS);
+		this.task = plugin.getExecutor().scheduleAtFixedRate(this, 15, 60 * plugin.getConfigManager().getConfig().getInt("Options." + FeatureType.Inactivity.toString() + ".CheckTimer"), TimeUnit.SECONDS);
 	}
 
 	@Override
@@ -42,12 +42,16 @@ public class DN_InactivityChecker implements Runnable {
 
 		SimpleDateFormat sdf = new SimpleDateFormat(this.instance.getConfigManager().getConfig().getString("Options.DateFormat.Date") + " " + this.instance.getConfigManager().getConfig().getString("Options.DateFormat.Time"));
 				
-		long channelId = this.instance.getConfigManager().getChannelID(FeatureType.Inactivity);
-		if(channelId < 0)
+		String channelId = this.instance.getConfigManager().getChannel(FeatureType.Inactivity);
+		
+		//Server should not send Messages
+		if(channelId == null || channelId.equals("") || channelId.equals("-1"))
 			return;
 		
 		if(this.instance.getDiscordManager().getDiscordBot() == null)
 			return;
+			
+		WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.Inactivity, channelId);
 		
 		long inactivityLimit = System.currentTimeMillis() - this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.Inactivity.toString() + ".InactivForDays") * 24 * 60 * 60 * 1000;
 		
@@ -67,7 +71,9 @@ public class DN_InactivityChecker implements Runnable {
 							
 						if(instance.getUniversalServer().getPlayer(uuid) != null && instance.getUniversalServer().getPlayer(uuid).isOnline()) //PLAYER IS ONLINE
 							continue;
-							
+						
+						String name = PlayerManager.getName(uuid.toString());
+						
 						long playtimeInMilli = rs.getLong(InformationType.Playtime.toString());
 						long lastTimePlayed = rs.getLong(InformationType.LastConnection.toString());
 						String location = rs.getString(InformationType.Location.toString());
@@ -84,7 +90,7 @@ public class DN_InactivityChecker implements Runnable {
 						if(ip == null || ip.equals("")) ip = "unknown";
 
 						HashMap<String, String> placeholder = new HashMap<>();
-						placeholder.put("Player", PlayerManager.getName(uuid.toString()));
+						placeholder.put("Player", name);
 						placeholder.put("UUID", uuid.toString());
 						placeholder.put("InactivDays", String.valueOf(instance.getConfigManager().getConfig().getInt("Options." + FeatureType.Inactivity.toString() + ".InactivForDays")));
 						placeholder.put("Server", server);
@@ -93,49 +99,67 @@ public class DN_InactivityChecker implements Runnable {
 						placeholder.put("Playtime", TimeFormatter.formatDate(playtimeSec, instance.getConfigManager()));
 						placeholder.put("Offlinetime", TimeFormatter.formatDate(offlinetimeSec, instance.getConfigManager()));
 						placeholder.put("LastSeen", sdf.format(date));
-							
-						if(!instance.getConfigManager().useEmbedMessage(FeatureType.Inactivity)) {
-							instance.getDiscordManager().sendDiscordMessage(channelId, "InactivityMessage", placeholder);
-						}else {
-							//EMBED
-							String path = "InactivityEmbed";
-							EmbedBuilder eb = instance.getDiscordManager().getEmbedMessage(uuid, path, placeholder);
-
-						    TextChannel tc = instance.getDiscordManager().getDiscordBot().getJda().getTextChannelById(channelId);
-						    
-						    if(tc == null) {
-						    	instance.getUniversalServer().getLogger().warning("Couldn't find Channel with the ID: " + channelId);
-						    	return;
-						    }
-
-							//https://minotar.net/ <- Player Heads
-							String minotarTypeS = instance.getConfigManager().getConfig().getString("DiscordEmbedMessages." + path + ".PictureType");
-							MinotarTypes minotarType = MinotarTypes.BUST;
-							try {
-								minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
-							}catch(Exception ex) { /* NOTING */ }
-							
-							eb.setTimestamp(Instant.ofEpochMilli(date.getTime()));
-
-							InputStream file = null;
-							String filename = minotarType.toString().toLowerCase() + "_" + uuid.toString() + ".jpg";
-							if(instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithPicture")) {
-								eb.setImage("attachment://" + filename);
-
+						
+						switch (instance.getConfigManager().getMessageType(FeatureType.Inactivity)) {
+							case MESSAGE: {
+								
+								instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "InactivityMessage", placeholder);
+								break;
+								
+							}case EMBED: {
+								
+								String path = "InactivityEmbed";
+								EmbedBuilder eb = instance.getDiscordManager().getEmbedMessage(uuid, path, placeholder);
+	
+							    TextChannel tc = instance.getDiscordManager().getDiscordBot().getJda().getTextChannelById(channelId);
+							    
+							    if(tc == null) {
+							    	instance.getUniversalServer().getLogger().warning("Couldn't find Channel with the ID: " + channelId);
+							    	return;
+							    }
+	
+								//https://minotar.net/ <- Player Heads
+								String minotarTypeS = instance.getConfigManager().getConfig().getString("DiscordEmbedMessages." + path + ".PictureType");
+								MinotarTypes minotarType = MinotarTypes.BUST;
 								try {
-									URL url = new URL("https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString());
-									URLConnection urlConn = url.openConnection();
-									file = urlConn.getInputStream();
-								}catch (IOException e) {
-									e.printStackTrace();
+									minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+								}catch(Exception ex) { /* NOTING */ }
+								
+								eb.setTimestamp(Instant.ofEpochMilli(date.getTime()));
+	
+								InputStream file = null;
+								String filename = minotarType.toString().toLowerCase() + "_" + uuid.toString() + ".jpg";
+								if(instance.getConfigManager().getConfig().getBoolean("DiscordEmbedMessages." + path + ".WithPicture")) {
+									eb.setImage("attachment://" + filename);
+	
+									try {
+										URL url = new URL("https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString());
+										URLConnection urlConn = url.openConnection();
+										file = urlConn.getInputStream();
+									}catch (IOException e) {
+										e.printStackTrace();
+									}
 								}
+								
+								//SEND MESSAGE
+								if(file != null)
+									tc.sendMessageEmbeds(eb.build()).addFile(file, filename).queue();
+								else
+									tc.sendMessageEmbeds(eb.build()).queue();
+								break;
+								
+							}case WEBHOOK: {
+								String minotarTypeS = instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Inactivity.PictureType");
+								MinotarTypes minotarType = MinotarTypes.BUST;
+								try {
+									minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+								}catch(Exception ex) { /* NOTING */ }
+								
+								String description = instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Inactivity.Description");
+								instance.getDiscordManager().sendWebhookMessage(webhookClient, name, "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+								break;
+								
 							}
-							
-							//SEND MESSAGE
-							if(file != null)
-								tc.sendMessageEmbeds(eb.build()).addFile(file, filename).queue();
-							else
-								tc.sendMessageEmbeds(eb.build()).queue();
 						}
 							
 						//ADD TO CACHE

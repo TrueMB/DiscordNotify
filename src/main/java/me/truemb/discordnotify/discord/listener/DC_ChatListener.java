@@ -1,12 +1,18 @@
 package me.truemb.discordnotify.discord.listener;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.vdurmont.emoji.EmojiParser;
 
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
+import me.truemb.discordnotify.utils.JsonReader;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -15,8 +21,12 @@ public class DC_ChatListener extends ListenerAdapter {
 	
 	private DiscordNotifyMain instance;
 	
+	private HashMap<String, Long> channel_id = new HashMap<>();
+	
 	public DC_ChatListener(DiscordNotifyMain plugin) {
 		this.instance = plugin;
+		
+		this.getAllChannelIds();
 	}
 
     @Override
@@ -31,77 +41,76 @@ public class DC_ChatListener extends ListenerAdapter {
 	    //WONT SEND MESSAGE OF DISCORD BOTS. SINCE THEY COULD BE A BAN COMMAND OR SO ON
 	    if(e.getAuthor().isBot())
 	    	return;
-	    	   	    
+	    	    
 	    //CORRECT CHANNEL
-	    if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat") && this.instance.getConfigManager().getChannelID(FeatureType.Chat) == channelId) {
-	    	
-			if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat))
-				return;
-		    
-			List<String> bypassList = this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Chat.toString() + ".bypassPrefix");
-			for(String prefix : bypassList) {
-		    	if(message.toLowerCase().startsWith(prefix.toLowerCase()))
-		    		return;
-		    }
-			
-		    final String mcMessage = EmojiParser.parseToAliases(this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
-		    		.replace("%Tag%", e.getAuthor().getAsTag())
-		    		.replace("%Message%", message)
-		    		.replace("%Channel%", channelName));
-
-		  
-		    if(!this.instance.getUniversalServer().isProxySubServer()) {
-
-				if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat")) {
-					this.instance.getUniversalServer().getOnlinePlayers().forEach(all -> {
-						UUID uuidAll = all.getUUID();
-						if(this.instance.getDiscordChatEnabled().containsKey(uuidAll) && this.instance.getDiscordChatEnabled().get(uuidAll))
-							all.sendMessage(mcMessage);
-					});
-				}else
-					this.instance.getUniversalServer().broadcast(mcMessage);
+		if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat)) {
+		    if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat") && this.channel_id.get(FeatureType.Chat.toString()) == channelId) {
+			    
+				List<String> bypassList = this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Chat.toString() + ".bypassPrefix");
+				for(String prefix : bypassList) {
+			    	if(message.toLowerCase().startsWith(prefix.toLowerCase()))
+			    		return;
+			    }
 				
-		    }
-	    	
-	   	}else if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat) && this.instance.getUniversalServer().isProxy()){
-		    
-			List<String> bypassList = this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Chat.toString() + ".bypassPrefix");
-			for(String prefix : bypassList) {
-		    	if(message.toLowerCase().startsWith(prefix.toLowerCase()))
-		    		return;
-		    }
-			
-		    final String mcMessage = EmojiParser.parseToAliases(this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
-		    		.replace("%Tag%", e.getAuthor().getAsTag())
-		    		.replace("%Message%", message)
-		    		.replace("%Channel%", channelName));
-		    
-	   		for(String server : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat").getKeys(false)) {
-	   			long channelID = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat." + server);
-	   			
-	   			if(channelID == channelId) {
-	   				//SERVER SEPERATED CHANNEL
-
-					this.instance.getUniversalServer().getOnlinePlayers().forEach(all -> {
-					    	
-						if(!all.getServer().equalsIgnoreCase(server))
-					    	return;
-
-		   				if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat")) {
+			    final String mcMessage = EmojiParser.parseToAliases(this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
+			    		.replace("%Tag%", e.getAuthor().getAsTag())
+			    		.replace("%Message%", message)
+			    		.replace("%Channel%", channelName));
+	
+			  
+			    if(!this.instance.getUniversalServer().isProxySubServer()) {
+	
+					if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat")) {
+						this.instance.getUniversalServer().getOnlinePlayers().forEach(all -> {
 							UUID uuidAll = all.getUUID();
 							if(this.instance.getDiscordChatEnabled().containsKey(uuidAll) && this.instance.getDiscordChatEnabled().get(uuidAll))
 								all.sendMessage(mcMessage);
-		   				}else
-							all.sendMessage(mcMessage);
-		   				
-					});
-	   				return;
-	   			}
-	   		}
-	   	}
+						});
+					}else
+						this.instance.getUniversalServer().broadcast(mcMessage);
+					
+			    }
+		    	
+		   	}else if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat) && this.instance.getUniversalServer().isProxy()){
+			    
+				List<String> bypassList = this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Chat.toString() + ".bypassPrefix");
+				for(String prefix : bypassList) {
+			    	if(message.toLowerCase().startsWith(prefix.toLowerCase()))
+			    		return;
+			    }
+				
+			    final String mcMessage = EmojiParser.parseToAliases(this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
+			    		.replace("%Tag%", e.getAuthor().getAsTag())
+			    		.replace("%Message%", message)
+			    		.replace("%Channel%", channelName));
+			    
+		   		for(String server : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat").getKeys(false)) {
+		   			long channelID = this.channel_id.get(FeatureType.Chat.toString() + "_" + server);
+		   			
+		   			if(channelID == channelId) {
+		   				//SERVER SEPERATED CHANNEL
+	
+						this.instance.getUniversalServer().getOnlinePlayers().forEach(all -> {
+						    	
+							if(!all.getServer().equalsIgnoreCase(server))
+						    	return;
+	
+			   				if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat")) {
+								UUID uuidAll = all.getUUID();
+								if(this.instance.getDiscordChatEnabled().containsKey(uuidAll) && this.instance.getDiscordChatEnabled().get(uuidAll))
+									all.sendMessage(mcMessage);
+			   				}else
+								all.sendMessage(mcMessage);
+			   				
+						});
+		   				return;
+		   			}
+		   		}
+		   	}
+		}
 	    
 		//STAFF CHAT
-	    if(this.instance.getConfigManager().getChannelID(FeatureType.Staff) == channelId) {
+	    if(this.channel_id.get(FeatureType.Staff.toString()) == channelId) {
 	    	
 			if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.Staff))
 				return;
@@ -128,5 +137,65 @@ public class DC_ChatListener extends ListenerAdapter {
 				});
 		    }
 		}
+    }
+    
+    
+    private long lookupWebhookUrlToChannelId(String url) throws JSONException, IOException {
+    	JSONObject json = JsonReader.readJsonFromUrl(url);
+    	long channelId = json.getLong("id");
+    	
+		return channelId;
+    }
+    
+    private long convertId(String channelIdAsString) {
+    	try {
+			long channelId = Long.parseLong(channelIdAsString);
+			return channelId;
+		}catch (NumberFormatException ex) {
+	    	try {
+				return this.lookupWebhookUrlToChannelId(channelIdAsString);
+			} catch (JSONException | IOException e) {
+				e.printStackTrace();
+			}
+		}
+    	
+    	return -1;
+    }
+    
+    private void getAllChannelIds() {
+    	this.instance.getUniversalServer().getLogger().info("Loading all Channel Id's.");
+
+    	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat)) {
+	    	if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat")) {
+	    		this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat").forEach(servers -> {
+	    	    	String id = FeatureType.Chat.toString() + "_" + servers;
+	    	    	
+	    			String channelIdAsString = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat." + servers);
+	    			long channelId = this.convertId(channelIdAsString);
+	    			
+	    			if(channelId > 0)
+		    			this.channel_id.put(id, channelId);
+	
+	    		});
+	    	}else {
+	    		String id = FeatureType.Chat.toString();
+		    	
+				String channelIdAsString = this.instance.getConfigManager().getChannel(FeatureType.Chat);
+				long channelId = this.convertId(channelIdAsString);
+				
+				if(channelId > 0)
+	    			this.channel_id.put(id, channelId);
+	    	}
+    	}
+    	
+    	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Staff)) {
+    		String id = FeatureType.Staff.toString();
+	    	
+			String channelIdAsString = this.instance.getConfigManager().getChannel(FeatureType.Staff);
+			long channelId = this.convertId(channelIdAsString);
+			
+			if(channelId > 0)
+    			this.channel_id.put(id, channelId);
+    	}
     }
 }

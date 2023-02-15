@@ -10,13 +10,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.truemb.discordnotify.enums.FeatureType;
+import me.truemb.discordnotify.enums.MessageType;
 import me.truemb.discordnotify.utils.ChatColor;
 import me.truemb.discordnotify.utils.ConfigUpdater;
 import me.truemb.discordnotify.utils.UTF8YamlConfiguration;
 
 public class ConfigManager {
 
-	private static final int configVersion = 20;
+	private static final int configVersion = 21;
 	
 	private File configFile;
 	private UTF8YamlConfiguration config;
@@ -63,13 +64,28 @@ public class ConfigManager {
 		return this.getConfig().getBoolean("FeaturesEnabled." + type);
 	}
 	
+	@Deprecated
 	public boolean useEmbedMessage(FeatureType type) {
 		return this.getConfig().getBoolean("Options." + type + ".useEmbedMessage");
 	}
 	
+	public MessageType getMessageType(FeatureType type) {
+		if(this.getConfig().isSet("Options." + type + ".MessageType"))
+			return MessageType.valueOf(this.getConfig().getString("Options." + type + ".MessageType").toUpperCase());
+
+		if(this.getConfig().isSet("Options." + type + ".MessageType") && this.getConfig().getBoolean("Options." + type + ".useEmbedMessage"))
+			return MessageType.EMBED;
+		
+		return MessageType.MESSAGE;
+	}
 	
+	@Deprecated
 	public long getChannelID(FeatureType type) {
 		return this.getConfig().getLong("Channel." + type);
+	}
+	
+	public String getChannel(FeatureType type) {
+		return this.getConfig().getString("Channel." + type);
 	}
 	
 	public String getMinecraftMessage(String path, boolean prefix) {

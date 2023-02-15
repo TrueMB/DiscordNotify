@@ -3,7 +3,9 @@ package me.truemb.discordnotify.commands;
 import java.util.HashMap;
 import java.util.UUID;
 
+import club.minnced.discord.webhook.WebhookClient;
 import me.truemb.discordnotify.enums.FeatureType;
+import me.truemb.discordnotify.enums.MinotarTypes;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.universal.player.UniversalPlayer;
 
@@ -65,17 +67,34 @@ public class DN_StaffCommand {
 		}
 		
 		//DISCORD STAFF MESSAGE
-		long channelId = this.instance.getConfigManager().getChannelID(FeatureType.Staff);
+		String channelId = this.instance.getConfigManager().getChannel(FeatureType.Staff);
 		HashMap<String, String> placeholder = new HashMap<>();
-		placeholder.put("Message", message);
 		placeholder.put("Player", up.getIngameName());
+		placeholder.put("Message", message);
 		placeholder.put("UUID", uuid.toString());
-		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.Staff)) {
-			this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "StaffEmbed", placeholder);
-		}else {
-			this.instance.getDiscordManager().sendDiscordMessage(channelId, "StaffMessage", placeholder);
-		}
 		
+		switch (this.instance.getConfigManager().getMessageType(FeatureType.Staff)) {
+			case MESSAGE: {
+				this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "StaffMessage", placeholder);
+				break;
+			}
+			case EMBED: {
+				this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "StaffEmbed", placeholder);
+				break;
+			}
+			case WEBHOOK: {
+				WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.Staff, channelId);
+				String minotarTypeS = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Staff.PictureType");
+				MinotarTypes minotarType = MinotarTypes.BUST;
+				try {
+					minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+				}catch(Exception ex) { /* NOTING */ }
+				
+				String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Staff.Description");
+				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+				break;
+			}
+		}
 		return;
 	}
 	

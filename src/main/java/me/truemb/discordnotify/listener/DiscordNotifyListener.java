@@ -7,13 +7,14 @@ import java.util.UUID;
 
 import org.spicord.bot.DiscordBot;
 
+import club.minnced.discord.webhook.WebhookClient;
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.InformationType;
+import me.truemb.discordnotify.enums.MinotarTypes;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.universal.listener.UniversalEventhandler;
 import me.truemb.universal.player.UniversalLocation;
 import me.truemb.universal.player.UniversalPlayer;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 
@@ -147,21 +148,44 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			return;
 		
 		UUID uuid = up.getUUID();
-		long channelId;
+		String channelId;
 		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave"))
-			channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + serverName);
+			channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + serverName);
 		else
-			channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerJoinLeave);
+			channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerJoinLeave);
+		
+		//Server should not send Messages
+		if(channelId == null || channelId.equals("") || channelId.equals("-1"))
+			return;
 
 		HashMap<String, String> placeholder = new HashMap<>();
 		placeholder.put("Player", up.getIngameName());
 		placeholder.put("UUID", uuid.toString());
 		placeholder.put("server", serverName);
 		
-		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
-			this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerJoinEmbed", placeholder);
-		}else {
-			this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerJoinMessage", placeholder);
+		switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerJoinLeave)) {
+			case MESSAGE: {
+				this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerJoinMessage", placeholder);
+				break;
+			}
+			case EMBED: {
+				this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerJoinEmbed", placeholder);
+				break;
+			}
+			case WEBHOOK: {
+
+				WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.PlayerJoinLeave, serverName, channelId);
+				
+				String minotarTypeS = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Join.PictureType");
+				MinotarTypes minotarType = MinotarTypes.BUST;
+				try {
+					minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+				}catch(Exception ex) { /* NOTING */ }
+				
+				String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Join.Description");
+				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+				break;
+			}
 		}
 		
 	}
@@ -234,21 +258,45 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			return;
 
 		UUID uuid = up.getUUID();
-		long channelId;
+		String channelId;
 		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave"))
-			channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + serverName);
+			channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + serverName);
 		else
-			channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerJoinLeave);
+			channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerJoinLeave);
+		
+		//Server should not send Messages
+		if(channelId == null || channelId.equals("") || channelId.equals("-1"))
+			return;
 		
 		HashMap<String, String> placeholder = new HashMap<>();
 		placeholder.put("Player", up.getIngameName());
 		placeholder.put("UUID", uuid.toString());
 		placeholder.put("server", serverName);
 		
-		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
-			this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerLeaveEmbed", placeholder);
-		}else {
-			this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerLeaveMessage", placeholder);
+		
+		switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerJoinLeave)) {	
+			case MESSAGE: {
+				this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerLeaveMessage", placeholder);
+				break;
+			}
+			case EMBED: {
+				this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerLeaveEmbed", placeholder);
+				break;
+			}
+			case WEBHOOK: {
+
+				WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.PlayerJoinLeave, serverName, channelId);
+				
+				String minotarTypeS = instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Leave.PictureType");
+				MinotarTypes minotarType = MinotarTypes.BUST;
+				try {
+					minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+				}catch(Exception ex) { /* NOTING */ }
+				
+				String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Leave.Description");
+				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+				break;
+			}
 		}
 	}
 
@@ -276,15 +324,15 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		String server = up.getServer();
 		String group = this.instance.getPermsAPI().getPrimaryGroup(uuid);
 		
-		long channelId;
-		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat")) {
-			channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat." + server);
-			
-			//Server should not send Messages
-			if(channelId <= 0)
-				return;
-		}else
-			channelId = this.instance.getConfigManager().getChannelID(FeatureType.Chat);
+		String channelId;
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat"))
+			channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat." + server);
+		else
+			channelId = this.instance.getConfigManager().getChannel(FeatureType.Chat);
+
+		//Server should not send Messages
+		if(channelId == null || channelId.equals("") || channelId.equals("-1"))
+			return;
 			
 		HashMap<String, String> placeholder = new HashMap<>();
 		placeholder.put("Message", message);
@@ -293,10 +341,32 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		placeholder.put("group", group == null ? "" : group);
 		placeholder.put("server", server);
 		
-		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().useEmbedMessage(FeatureType.Chat)) {
-			this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "ChatEmbed", placeholder);
-		}else {
-			this.instance.getDiscordManager().sendDiscordMessage(channelId, "ChatMessage", placeholder);
+		if(this.instance.getUniversalServer().isProxySubServer())
+			return;
+		
+		switch (this.instance.getConfigManager().getMessageType(FeatureType.Chat)) {
+			case MESSAGE: {
+				this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "ChatMessage", placeholder);
+				break;
+			}
+			case EMBED: {
+				this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "ChatEmbed", placeholder);
+				break;
+			}
+			case WEBHOOK: {
+	
+				WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.Chat, server, channelId);
+				
+				String minotarTypeS = instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Chat.PictureType");
+				MinotarTypes minotarType = MinotarTypes.BUST;
+				try {
+					minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+				}catch(Exception ex) { /* NOTING */ }
+				
+				String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Chat.Description");
+				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+				break;
+			}
 		}
 	}
 	
@@ -320,25 +390,44 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 		//DISCORD DEATH MESSAGE
 		String server = up.getServer();
-		long channelId;
-		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerDeath.toString() + ".enableServerSeperatedDeath")) {
-			channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.PlayerDeath.toString() + ".serverSeperatedDeath." + server);
+		String channelId;
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerDeath.toString() + ".enableServerSeperatedDeath"))
+			channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerDeath.toString() + ".serverSeperatedDeath." + server);
+		else
+			channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerDeath);
 
-			//Server should not send Messages
-			if(channelId <= 0)
-				return;
-		}else
-			channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerDeath);
+		//Server should not send Messages
+		if(channelId == null || channelId.equals("") || channelId.equals("-1"))
+			return;
 		
 		HashMap<String, String> placeholder = new HashMap<>();
 		placeholder.put("Player", ingameName);
 		placeholder.put("UUID", uuid.toString());
 		placeholder.put("DeathMessage", deathMessage);
 		
-		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerDeath)) {
-			this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "DeathEmbed", placeholder);
-		}else {
-			this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerDeathMessage", placeholder);
+		switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerDeath)) {
+			case MESSAGE: {
+				this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerDeathMessage", placeholder);
+				break;
+			}
+			case EMBED: {
+				this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "DeathEmbed", placeholder);
+				break;
+			}
+			case WEBHOOK: {
+	
+				WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.PlayerDeath, server, channelId);
+				
+				String minotarTypeS = instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Death.PictureType");
+				MinotarTypes minotarType = MinotarTypes.BUST;
+				try {
+					minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+				}catch(Exception ex) { /* NOTING */ }
+				
+				String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Death.Description");
+				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+				break;
+			}
 		}
 	}
 
@@ -361,16 +450,36 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			if(!up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Leave"))) {
 				for(String server : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave").getKeys(false)){
 					if(server.equalsIgnoreCase(oldServerName)) {
-						long channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + server);
+						String channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + server);
+
+						if(channelId != null && !channelId.equals("") && !channelId.equals("-1")){
 						
-						if(channelId > 0) {
-							if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
-								this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerServerChangeLeaveEmbed", placeholder);
-							}else {
-								this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerServerChangeLeaveMessage", placeholder);
+							switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerJoinLeave)) {
+								case MESSAGE: {
+									this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerServerChangeLeaveMessage", placeholder);
+									break;
+								}
+								case EMBED: {
+									this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerServerChangeLeaveEmbed", placeholder);
+									break;
+								}
+								case WEBHOOK: {
+						
+									WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.PlayerJoinLeave, server, channelId);
+									
+									String minotarTypeS = instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.PlayerServerChangeLeave.PictureType");
+									MinotarTypes minotarType = MinotarTypes.BUST;
+									try {
+										minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+									}catch(Exception ex) { /* NOTING */ }
+									
+									String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.PlayerServerChangeLeave.Description");
+									this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+									break;
+								}
 							}
+							break;
 						}
-						break;
 					}
 				}
 			}
@@ -379,16 +488,36 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			if(!up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Join"))) {
 				for(String server : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave").getKeys(false)){
 					if(server.equalsIgnoreCase(newServerName)) {
-						long channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + server);
+						String channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + server);
 
-						if(channelId > 0) {
-							if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
-								this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerServerChangeJoinEmbed", placeholder);
-							}else {
-								this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerServerChangeJoinMessage", placeholder);
+						if(channelId != null && !channelId.equals("") && !channelId.equals("-1")){
+							
+							switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerJoinLeave)) {
+								case MESSAGE: {
+									this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerServerChangeJoinMessage", placeholder);
+									break;
+								}
+								case EMBED: {
+									this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerServerChangeJoinEmbed", placeholder);
+									break;
+								}
+								case WEBHOOK: {
+						
+									WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.PlayerJoinLeave, server, channelId);
+									
+									String minotarTypeS = instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.PlayerServerChangeJoin.PictureType");
+									MinotarTypes minotarType = MinotarTypes.BUST;
+									try {
+										minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+									}catch(Exception ex) { /* NOTING */ }
+									
+									String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.PlayerServerChangeJoin.Description");
+									this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+									break;
+								}
 							}
+							break;
 						}
-						break;
 					}
 				}
 			}
@@ -398,12 +527,31 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			if(up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Join")))
 				return;
 			
-			long channelId = this.instance.getConfigManager().getChannelID(FeatureType.PlayerJoinLeave);
+			String channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerJoinLeave);
 			
-			if(this.instance.getConfigManager().useEmbedMessage(FeatureType.PlayerJoinLeave)) {
-				this.instance.getDiscordManager().sendEmbedMessage(channelId, uuid, "PlayerServerChangeEmbed", placeholder);
-			}else {
-				this.instance.getDiscordManager().sendDiscordMessage(channelId, "PlayerServerChangeMessage", placeholder);
+			switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerJoinLeave)) {
+				case MESSAGE: {
+					this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerServerChangeMessage", placeholder);
+					break;
+				}
+				case EMBED: {
+					this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerServerChangeEmbed", placeholder);
+					break;
+				}
+				case WEBHOOK: {
+		
+					WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.PlayerJoinLeave, channelId);
+					
+					String minotarTypeS = instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.PlayerServerChange.PictureType");
+					MinotarTypes minotarType = MinotarTypes.BUST;
+					try {
+						minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+					}catch(Exception ex) { /* NOTING */ }
+					
+					String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.PlayerServerChange.Description");
+					this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+					break;
+				}
 			}
 		}
 	}

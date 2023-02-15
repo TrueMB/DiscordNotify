@@ -49,12 +49,12 @@ Options:
   OtherFormats:
     Location: '%world%, x=%x%, y=%y%, z=%z%, yaw=%yaw%, pitch=%pitch%'
   Inactivity:
+    MessageType: EMBED
     #Checking, if players are inactive (in Minutes)
     CheckTimer: 60
     InactivForDays: 4
-    useEmbedMessage: true
   PlayerJoinLeave:
-    useEmbedMessage: false
+    MessageType: MESSAGE
     #(Bungeecord only) If false, only a connect Message to the bungeecord will be send. And not on every Server Change.
     enablePlayerServerSwitch: true
     enableServerSeperatedJoinLeave: false
@@ -62,7 +62,7 @@ Options:
       lobby: -1
       freebuild: -1
   PlayerDeath:
-    useEmbedMessage: false
+    MessageType: MESSAGE
     enableServerSeperatedDeath: false
     serverSeperatedDeath:
       lobby: -1
@@ -82,7 +82,7 @@ Options:
         - 'lobby'
         - 'freebuild'
   Chat:
-    useEmbedMessage: false
+    MessageType: WEBHOOK
     #Should the Discord Message send to the Minecraft Server?
     syncDiscord: true
     #Allows the command /dchat to join or leave the Discord Chat in Minecraft
@@ -96,7 +96,7 @@ Options:
     bypassPrefix:
       - '?'
   Staff:
-    useEmbedMessage: false
+    MessageType: WEBHOOK
     #Should the Discord Message send to the Minecraft Server?
     syncDiscord: true
     bypassPrefix:
@@ -395,6 +395,35 @@ DiscordEmbedMessages:
     Color: RED
     DisableTimestamp: false
     WithAuthorPicture: false
+DiscordWebhookMessages:
+  Inactivity:
+    Description: 'was last seen: %LastSeen% (Not Online for: %Offlinetime%)'
+    PictureType: BODY
+  Join:
+    Description: 'joined the server.'
+    PictureType: BODY
+  Leave:
+    Description: 'left the server.'
+    PictureType: BODY
+  #Triggers if no seperated Channels are active
+  PlayerServerChange:
+    Description: 'went from **%old%** to **%target%**.'
+    PictureType: BODY
+  PlayerServerChangeJoin:
+    Description: 'joined the server from %old%.'
+    PictureType: BODY
+  PlayerServerChangeLeave:
+    Description: 'left the server and went to %target%.'
+    PictureType: BODY
+  Death:
+    Description: '%DeathMessage%'
+    PictureType: BODY
+  Chat:
+    Description: '%Message%'
+    PictureType: BODY
+  Staff:
+    Description: '%Message%'
+    PictureType: BODY
 
   #Do NOT touch
-ConfigVersion: 20
+ConfigVersion: 21
