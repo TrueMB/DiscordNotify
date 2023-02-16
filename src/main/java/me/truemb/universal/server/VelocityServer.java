@@ -5,6 +5,7 @@ import java.util.logging.Logger;
 import com.velocitypowered.api.proxy.ProxyServer;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class VelocityServer extends UniversalServer{
 	
@@ -56,6 +57,16 @@ public class VelocityServer extends UniversalServer{
 	@Override
 	public boolean isProxySubServer() {
 		return false;
+	}
+
+	@Override
+	public int getMaxPlayers() {
+		return this.proxyServer.getConfiguration().getShowMaxPlayers();
+	}
+
+	@Override
+	public String getMotd() {
+		return PlainTextComponentSerializer.plainText().serialize(this.proxyServer.getConfiguration().getMotd());
 	}
 
 }

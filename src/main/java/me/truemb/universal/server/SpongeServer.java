@@ -9,6 +9,7 @@ import org.spongepowered.api.Sponge;
 import com.google.inject.Inject;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class SpongeServer extends UniversalServer {
 
@@ -65,5 +66,15 @@ public class SpongeServer extends UniversalServer {
 	@Override
 	public boolean isProxySubServer() {
 		return true; //TODO
+	}
+
+	@Override
+	public int getMaxPlayers() {
+		return this.server.maxPlayers();
+	}
+
+	@Override
+	public String getMotd() {
+		return PlainTextComponentSerializer.plainText().serialize(this.server.motd());
 	}
 }

@@ -69,4 +69,14 @@ public class BukkitServer extends UniversalServer {
 		//FALLBACK, IF NO PAPER SERVER
 		return Bukkit.spigot().getConfig().getBoolean("settings.bungeecord");
 	}
+
+	@Override
+	public int getMaxPlayers() {
+		return Bukkit.getMaxPlayers();
+	}
+
+	@Override
+	public String getMotd() {
+		return Bukkit.getMotd();
+	}
 }

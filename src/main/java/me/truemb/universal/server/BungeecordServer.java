@@ -45,4 +45,15 @@ public class BungeecordServer extends UniversalServer {
 		return false;
 	}
 
+	@SuppressWarnings("deprecation")
+	@Override
+	public int getMaxPlayers() {
+		return ProxyServer.getInstance().getConfig().getPlayerLimit();
+	}
+
+	@Override
+	public String getMotd() {
+		return ""; //TODO
+	}
+
 }

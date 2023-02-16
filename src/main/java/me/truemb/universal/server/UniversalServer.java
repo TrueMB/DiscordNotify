@@ -37,6 +37,10 @@ public abstract class UniversalServer {
 		
 		return players.size() > 0 ? players.get(0) : null;
 	}
+	
+	public abstract int getMaxPlayers();
+	
+	public abstract String getMotd();
 
 	public void loadServers(HashMap<String, SocketAddress> servers) {
 		this.servers = servers;

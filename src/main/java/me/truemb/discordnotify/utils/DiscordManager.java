@@ -29,6 +29,7 @@ import me.truemb.discordnotify.discord.listener.DC_RoleChangeListener;
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.MinotarTypes;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
+import me.truemb.discordnotify.staticembed.StaticEmbedManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -46,6 +47,8 @@ public class DiscordManager {
 	private HashMap<String, WebhookClient> webhookClients = new HashMap<>();
 
 	private DiscordNotifyMain instance;
+	
+	private StaticEmbedManager staticEmbedManager;
 	
 	//ADDONS
 	private DC_PlayerInfoCommand playerInfoAddon;
@@ -87,6 +90,8 @@ public class DiscordManager {
 	
 	public void disconnectDiscordBot() {
         if(this.getDiscordBot() != null && this.getDiscordBot().isReady()) {
+        	
+        	this.staticEmbedManager.shutdown();
         	
         	//SEND SHUTDOWN MESSAGE TO DISCORD
         	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
@@ -146,6 +151,8 @@ public class DiscordManager {
 	    this.getDiscordBot().getJda().addEventListener(this.chatListener);
 	    this.getDiscordBot().getJda().addEventListener(this.broadcastListener);
 	    this.getDiscordBot().getJda().addEventListener(this.roleChangeListener);
+	    
+	    this.staticEmbedManager = new StaticEmbedManager(this.instance);
 
     	//SEND START MESSAGE TO DISCORD
     	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))
@@ -451,6 +458,10 @@ public class DiscordManager {
 
 	public int getHookSchedulerId() {
 		return this.hookSchedulerId;
+	}
+	
+	public StaticEmbedManager getStaticEmbedManager() {
+		return this.staticEmbedManager;
 	}
 
 	public void setHookSchedulerId(int hookSchedulerId) {

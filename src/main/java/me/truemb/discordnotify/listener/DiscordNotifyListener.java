@@ -44,6 +44,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 		//ALWAYS ON JOIN
 		this.instance.getJoinTime().put(uuid, System.currentTimeMillis());
+		this.instance.getDiscordManager().getStaticEmbedManager().updateAllEmbeds();
 		
 		//CHECK FOR NAME CHANGE
 		this.instance.getOfflineInformationsSQL().checkForNameChange(uuid, up.getIngameName());
@@ -228,6 +229,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			
 			this.instance.getJoinTime().remove(uuid);
 		}
+		this.instance.getDiscordManager().getStaticEmbedManager().updateAllEmbeds();
 		
 		//VERIFICATION
 		this.instance.getVerifyManager().clearVerficationProgress(uuid);
