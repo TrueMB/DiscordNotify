@@ -144,17 +144,16 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 	 * Will only trigger, if the JoinLeaveFeature is Active
 	 */
 	private void onPlayerJoinFeature(UniversalPlayer up, String serverName) {
-
 		if(up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Join")))
 			return;
-		
+
 		UUID uuid = up.getUUID();
 		String channelId;
 		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave"))
 			channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + serverName);
 		else
 			channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerJoinLeave);
-		
+
 		//Server should not send Messages
 		if(channelId == null || channelId.equals("") || channelId.equals("-1"))
 			return;
@@ -174,7 +173,6 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 				break;
 			}
 			case WEBHOOK: {
-
 				WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.PlayerJoinLeave, serverName, channelId);
 				
 				String minotarTypeS = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Join.PictureType");
@@ -184,7 +182,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 				}catch(Exception ex) { /* NOTING */ }
 				
 				String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Join.Description");
-				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description, placeholder);
 				break;
 			}
 		}
@@ -296,7 +294,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 				}catch(Exception ex) { /* NOTING */ }
 				
 				String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Leave.Description");
-				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description, placeholder);
 				break;
 			}
 		}
@@ -366,7 +364,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 				}catch(Exception ex) { /* NOTING */ }
 				
 				String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Chat.Description");
-				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description, placeholder);
 				break;
 			}
 		}
@@ -427,7 +425,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 				}catch(Exception ex) { /* NOTING */ }
 				
 				String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Death.Description");
-				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description, placeholder);
 				break;
 			}
 		}
@@ -476,7 +474,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 									}catch(Exception ex) { /* NOTING */ }
 									
 									String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.PlayerServerChangeLeave.Description");
-									this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+									this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description, placeholder);
 									break;
 								}
 							}
@@ -514,7 +512,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 									}catch(Exception ex) { /* NOTING */ }
 									
 									String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.PlayerServerChangeJoin.Description");
-									this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+									this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description, placeholder);
 									break;
 								}
 							}
@@ -551,7 +549,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 					}catch(Exception ex) { /* NOTING */ }
 					
 					String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.PlayerServerChange.Description");
-					this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+					this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description, placeholder);
 					break;
 				}
 			}

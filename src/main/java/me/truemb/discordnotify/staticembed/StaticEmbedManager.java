@@ -42,7 +42,6 @@ public class StaticEmbedManager {
     		this.instance.getUniversalServer().getLogger().warning("Discord BOT is not ready.");
 			return;
 		}
-		
 		TextChannel channel = bot.getJda().getTextChannelById(channelId);
 
 		if(channel == null) {
@@ -86,15 +85,15 @@ public class StaticEmbedManager {
 		String players = "";
 		for(UniversalPlayer player : this.instance.getUniversalServer().getOnlinePlayers())
 			players += ", " + player.getIngameName();
-		players = players.substring(2);
+		if(players.length() >= 2)
+			players = players.substring(2);
 		
 		HashMap<String, String> placeholders = new HashMap<>();
 
 		placeholders.put("online", String.valueOf(this.instance.getUniversalServer().getOnlinePlayers().size()));
 		placeholders.put("onlinemax", String.valueOf(this.instance.getUniversalServer().getMaxPlayers()));
-		placeholders.put("motd", players);
+		placeholders.put("players", players);
 		placeholders.put("motd", this.instance.getUniversalServer().getMotd());
-		
 		
 		String title = this.instance.getConfigManager().getConfig().getString(path + "Title");
 		String description = this.instance.getConfigManager().getConfig().getString(path + "Description");
@@ -103,7 +102,7 @@ public class StaticEmbedManager {
 		boolean disableTimestamp = this.instance.getConfigManager().getConfig().getBoolean(path + "DisableTimestamp");
 
 		List<String> fieldList = this.instance.getConfigManager().getConfig().getStringList(path + "Fields");
-		
+
 		EmbedBuilder eb = new EmbedBuilder();
 		
 		if(author != null && !author.equalsIgnoreCase(""))
@@ -134,7 +133,7 @@ public class StaticEmbedManager {
 		}
 
 		eb.setColor(color);
-		
+
 		if(!disableTimestamp)
 			eb.setTimestamp(Instant.now());
 		

@@ -398,32 +398,32 @@ DiscordEmbedMessages:
 DiscordWebhookMessages:
   Inactivity:
     Description: 'was last seen: %LastSeen% (Not Online for: %Offlinetime%)'
-    PictureType: BODY
+    PictureType: HELM
   Join:
     Description: 'joined the server.'
-    PictureType: BODY
+    PictureType: HELM
   Leave:
     Description: 'left the server.'
-    PictureType: BODY
+    PictureType: HELM
   #Triggers if no seperated Channels are active
   PlayerServerChange:
     Description: 'went from **%old%** to **%target%**.'
-    PictureType: BODY
+    PictureType: HELM
   PlayerServerChangeJoin:
     Description: 'joined the server from %old%.'
-    PictureType: BODY
+    PictureType: HELM
   PlayerServerChangeLeave:
     Description: 'left the server and went to %target%.'
-    PictureType: BODY
+    PictureType: HELM
   Death:
     Description: '%DeathMessage%'
-    PictureType: BODY
+    PictureType: HELM
   Chat:
     Description: '%Message%'
-    PictureType: BODY
+    PictureType: HELM
   Staff:
     Description: '%Message%'
-    PictureType: BODY
+    PictureType: HELM
 
 #This will send a message to the channel and remove it after shutdown.
 #While the plugin is runnings, it keeps the embed updated.

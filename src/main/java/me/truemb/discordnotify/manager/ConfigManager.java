@@ -73,7 +73,7 @@ public class ConfigManager {
 		if(this.getConfig().isSet("Options." + type + ".MessageType"))
 			return MessageType.valueOf(this.getConfig().getString("Options." + type + ".MessageType").toUpperCase());
 
-		if(this.getConfig().isSet("Options." + type + ".MessageType") && this.getConfig().getBoolean("Options." + type + ".useEmbedMessage"))
+		if(!this.getConfig().isSet("Options." + type + ".MessageType") && this.getConfig().getBoolean("Options." + type + ".useEmbedMessage"))
 			return MessageType.EMBED;
 		
 		return MessageType.MESSAGE;

@@ -91,7 +91,7 @@ public class DN_StaffCommand {
 				}catch(Exception ex) { /* NOTING */ }
 				
 				String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Staff.Description");
-				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description, placeholder);
 				break;
 			}
 		}

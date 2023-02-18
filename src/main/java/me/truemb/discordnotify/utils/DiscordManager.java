@@ -9,7 +9,10 @@ import java.net.URLConnection;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
@@ -37,7 +40,9 @@ import net.dv8tion.jda.api.entities.User;
 import okhttp3.OkHttpClient;
 
 public class DiscordManager {
-	
+
+    public static final Pattern WEBHOOK_PATTERN = Pattern.compile("(?:https?://)?(?:\\w+\\.)?discord\\.com/api(?:/v\\d+)?/webhooks/(\\d+)/([\\w-]+)(?:/(?:\\w+)?)?");
+    
 	private DiscordBot discordBot = null;
 	private boolean discordBotHooked = false;
 	private int hookSchedulerId = -1; //IS THE SCHEDULER ID, WHICH HOOKS INTO THE DISCORD BOT
@@ -197,6 +202,26 @@ public class DiscordManager {
 		this.webookCluster.setDefaultHttpClient(new OkHttpClient());
 		this.webookCluster.setDefaultDaemon(true);
 	}
+	
+	/**
+	 * Need an own Method, since the Link isn't correct anymore in the API.
+	 * 
+	 * @param url
+	 * @return
+	 */
+	private WebhookClientBuilder createWebhookClientBuilder(String url) {
+
+        Objects.requireNonNull(url, "Url");
+        Matcher matcher = WEBHOOK_PATTERN.matcher(url);
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Failed to parse webhook URL");
+        }
+
+        long id = Long.parseUnsignedLong(matcher.group(1));
+        String token = matcher.group(2);
+        
+        return new WebhookClientBuilder(id, token);
+	}
 
 	public WebhookClient createOrLoadWebhook(FeatureType type, String url) {
 		return this.createOrLoadWebhook(type, null, url);
@@ -208,7 +233,7 @@ public class DiscordManager {
 		if(this.webhookClients.containsKey(id))
 			return this.webhookClients.get(id);
 		
-		WebhookClientBuilder cbuilder = new WebhookClientBuilder(url);
+		WebhookClientBuilder cbuilder = this.createWebhookClientBuilder(url);
 		cbuilder.setThreadFactory((job) -> {
 		    Thread thread = new Thread(job);
 		    thread.setName("Webhook");
@@ -227,13 +252,13 @@ public class DiscordManager {
 		return client;
 	}
 	
-	public void sendWebhookMessage(WebhookClient client, String username, String avatarUrl, String content) {
+	public void sendWebhookMessage(WebhookClient client, String username, String avatarUrl, String content, HashMap<String, String> placeholders) {
 		
 		WebhookMessageBuilder builder = new WebhookMessageBuilder();
 		
-		builder.setUsername(username);
+		builder.setUsername(this.getPlaceholderString(username, placeholders));
 		builder.setAvatarUrl(avatarUrl);
-		builder.setContent(content);
+		builder.setContent(this.getPlaceholderString(content, placeholders));
 		
 		client.send(builder.build());
 	}

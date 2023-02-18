@@ -156,7 +156,7 @@ public class DN_InactivityChecker implements Runnable {
 								}catch(Exception ex) { /* NOTING */ }
 								
 								String description = instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Inactivity.Description");
-								instance.getDiscordManager().sendWebhookMessage(webhookClient, name, "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description);
+								instance.getDiscordManager().sendWebhookMessage(webhookClient, name, "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description, placeholder);
 								break;
 								
 							}
