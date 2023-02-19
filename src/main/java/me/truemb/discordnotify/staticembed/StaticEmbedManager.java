@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.spicord.bot.DiscordBot;
 
@@ -34,6 +35,10 @@ public class StaticEmbedManager {
 		String path = "StaticEmbeds." + embedPath + ".";
 
 		long channelId = this.instance.getConfigManager().getConfig().getLong(path + "Channel");
+		
+		if(channelId <= 0)
+			return;
+		
 		MessageEmbed embed = this.getEmbed(embedPath);
 
 		DiscordBot bot = this.instance.getDiscordManager().getDiscordBot();
@@ -45,13 +50,15 @@ public class StaticEmbedManager {
 		TextChannel channel = bot.getJda().getTextChannelById(channelId);
 
 		if(channel == null) {
-			this.instance.getUniversalServer().getLogger().warning("Couldn't send Message to channel: " + channelId);
+			this.instance.getUniversalServer().getLogger().warning("Couldn't send Static Embed Message to Channel: " + channelId);
 			return;
 		}
+		
+		System.out.println("TEST0");
+		
+		channel.sendMessageEmbeds(embed).queue();
 
-		channel.sendMessageEmbeds(embed).queue(message -> {
-			this.embeds.put(embedPath, message);
-		});
+		System.out.println("TEST1");
 	}
 
 	public void updateAllEmbeds() {
@@ -106,7 +113,7 @@ public class StaticEmbedManager {
 		EmbedBuilder eb = new EmbedBuilder();
 		
 		if(author != null && !author.equalsIgnoreCase(""))
-				eb.setAuthor(this.instance.getDiscordManager().getPlaceholderString(author, placeholders));
+			eb.setAuthor(this.instance.getDiscordManager().getPlaceholderString(author, placeholders));
 		
 		if(title != null && !title.equalsIgnoreCase(""))
 			eb.setTitle(this.instance.getDiscordManager().getPlaceholderString(title, placeholders));
