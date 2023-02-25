@@ -66,7 +66,8 @@ public class VelocityServer extends UniversalServer{
 
 	@Override
 	public String getMotd() {
-		return PlainTextComponentSerializer.plainText().serialize(this.proxyServer.getConfiguration().getMotd());
+		Component comp = this.proxyServer.getConfiguration().getMotd();
+		return PlainTextComponentSerializer.plainText().serialize(comp);
 	}
 
 }

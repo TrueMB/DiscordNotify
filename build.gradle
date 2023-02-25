@@ -152,7 +152,7 @@ bukkit {
 }
 
 shadowJar {
-  relocate 'net.kyori', 'me.truemb.discordnotify.kyori'
+  //relocate 'net.kyori', 'me.truemb.discordnotify.kyori'
   relocate 'com.jeff_media.updatechecker', 'me.truemb.discordnotify.updater'
   relocate 'me.carleslc.Simple-YAML', 'me.truemb.discordnotify.simple-yaml'
   relocate 'org.bstats', 'me.truemb.discordnotify.bstats'

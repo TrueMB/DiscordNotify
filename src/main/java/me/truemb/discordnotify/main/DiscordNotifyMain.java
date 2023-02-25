@@ -188,11 +188,16 @@ public class DiscordNotifyMain {
 			return;
 
 		if(this.getUniversalServer().getServerPlatform() == ServerType.BUKKIT) {
+			this.getUniversalServer().getLogger().info("Scanning Playerdata the first time. This can take some time.");
+			
 			org.bukkit.OfflinePlayer[] players = org.bukkit.Bukkit.getOfflinePlayers();
 			Collection<OfflinePlayer> all = Arrays.asList(players);
 			
 			new Thread(() -> {
-				all.forEach(player -> {
+				
+				int counter = 0;
+				for(OfflinePlayer player : all) {
+					counter++;
 					UUID uuid = player.getUniqueId();
 		
 					long lastTimePlayed = player.getLastPlayed();
@@ -205,17 +210,27 @@ public class DiscordNotifyMain {
 						this.getOfflineInformationManager().setInformation(uuid, InformationType.LastConnection, lastTimePlayed); //ONLY NEWEST
 						this.getOfflineInformationsSQL().updateInformation(uuid, InformationType.LastConnection, lastTimePlayed);
 					}
-				});
+					if(counter == 20) {
+						counter = 0;
+						try {
+							Thread.sleep(1500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				
+				try {
+					file.createNewFile();
+					this.getUniversalServer().getLogger().info("Sent the playtime of the players to the main server.");
+				} catch (IOException e) {
+					this.getUniversalServer().getLogger().warning("Couldn't create ScanIsDone File. Please create it manually or look for the Issue. Otherwise the scan will be done on each server start and add the playtime again.");
+				}
+				
 			}).start();
 		}
 		//TODO SPONGE METHOD NEEDS TO BE ADDED
 		
-		try {
-			file.createNewFile();
-			this.getUniversalServer().getLogger().info("Sent the playtime of the players to the main server.");
-		} catch (IOException e) {
-			this.getUniversalServer().getLogger().warning("Couldn't create ScanIsDone File. Please create it manually or look for the Issue. Otherwise the scan will be done on each server start and add the playtime again.");
-		}
 	}
 	
 	//MySQL
