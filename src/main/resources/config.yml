@@ -431,7 +431,7 @@ StaticEmbeds:
   Example:
     Channel: -1
     Title: '**Server Information**'
-    Description: 'There are currently %online%/%onlineMax% Players online. \n\n%players%'
+    Description: 'There are currently %online%/%onlineMax% Players online. %n%n %players%'
     Fields:
       - 'Online : %online%'
       - 'Motd : %motd%'

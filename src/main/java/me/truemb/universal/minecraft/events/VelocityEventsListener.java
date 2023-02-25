@@ -83,10 +83,10 @@ public class VelocityEventsListener {
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
 		if(up == null)
 			return;
-		
+
+		this.plugin.getUniversalServer().removePlayer(up);
 		this.plugin.getListener().onPlayerQuit(up, serverName);
 		
-		this.plugin.getUniversalServer().removePlayer(up);
 	}
 	
 }

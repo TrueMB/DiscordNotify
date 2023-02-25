@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import org.spicord.bot.DiscordBot;
 
@@ -20,8 +19,8 @@ public class StaticEmbedManager {
 	
 	private DiscordNotifyMain instance;
 	
-	//Message ID and EmbedPath Message
-	private HashMap<String, Message> embeds = new HashMap<>();
+	//EmbedPath - Message ID
+	private HashMap<String, Long> embeds = new HashMap<>();
 	
 	public StaticEmbedManager(DiscordNotifyMain plugin) {
 		this.instance = plugin;
@@ -47,6 +46,7 @@ public class StaticEmbedManager {
     		this.instance.getUniversalServer().getLogger().warning("Discord BOT is not ready.");
 			return;
 		}
+		
 		TextChannel channel = bot.getJda().getTextChannelById(channelId);
 
 		if(channel == null) {
@@ -54,11 +54,9 @@ public class StaticEmbedManager {
 			return;
 		}
 		
-		System.out.println("TEST0");
-		
-		channel.sendMessageEmbeds(embed).queue();
-
-		System.out.println("TEST1");
+		channel.sendMessageEmbeds(embed).queue(message -> {
+			this.embeds.put(embedPath, message.getIdLong());
+		});
 	}
 
 	public void updateAllEmbeds() {
@@ -67,13 +65,30 @@ public class StaticEmbedManager {
 	}
 	
 	public void updateEmbed(String embedPath) {
-
-		Message message = this.embeds.get(embedPath);
-		if(message == null) return;
+		String path = "StaticEmbeds." + embedPath + ".";
 		
-		MessageEmbed embed = this.getEmbed(embedPath);
+		long channelId = this.instance.getConfigManager().getConfig().getLong(path + "Channel");
+		long messageId = this.embeds.get(embedPath);
+		
+		if(channelId <= 0 || messageId <= 0)
+			return;
 
-		message.editMessageEmbeds(embed).queue();
+		DiscordBot bot = this.instance.getDiscordManager().getDiscordBot();
+		
+		if(bot == null) {
+    		this.instance.getUniversalServer().getLogger().warning("Discord BOT is not ready.");
+			return;
+		}
+
+		MessageEmbed embed = this.getEmbed(embedPath);
+		TextChannel channel = bot.getJda().getTextChannelById(channelId);
+		
+		channel.retrieveMessageById(messageId).queue(message -> {
+			message.editMessageEmbeds(embed).queue();
+		});
+		
+		
+
 	}
 	
 	/**
@@ -81,8 +96,28 @@ public class StaticEmbedManager {
 	 * if the plugin shuts down
 	 */
 	public void shutdown() {
-		for(Message message : this.embeds.values()) {
-			message.delete().queue();
+
+		DiscordBot bot = this.instance.getDiscordManager().getDiscordBot();
+		
+		if(bot == null) {
+    		this.instance.getUniversalServer().getLogger().warning("Discord BOT is not ready.");
+			return;
+		}
+		
+		for(String embedPath : this.embeds.keySet()) {
+			String path = "StaticEmbeds." + embedPath + ".";
+			
+			long channelId = this.instance.getConfigManager().getConfig().getLong(path + "Channel");
+			long messageId = this.embeds.get(embedPath);
+			
+			if(channelId <= 0 || messageId <= 0)
+				continue;
+
+			TextChannel channel = bot.getJda().getTextChannelById(channelId);
+			
+			Message message = channel.retrieveMessageById(messageId).complete();
+			message.delete().complete();
+			
 		}
 	}
 	

@@ -84,10 +84,10 @@ public class BungeeEventsListener implements Listener {
 			return;
 		
 		String serverName = up.getServer();
-		
+
+		this.plugin.getUniversalServer().removePlayer(up);
 		this.plugin.getListener().onPlayerQuit(up, serverName);
 		
-		this.plugin.getUniversalServer().removePlayer(up);
 	}
 	
 }

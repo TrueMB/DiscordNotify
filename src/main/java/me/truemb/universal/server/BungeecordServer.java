@@ -2,6 +2,7 @@ package me.truemb.universal.server;
 
 import java.util.logging.Logger;
 
+import me.truemb.discordnotify.utils.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 
@@ -45,15 +46,14 @@ public class BungeecordServer extends UniversalServer {
 		return false;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public int getMaxPlayers() {
-		return ProxyServer.getInstance().getConfig().getPlayerLimit();
+		return ProxyServer.getInstance().getConfigurationAdapter().getListeners().iterator().next().getMaxPlayers();
 	}
 
 	@Override
 	public String getMotd() {
-		return ""; //TODO
+		return ChatColor.stripColor(ProxyServer.getInstance().getConfigurationAdapter().getListeners().iterator().next().getMotd());
 	}
 
 }

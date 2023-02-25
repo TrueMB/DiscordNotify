@@ -333,6 +333,7 @@ public class DiscordManager {
 	 * @param placeholder
 	 */
 	public void sendEmbedMessageWithNoPictureSync(long channelId, String path, HashMap<String, String> placeholder) {
+		
 		if(this.getDiscordBot() == null) {
     		this.instance.getUniversalServer().getLogger().warning("Discord BOT is not ready.");
 			return;
@@ -432,6 +433,7 @@ public class DiscordManager {
 			this.instance.getUniversalServer().getLogger().warning("Couldn't find Channel with the ID: " + channelId);
 	    	return;
 	    }
+	    
 	    tc.sendMessage(this.getDiscordMessage(path, placeholder)).complete();
     }
 	
@@ -448,6 +450,7 @@ public class DiscordManager {
 			this.instance.getUniversalServer().getLogger().warning("Couldn't find Channel with the ID: " + channelId);
 	    	return;
 	    }
+	    
 	    tc.sendMessage(this.getDiscordMessage(path, placeholder)).queue();
     }
 	
@@ -473,6 +476,7 @@ public class DiscordManager {
 					message = message.replaceAll("(?i)%" + key.toLowerCase() + "%", value); //IGNORES UPPER CASE?
 			}
 		}
+		message = message.replace("%n", System.lineSeparator());
 		
 		return message;
 	}

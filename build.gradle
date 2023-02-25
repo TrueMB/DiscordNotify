@@ -17,6 +17,11 @@ plugins {
 
 repositories {
     mavenLocal()
+    
+    maven {
+        url = uri("https://repo.papermc.io/repository/maven-public/")
+    }
+    
     maven {
         url = uri('https://oss.sonatype.org/content/repositories/snapshots')
     }
@@ -60,6 +65,7 @@ repositories {
 
 dependencies {
     library 'com.google.code.gson:gson:2.8.7' // All platforms plugin.yml
+    annotationProcessor("com.velocitypowered:velocity-api:3.1.1")
     
     api 'net.kyori:adventure-api:4.12.0'
     api 'net.kyori:adventure-text-serializer-plain:4.12.0'
@@ -73,7 +79,7 @@ dependencies {
     api 'com.google.code.gson:gson:2.10'
     api 'club.minnced:discord-webhooks:0.2.0'
     compileOnly 'net.md-5:bungeecord-api:1.18-R0.1-SNAPSHOT'
-    compileOnly 'com.velocitypowered:velocity-api:3.1.0'
+    compileOnly 'com.velocitypowered:velocity-api:3.1.1'
     compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly 'org.spongepowered:spongeapi:9.0.0-SNAPSHOT'
     compileOnly 'org.projectlombok:lombok:1.18.24'
