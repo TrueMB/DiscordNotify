@@ -21,6 +21,7 @@ import me.truemb.universal.player.UniversalLocation;
 import me.truemb.universal.player.UniversalPlayer;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 public class DC_PlayerInfoCommand extends SimpleAddon {
 
@@ -79,7 +80,7 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 						UUID uuid = ingameNameOrUUID.length() <= 16 ? PlayerManager.getUUIDOffline(ingameNameOrUUID) : UUID.fromString(ingameNameOrUUID); //NEEDS TIME TO LOAD
 						
 						if(uuid == null) {
-							command.getMessage().addReaction("�?�").submit();
+							command.getMessage().addReaction(Emoji.fromFormatted("❌")).queue();
 							return;
 						}
 
@@ -142,7 +143,7 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 						}else {
 				    		command.reply(instance.getDiscordManager().getDiscordMessage("PlayerInfo", placeholder));
 						}
-				        command.getMessage().addReaction("✔").submit();
+				        command.getMessage().addReaction(Emoji.fromFormatted("✔️")).submit();
 					}
 				}).get();
 			} catch (InterruptedException | ExecutionException e) {

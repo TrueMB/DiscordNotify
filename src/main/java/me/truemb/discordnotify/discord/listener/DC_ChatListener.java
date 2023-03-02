@@ -14,7 +14,7 @@ import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.MessageType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.discordnotify.utils.JsonReader;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -34,7 +34,7 @@ public class DC_ChatListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e) {
     	
         long channelId = e.getChannel().getIdLong();
-        TextChannel channel = e.getTextChannel();
+        MessageChannelUnion channel = e.getChannel();
         String channelName =  EmojiParser.removeAllEmojis(channel.getName()).replace("[^a-zA-Z0-9 -]", "");
 
 	    String message = e.getMessage().getContentDisplay();

@@ -24,7 +24,8 @@ import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.discordnotify.utils.PlayerManager;
 import me.truemb.discordnotify.utils.TimeFormatter;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 public class DN_InactivityChecker implements Runnable {
 	
@@ -143,7 +144,7 @@ public class DN_InactivityChecker implements Runnable {
 								
 								//SEND MESSAGE
 								if(file != null)
-									tc.sendMessageEmbeds(eb.build()).addFile(file, filename).queue();
+									tc.sendMessageEmbeds(eb.build()).addFiles(FileUpload.fromData(file, filename)).queue();
 								else
 									tc.sendMessageEmbeds(eb.build()).queue();
 								break;

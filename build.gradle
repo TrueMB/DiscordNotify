@@ -47,10 +47,6 @@ repositories {
     }
 
     maven {
-        url = uri('https://repo.spicord.org/')
-    }
-
-    maven {
         url = uri('https://m2.dv8tion.net/releases/')
     }
 
@@ -84,8 +80,8 @@ dependencies {
     compileOnly 'org.spongepowered:spongeapi:9.0.0-SNAPSHOT'
     compileOnly 'org.projectlombok:lombok:1.18.24'
     compileOnly 'me.clip:placeholderapi:2.11.2'
-    compileOnly 'org.spicord:spicord-common:4.0.0'
-    compileOnly 'net.dv8tion:JDA:4.4.0_350'
+    compileOnly 'com.github.Spicord:Spicord:v5-SNAPSHOT'
+    compileOnly 'net.dv8tion:JDA:5.0.0-beta.4'
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
     compileOnly 'net.luckperms:api:5.4'
 }

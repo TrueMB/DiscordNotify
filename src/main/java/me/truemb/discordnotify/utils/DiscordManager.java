@@ -35,8 +35,9 @@ import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.discordnotify.staticembed.StaticEmbedManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
 import okhttp3.OkHttpClient;
 
 public class DiscordManager {
@@ -313,7 +314,7 @@ public class DiscordManager {
 
 				//SENDING MESSAGE WITH PICTURE
 				if(file != null) {
-					channel.sendMessageEmbeds(eb.build()).addFile(file, filename).queue();
+					channel.sendMessageEmbeds(eb.build()).addFiles(FileUpload.fromData(file, filename)).queue();
 					return;
 				}
 			}
