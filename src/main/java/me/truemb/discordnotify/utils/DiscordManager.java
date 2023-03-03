@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLConnection;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -35,6 +36,8 @@ import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.discordnotify.staticembed.StaticEmbedManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -181,9 +184,9 @@ public class DiscordManager {
 		placeholder.put("server", server);
 		
 		if(this.instance.getConfigManager().useEmbedMessage(FeatureType.ServerStatus)) {
-			this.instance.getDiscordManager().sendEmbedMessageWithNoPictureSync(channelId, status ? "ServerStartEmbed" : "ServerStopEmbed", placeholder);
+			this.sendEmbedMessageWithNoPictureSync(channelId, status ? "ServerStartEmbed" : "ServerStopEmbed", placeholder);
 		}else {
-			this.instance.getDiscordManager().sendDiscordMessageSync(channelId, status ? "ServerStartMessage" : "ServerStopMessage", placeholder);
+			this.sendDiscordMessageSync(channelId, status ? "ServerStartMessage" : "ServerStopMessage", placeholder);
 		}
 	}
 	
@@ -466,6 +469,155 @@ public class DiscordManager {
 			channel.sendMessage(message).submit();
 		});
     }
+	
+	
+	//ROLE SYNC
+
+	//ROLESYNC
+	public void checkForRolesUpdate(UUID uuid, long disuuid, String[] currentGroupList) {
+		if(this.instance.getDiscordManager() == null)
+			return;
+		
+		DiscordBot discordBot = this.getDiscordBot();
+		if(discordBot == null) 
+			return;
+
+		long discordServerId = this.instance.getConfigManager().getConfig().getLong("Options.DiscordBot.ServerID");
+		Guild guild = discordServerId <= 0 ? discordBot.getJda().getGuilds().get(0) : discordBot.getJda().getGuildById(discordServerId);
+		
+		Member member = guild.getMemberById(disuuid);
+
+		if(member == null) {
+			guild.retrieveMemberById(disuuid).queue(mem -> {
+				this.checkForRolesUpdate(uuid, mem, currentGroupList);
+			});
+		}else
+			this.checkForRolesUpdate(uuid, member, currentGroupList);
+	}
+
+	//CHECK FOR UPDATES
+	public void checkForRolesUpdate(UUID uuid, Member member, String[] currentGroupList) {
+		if(this.instance.getDiscordManager() == null) 
+			return;
+		
+		DiscordBot discordBot = this.getDiscordBot();
+		if(discordBot == null) 
+			return;
+
+		if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync))
+			return;
+		
+		//NOT CORRECTLY VERIFIED
+		if(!this.instance.getVerifyManager().isVerified(uuid) || this.instance.getVerifyManager().getVerfiedWith(uuid) != member.getIdLong())
+			return;
+		
+		boolean changesWereMade = false;
+
+		List<String> rolesBackup = this.instance.getVerifyManager().getBackupRoles(uuid);
+		if(rolesBackup == null)
+			rolesBackup = new ArrayList<>();
+
+		for(String group : currentGroupList) {
+			List<Role> roles = new ArrayList<>();
+			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
+				roles = discordBot.getJda().getRolesByName(group, true);
+			else {
+				String groupConfig = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group.toLowerCase());
+				
+				if(groupConfig == null)
+					continue;
+				
+				roles = discordBot.getJda().getRolesByName(groupConfig, true);
+			}
+			
+			if(roles.size() <= 0)
+				continue;
+			
+			Role role = roles.get(0);
+			String roleName = role.getName();
+
+			if(rolesBackup.contains(roleName))
+				continue;
+				
+			rolesBackup.add(roleName);
+			role.getGuild().addRoleToMember(member, role).queue();
+			changesWereMade = true;
+		}
+		
+		List<String> allBackupRoles = new ArrayList<>(rolesBackup);
+		for(String backupRoles : allBackupRoles) {
+			boolean isInGroup = false;
+			for(String group : currentGroupList) {
+				if(backupRoles.equalsIgnoreCase(group)) {
+					isInGroup = true;
+				}
+			}
+			if(!isInGroup) {
+				List<Role> roles = new ArrayList<>();
+				if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
+					roles = discordBot.getJda().getRolesByName(backupRoles, true);
+				else {
+					String groupConfig = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + backupRoles.toLowerCase());
+					
+					if(groupConfig == null)
+						continue;
+					
+					roles = discordBot.getJda().getRolesByName(groupConfig, true);
+				}
+				if(roles.size() <= 0)
+					continue;
+				
+				Role role = roles.get(0);
+				String roleName = role.getName();
+
+				role.getGuild().removeRoleFromMember(member, role).queue();
+				rolesBackup.remove(roleName);
+				
+				changesWereMade = true;
+			}
+		}
+
+		this.instance.getVerifyManager().setBackupRoles(uuid, rolesBackup);
+		if(changesWereMade)
+			this.instance.getVerifySQL().updateRoles(uuid, rolesBackup);
+	}
+
+	public void resetRoles(UUID uuid, Member member) {
+		if(this.instance.getDiscordManager() == null) 
+			return;
+		
+		DiscordBot discordBot = this.getDiscordBot();
+		if(discordBot == null) 
+			return;
+		
+		if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync))
+			return;
+
+		List<String> rolesBackup = this.instance.getVerifyManager().getBackupRoles(uuid);
+		if(rolesBackup == null)
+			rolesBackup = new ArrayList<>();
+		
+		for(String backupRoles : rolesBackup) {
+			List<Role> roles = new ArrayList<>();
+			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
+				roles = discordBot.getJda().getRolesByName(backupRoles, true);
+			else {
+				String groupConfig = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + backupRoles.toLowerCase());
+				
+				if(groupConfig == null)
+					continue;
+				
+				roles = discordBot.getJda().getRolesByName(groupConfig, true);
+			}
+			if(roles.size() <= 0)
+				continue;
+				
+			Role role = roles.get(0);
+			role.getGuild().removeRoleFromMember(member, role).complete();
+		}
+
+		this.instance.getVerifyManager().removeBackupRoles(uuid);
+	}
 	
 	//PLACEHOLDERS
 	public String getPlaceholderString(String message, HashMap<String, String> placeholder) {

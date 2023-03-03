@@ -48,6 +48,7 @@ Options:
     NotOnline: 'Currently Offline'
   OtherFormats:
     Location: '%world%, x=%x%, y=%y%, z=%z%, yaw=%yaw%, pitch=%pitch%'
+    PlayerWithInfo: '%player% [%server%]'
   Inactivity:
     MessageType: EMBED
     #Checking, if players are inactive (in Minutes)
@@ -440,4 +441,4 @@ StaticEmbeds:
     DisableTimestamp: false
 
   #Do NOT touch
-ConfigVersion: 21
+ConfigVersion: 22

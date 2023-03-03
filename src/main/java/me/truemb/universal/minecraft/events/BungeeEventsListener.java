@@ -57,13 +57,14 @@ public class BungeeEventsListener implements Listener {
 			this.plugin.getUniversalServer().addPlayer(up = new BungeePlayer(p, this.adventure));
 		
 		//PLAYER JOINS PROXY - Server current null
-		String oldServerName = up.getServer();
+		String oldServerName = up.getServer() != null ? String.valueOf(up.getServer()) : null; //Clone the string, to not override the oldServer
+		up.setServer(newServerName);
+		
 		if(oldServerName == null)
 			this.plugin.getListener().onPlayerJoin(up, newServerName); //JOINING PROXY
 		else
 			this.plugin.getListener().onPlayerServerChange(up, oldServerName, newServerName); //CHANGING SERVER
 		
-		up.setServer(newServerName);		
 	}
 
 	@EventHandler

@@ -86,9 +86,6 @@ public class StaticEmbedManager {
 		channel.retrieveMessageById(messageId).queue(message -> {
 			message.editMessageEmbeds(embed).queue();
 		});
-		
-		
-
 	}
 	
 	/**
@@ -130,11 +127,19 @@ public class StaticEmbedManager {
 		if(players.length() >= 2)
 			players = players.substring(2);
 		
+		String playerWithServerFormat = this.instance.getConfigManager().getConfig().getString("Options.OtherFormats.PlayerWithInfo");
+		String playersWithServer = "";
+		for(UniversalPlayer player : this.instance.getUniversalServer().getOnlinePlayers())
+			playersWithServer += ", " + playerWithServerFormat.replaceAll("(?i)%" + "player" + "%", player.getIngameName()).replaceAll("(?i)%" + "server" + "%", player.getServer());
+		if(playersWithServer.length() >= 2)
+			playersWithServer = playersWithServer.substring(2);
+		
 		HashMap<String, String> placeholders = new HashMap<>();
 
 		placeholders.put("online", String.valueOf(this.instance.getUniversalServer().getOnlinePlayers().size()));
 		placeholders.put("onlinemax", String.valueOf(this.instance.getUniversalServer().getMaxPlayers()));
 		placeholders.put("players", players);
+		placeholders.put("playersinfo", playersWithServer);
 		placeholders.put("motd", this.instance.getUniversalServer().getMotd());
 		
 		String title = this.instance.getConfigManager().getConfig().getString(path + "Title");

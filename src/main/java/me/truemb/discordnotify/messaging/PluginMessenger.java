@@ -72,9 +72,9 @@ public class PluginMessenger {
 					Member member = guild.getMemberById(disuuid);
 					if(member == null)
 						guild.retrieveMemberById(disuuid).queue(mem ->  
-							instance.getVerifyManager().checkForRolesUpdate(uuid, mem, currentGroupList));
+							instance.getDiscordManager().checkForRolesUpdate(uuid, mem, currentGroupList));
 					else
-						instance.getVerifyManager().checkForRolesUpdate(uuid, member, currentGroupList);
+						instance.getDiscordManager().checkForRolesUpdate(uuid, member, currentGroupList);
 				
 				}else if (subChannel.equalsIgnoreCase("INFO_UPDATE")) {
 

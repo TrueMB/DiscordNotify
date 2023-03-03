@@ -94,7 +94,7 @@ public class DC_VerifyCommand extends SimpleAddon {
     	    					}
     	    				}
     	    				
-    	    				this.instance.getVerifyManager().resetRoles(mcuuid, member);
+    	    				this.instance.getDiscordManager().resetRoles(mcuuid, member);
     	    				
     	    				String verifyGroupS = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.Verification.toString() + ".minecraftRank");
     	    				

@@ -68,7 +68,7 @@ public class DN_VerifyCommand {
 				}
 				
 				//RESET ROLES
-				this.instance.getVerifyManager().resetRoles(uuid, member);
+				this.instance.getDiscordManager().resetRoles(uuid, member);
 				
 				String verifyGroupS = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.Verification.toString() +  ".minecraftRank");
 				

@@ -129,10 +129,10 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 					Member member = this.instance.getDiscordManager().getCurrentGuild().getMemberById(disuuid);
 					if(member == null) {
 						this.instance.getDiscordManager().getCurrentGuild().retrieveMemberById(disuuid).queue(mem -> {
-							this.instance.getVerifyManager().checkForRolesUpdate(uuid, mem, currentGroupList);
+							this.instance.getDiscordManager().checkForRolesUpdate(uuid, mem, currentGroupList);
 						});
 					}else
-						this.instance.getVerifyManager().checkForRolesUpdate(uuid, member, currentGroupList);
+						this.instance.getDiscordManager().checkForRolesUpdate(uuid, member, currentGroupList);
 				}
 			}
 		}
@@ -433,6 +433,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 
 	@Override
 	public void onPlayerServerChange(UniversalPlayer up, String oldServerName, String newServerName) {
+		this.instance.getDiscordManager().getStaticEmbedManager().updateAllEmbeds();
 		
 		if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enablePlayerServerSwitch"))
 			return;

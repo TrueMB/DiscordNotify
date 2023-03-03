@@ -57,6 +57,8 @@ public class VelocityEventsListener {
 			up = new VelocityPlayer(p);
 			this.plugin.getUniversalServer().addPlayer(up);
 		}
+
+		up.setServer(newServerName);
 		
 		//PLAYER JOINS PROXY - Server current null
 		if(oldServerName == null)
@@ -64,7 +66,6 @@ public class VelocityEventsListener {
 		else
 			this.plugin.getListener().onPlayerServerChange(up, oldServerName, newServerName); //CHANGING SERVER
 		
-		up.setServer(newServerName);
 	}
 	
 	@Subscribe

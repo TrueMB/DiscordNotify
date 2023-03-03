@@ -214,7 +214,7 @@ public class VerifySQL {
 							else
 								currentGroupList = instance.getPermsAPI().getGroups(uuid);
 							
-							instance.getVerifyManager().checkForRolesUpdate(uuid, member, currentGroupList);
+							instance.getDiscordManager().checkForRolesUpdate(uuid, member, currentGroupList);
 						}
 						
 					}
