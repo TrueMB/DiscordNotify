@@ -68,7 +68,7 @@ public class StaticEmbedManager {
 		String path = "StaticEmbeds." + embedPath + ".";
 		
 		long channelId = this.instance.getConfigManager().getConfig().getLong(path + "Channel");
-		long messageId = this.embeds.get(embedPath);
+		long messageId = this.embeds.containsKey(embedPath) ? this.embeds.get(embedPath) : -1;
 		
 		if(channelId <= 0 || messageId <= 0)
 			return;
