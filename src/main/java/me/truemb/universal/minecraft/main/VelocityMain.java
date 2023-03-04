@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import org.bstats.velocity.Metrics;
+
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandManager;
 import com.velocitypowered.api.command.CommandMeta;
@@ -42,9 +44,11 @@ import me.truemb.universal.minecraft.events.VelocityEventsListener;
 import me.truemb.universal.player.UniversalPlayer;
 import me.truemb.universal.player.VelocityPlayer;
 
-@Plugin(id = "discordnotify", name = "DiscordNotify", version = "3.3.0", authors = {"TrueMB"}, dependencies = { @Dependency(id = "spicord")} )
+@Plugin(id = "discordnotify", name = "DiscordNotify", version = "3.3.1", authors = {"TrueMB"}, dependencies = { @Dependency(id = "spicord")} )
 public class VelocityMain implements IRelay {
-	
+
+    private final Metrics.Factory metricsFactory;
+    
 	private DiscordNotifyMain instance;
 	
     private IMessageChannel core;
@@ -56,7 +60,7 @@ public class VelocityMain implements IRelay {
     private File dataDirectory;
 
     @Inject
-    public VelocityMain(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory) {
+    public VelocityMain(ProxyServer server, Logger logger, @DataDirectory Path dataDirectory, Metrics.Factory metricsFactory) {
     	this.dataDirectory = dataDirectory.toFile();
     	this.proxy = server;
         this.core = new MessageChannelCore(this);
@@ -66,6 +70,8 @@ public class VelocityMain implements IRelay {
         } catch (MessageChannelException exception) {
             exception.printStackTrace();
         }
+        
+        this.metricsFactory = metricsFactory;
 	}
 	
     @Subscribe
@@ -126,6 +132,10 @@ public class VelocityMain implements IRelay {
 		CommandMeta verifyMeta = commandManager.metaBuilder("verify").build();
 		
 		commandManager.register(verifyMeta, verifyCommand);
+		
+		//METRICS ANALYTICS
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options.useMetrics"))
+	        this.metricsFactory.make(this, DiscordNotifyMain.BSTATS_PLUGIN_ID);
     }
 
     @Override

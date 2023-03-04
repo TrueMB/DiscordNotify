@@ -36,6 +36,8 @@ import me.truemb.universal.server.UniversalServer;
 
 @Getter
 public class DiscordNotifyMain {
+	
+    public static final int BSTATS_PLUGIN_ID = 12029;
 		
 	private final File dataDirectory;
 	private PluginDescription pluginDescription;

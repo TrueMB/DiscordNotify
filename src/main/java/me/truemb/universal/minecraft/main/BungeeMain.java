@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.bstats.bungeecord.Metrics;
+
 import lombok.Getter;
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
@@ -84,6 +86,10 @@ public class BungeeMain extends Plugin implements IRelay, Listener {
 		
 		BungeeCommandExecutor_Verify verifyCommand = new BungeeCommandExecutor_Verify(this.instance);
 		ProxyServer.getInstance().getPluginManager().registerCommand(this, verifyCommand);
+		
+		//METRICS ANALYTICS
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options.useMetrics"))
+			new Metrics(this, DiscordNotifyMain.BSTATS_PLUGIN_ID);
 	}
 	
 	@Override

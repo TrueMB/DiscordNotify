@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.entity.Player;
@@ -86,6 +87,11 @@ public class BukkitMain extends JavaPlugin implements IRelay {
 			}catch(Exception exception){
 			    exception.printStackTrace();
 			}
+
+			//METRICS ANALYTICS
+			if(this.instance.getConfigManager().getConfig().getBoolean("Options.useMetrics"))
+				new Metrics(this, DiscordNotifyMain.BSTATS_PLUGIN_ID);
+			
 		}else if(this.getServer().getPluginManager().getPlugin("Spicord") != null){
 			this.instance.getUniversalServer().getLogger().severe("Network Sub-Server detected, but Spicord as well. Please install Spicord on your Bungeecord/Velocity Server.");
 			return;
