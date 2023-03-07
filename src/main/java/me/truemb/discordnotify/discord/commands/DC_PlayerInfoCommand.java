@@ -143,7 +143,7 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 						}else {
 				    		command.reply(instance.getDiscordManager().getDiscordMessage("PlayerInfo", placeholder));
 						}
-				        command.getMessage().addReaction(Emoji.fromFormatted("✔️")).submit();
+				        command.getMessage().addReaction(Emoji.fromFormatted("✔️")).queue();
 					}
 				}).get();
 			} catch (InterruptedException | ExecutionException e) {
