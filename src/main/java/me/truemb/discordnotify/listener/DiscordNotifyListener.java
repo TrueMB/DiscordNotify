@@ -167,11 +167,19 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 		switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerJoinLeave)) {
 			case MESSAGE: {
-				this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerJoinMessage", placeholder);
+				try {
+					this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerJoinMessage", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerJoinLeave.toString() + " couldn't parse the Channel ID.");
+				}
 				break;
 			}
 			case EMBED: {
-				this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerJoinEmbed", placeholder);
+				try {
+					this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerJoinEmbed", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerJoinLeave.toString() + " couldn't parse the Channel ID.");
+				}
 				break;
 			}
 			case WEBHOOK: {
@@ -280,11 +288,19 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 		switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerJoinLeave)) {	
 			case MESSAGE: {
-				this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerLeaveMessage", placeholder);
+				try {
+					this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerLeaveMessage", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerJoinLeave.toString() + " couldn't parse the Channel ID.");
+				}
 				break;
 			}
 			case EMBED: {
-				this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerLeaveEmbed", placeholder);
+				try {
+					this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerLeaveEmbed", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerJoinLeave.toString() + " couldn't parse the Channel ID.");
+				}
 				break;
 			}
 			case WEBHOOK: {
@@ -352,11 +368,19 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 
 		switch (this.instance.getConfigManager().getMessageType(FeatureType.Chat)) {
 			case MESSAGE: {
-				this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "ChatMessage", placeholder);
+				try {
+					this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "ChatMessage", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.Chat.toString() + " couldn't parse the Channel ID.");
+				}
 				break;
 			}
 			case EMBED: {
-				this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "ChatEmbed", placeholder);
+				try {
+					this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "ChatEmbed", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.Chat.toString() + " couldn't parse the Channel ID.");
+				}
 				break;
 			}
 			case WEBHOOK: {
@@ -415,11 +439,19 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 		switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerDeath)) {
 			case MESSAGE: {
-				this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerDeathMessage", placeholder);
+				try {
+					this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerDeathMessage", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerDeath.toString() + " couldn't parse the Channel ID.");
+				}
 				break;
 			}
 			case EMBED: {
-				this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "DeathEmbed", placeholder);
+				try {
+					this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "DeathEmbed", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerDeath.toString() + " couldn't parse the Channel ID.");
+				}
 				break;
 			}
 			case WEBHOOK: {
@@ -465,11 +497,19 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 						
 							switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerJoinLeave)) {
 								case MESSAGE: {
-									this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerServerChangeLeaveMessage", placeholder);
+									try {
+										this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerServerChangeLeaveMessage", placeholder);
+									}catch (NumberFormatException ex) {
+										this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerJoinLeave.toString() + " couldn't parse the Channel ID.");
+									}
 									break;
 								}
 								case EMBED: {
-									this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerServerChangeLeaveEmbed", placeholder);
+									try {
+										this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerServerChangeLeaveEmbed", placeholder);
+									}catch (NumberFormatException ex) {
+										this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerJoinLeave.toString() + " couldn't parse the Channel ID.");
+									}
 									break;
 								}
 								case WEBHOOK: {
@@ -503,11 +543,19 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 							
 							switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerJoinLeave)) {
 								case MESSAGE: {
-									this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerServerChangeJoinMessage", placeholder);
+									try {
+										this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerServerChangeJoinMessage", placeholder);
+									}catch (NumberFormatException ex) {
+										this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerJoinLeave.toString() + " couldn't parse the Channel ID.");
+									}
 									break;
 								}
 								case EMBED: {
-									this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerServerChangeJoinEmbed", placeholder);
+									try {
+										this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerServerChangeJoinEmbed", placeholder);
+									}catch (NumberFormatException ex) {
+										this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerJoinLeave.toString() + " couldn't parse the Channel ID.");
+									}
 									break;
 								}
 								case WEBHOOK: {
@@ -540,11 +588,19 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			
 			switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerJoinLeave)) {
 				case MESSAGE: {
-					this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerServerChangeMessage", placeholder);
+					try {
+						this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerServerChangeMessage", placeholder);
+					}catch (NumberFormatException ex) {
+						this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerJoinLeave.toString() + " couldn't parse the Channel ID.");
+					}
 					break;
 				}
 				case EMBED: {
-					this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerServerChangeEmbed", placeholder);
+					try {
+						this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "PlayerServerChangeEmbed", placeholder);
+					}catch (NumberFormatException ex) {
+						this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerJoinLeave.toString() + " couldn't parse the Channel ID.");
+					}
 					break;
 				}
 				case WEBHOOK: {

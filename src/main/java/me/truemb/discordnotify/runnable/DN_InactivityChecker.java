@@ -103,11 +103,19 @@ public class DN_InactivityChecker implements Runnable {
 						
 						switch (instance.getConfigManager().getMessageType(FeatureType.Inactivity)) {
 							case MESSAGE: {
-								
-								instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "InactivityMessage", placeholder);
+								try {
+									instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "InactivityMessage", placeholder);
+								}catch (NumberFormatException ex) {
+									instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.Inactivity.toString() + " couldn't parse the Channel ID.");
+								}
 								break;
 								
 							}case EMBED: {
+								try {
+									Long.parseLong(channelId);
+								}catch (NumberFormatException ex) {
+									instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.Inactivity.toString() + " couldn't parse the Channel ID.");
+								}
 								
 								String path = "InactivityEmbed";
 								EmbedBuilder eb = instance.getDiscordManager().getEmbedMessage(uuid, path, placeholder);

@@ -75,11 +75,19 @@ public class DN_StaffCommand {
 		
 		switch (this.instance.getConfigManager().getMessageType(FeatureType.Staff)) {
 			case MESSAGE: {
-				this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "StaffMessage", placeholder);
+				try {
+					this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "StaffMessage", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.Staff.toString() + " couldn't parse the Channel ID.");
+				}
 				break;
 			}
 			case EMBED: {
-				this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "StaffEmbed", placeholder);
+				try {
+					this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "StaffEmbed", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.Staff.toString() + " couldn't parse the Channel ID.");
+				}
 				break;
 			}
 			case WEBHOOK: {
