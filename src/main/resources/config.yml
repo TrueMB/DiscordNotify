@@ -444,4 +444,4 @@ StaticEmbeds:
     DisableTimestamp: false
 
   #Do NOT touch
-ConfigVersion: 22
+ConfigVersion: 23

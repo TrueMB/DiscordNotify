@@ -17,7 +17,7 @@ import me.truemb.discordnotify.utils.UTF8YamlConfiguration;
 
 public class ConfigManager {
 
-	private static final int configVersion = 22;
+	private static final int configVersion = 23;
 	
 	private File configFile;
 	private UTF8YamlConfiguration config;
