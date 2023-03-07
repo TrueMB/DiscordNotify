@@ -148,9 +148,11 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			return;
 
 		UUID uuid = up.getUUID();
-		String channelId;
+		String channelId = null;
 		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave"))
-			channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + serverName);
+			for(String servers : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave").getKeys(false))
+				if(servers.equalsIgnoreCase(serverName))
+					channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + servers);
 		else
 			channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerJoinLeave);
 
@@ -258,9 +260,11 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			return;
 
 		UUID uuid = up.getUUID();
-		String channelId;
+		String channelId = null;
 		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave"))
-			channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + serverName);
+			for(String servers : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave").getKeys(false))
+				if(servers.equalsIgnoreCase(serverName))
+					channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + servers);
 		else
 			channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerJoinLeave);
 		
@@ -324,10 +328,12 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		String server = up.getServer();
 		String group = this.instance.getPermsAPI().getPrimaryGroup(uuid);
 		
-		String channelId;
-		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat"))
-			channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat." + server);
-		else
+		String channelId = null;
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat")) {
+			for(String servers : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat").getKeys(false))
+				if(servers.equalsIgnoreCase(server))
+					channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat." + servers);
+		}else
 			channelId = this.instance.getConfigManager().getChannel(FeatureType.Chat);
 
 		//Server should not send Messages
@@ -343,7 +349,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 		if(this.instance.getUniversalServer().isProxySubServer())
 			return;
-		
+
 		switch (this.instance.getConfigManager().getMessageType(FeatureType.Chat)) {
 			case MESSAGE: {
 				this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "ChatMessage", placeholder);
@@ -354,7 +360,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 				break;
 			}
 			case WEBHOOK: {
-	
+
 				WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.Chat, server, channelId);
 				
 				String minotarTypeS = instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Chat.PictureType");
@@ -390,9 +396,11 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 		//DISCORD DEATH MESSAGE
 		String server = up.getServer();
-		String channelId;
+		String channelId = null;
 		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerDeath.toString() + ".enableServerSeperatedDeath"))
-			channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerDeath.toString() + ".serverSeperatedDeath." + server);
+			for(String servers : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerDeath.toString() + ".serverSeperatedDeath").getKeys(false))
+				if(servers.equalsIgnoreCase(server))
+					channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerDeath.toString() + ".serverSeperatedDeath." + servers);
 		else
 			channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerDeath);
 

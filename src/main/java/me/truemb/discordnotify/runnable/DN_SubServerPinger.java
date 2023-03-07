@@ -59,9 +59,11 @@ public class DN_SubServerPinger implements Runnable{
 	
 	private void announceServerStatusChange(String server, boolean status) {
 		
-		long channelId;
+		long channelId = -1;
 		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.ServerStatus.toString() + ".enableServerSeperatedStatus"))
-			channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.ServerStatus.toString() + ".serverSeperatedStatus." + server);
+			for(String servers : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.ServerStatus.toString() + ".serverSeperatedStatus").getKeys(false))
+				if(servers.equalsIgnoreCase(server))
+					channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.ServerStatus.toString() + ".serverSeperatedStatus." + servers);
 		else
 			channelId = this.instance.getConfigManager().getChannelID(FeatureType.ServerStatus);
 
