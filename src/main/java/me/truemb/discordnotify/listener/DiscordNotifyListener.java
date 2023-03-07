@@ -335,6 +335,9 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		if(up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Chat")))
 			return;
 		
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".onlyVerified") && !this.instance.getVerifyManager().isVerified(up.getUUID()))
+			return;
+		
 		//Check if extra Chat is enabled for ChatSyncing
 		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat"))
 			if(!this.discordChatEnabled.containsKey(uuid) || !this.discordChatEnabled.get(uuid))

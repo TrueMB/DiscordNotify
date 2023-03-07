@@ -16,7 +16,9 @@ import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.discordnotify.utils.JsonReader;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.ErrorResponse;
 
 public class DC_ChatListener extends ListenerAdapter {
 	
@@ -43,21 +45,37 @@ public class DC_ChatListener extends ListenerAdapter {
 	    if(e.getAuthor().isBot())
 	    	return;
 	    
+	    HashMap<String, String> placeholder = new HashMap<>();
 	    String tag = e.getAuthor().getAsTag();
 	    String username = e.getAuthor().getName();
 	    String nickname = e.getMember().getNickname();
 	    if(nickname == null) nickname = "";
 	    String name = e.getMember().getEffectiveName();
+	    
+	    placeholder.put("tag", tag);
+	    placeholder.put("username", username);
+	    placeholder.put("nickname", nickname);
+	    placeholder.put("name", name);
 	    	    
 	    //CORRECT CHANNEL
 		if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat)) {
+		    
+			List<String> bypassList = this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Chat.toString() + ".bypassPrefix");
+			for(String prefix : bypassList) {
+		    	if(message.toLowerCase().startsWith(prefix.toLowerCase()))
+		    		return;
+		    }
+			
+			//Verfied Feature enabled but the user is not verified
+			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".onlyVerified") && !this.instance.getVerifyManager().isVerified(e.getAuthor().getIdLong())) {
+				e.getMessage().delete().queue();
+		    	e.getMember().getUser().openPrivateChannel()
+		    		.flatMap(pchannel -> pchannel.sendMessage(this.instance.getDiscordManager().getDiscordMessage("UserNotVerified", placeholder)))
+		    		.queue(null, new ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER, (ex) -> System.out.print(""))); //prevent Error Message, so there wont be console spamming, if a user has private message enabled
+				return;
+			}
+			
 		    if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat") && this.channel_id.get(FeatureType.Chat.toString()) == channelId) {
-			    
-				List<String> bypassList = this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Chat.toString() + ".bypassPrefix");
-				for(String prefix : bypassList) {
-			    	if(message.toLowerCase().startsWith(prefix.toLowerCase()))
-			    		return;
-			    }
 				
 			    final String mcMessage = EmojiParser.parseToAliases(this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
 			    		.replaceAll("(?i)%" + "tag" + "%", tag)
@@ -82,12 +100,6 @@ public class DC_ChatListener extends ListenerAdapter {
 			    }
 		    	
 		   	}else if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat) && this.instance.getUniversalServer().isProxy()){
-			    
-				List<String> bypassList = this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Chat.toString() + ".bypassPrefix");
-				for(String prefix : bypassList) {
-			    	if(message.toLowerCase().startsWith(prefix.toLowerCase()))
-			    		return;
-			    }
 				
 			    final String mcMessage = EmojiParser.parseToAliases(this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
 			    		.replaceAll("(?i)%" + "tag" + "%", tag)
@@ -183,7 +195,7 @@ public class DC_ChatListener extends ListenerAdapter {
     }
     
     private void getAllChannelIds() {
-    	this.instance.getUniversalServer().getLogger().info("Loading all Channel Id's.");
+    	this.instance.getUniversalServer().getLogger().info("Loading all Chat/Staff Channel Id's from the Webhook URLs.");
 
     	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat) && this.instance.getConfigManager().getMessageType(FeatureType.Chat) == MessageType.WEBHOOK) {
 	    	if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat")) {
@@ -217,6 +229,6 @@ public class DC_ChatListener extends ListenerAdapter {
 			if(channelId > 0)
     			this.channel_id.put(id, channelId);
     	}
-    	this.instance.getUniversalServer().getLogger().info("Channel Id's are found.");
+    	this.instance.getUniversalServer().getLogger().info("Chat/Staff Channel Id's are found.");
     }
 }

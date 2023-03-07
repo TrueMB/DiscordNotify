@@ -86,6 +86,8 @@ Options:
     MessageType: WEBHOOK
     #Should the Discord Message send to the Minecraft Server?
     syncDiscord: true
+    #Only Verified Accounts can Sync their Chat. Needs the Verification Feature
+    onlyVerified: false
     #Allows the command /dchat to join or leave the Discord Chat in Minecraft
     enableSplittedChat: false
     #if enabled, then Options.Chat.serverSeperatedChat.%server% will be used and not Channel.Chat
@@ -224,6 +226,7 @@ DiscordMessages:
   PlayerServerChangeJoinMessage: '**%Player%** joined the server from %old%.'
   PlayerServerChangeLeaveMessage: '**%Player%** left the server and went to %target%.'
   PlayerDeathMessage: '%DeathMessage%'
+  UserNotVerified: 'Your are not Verified. Your Message got deleted.'
   ChatMessage: '%Player%: %Message%'
   StaffMessage: '%Player%: %Message%'
   PlayerInfoHelp: 'Please use %Prefix%playerinfo <IngameName>'
