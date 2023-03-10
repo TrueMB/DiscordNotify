@@ -26,7 +26,7 @@ public class VelocityPlayer extends UniversalPlayer{
 
 	@Override
 	public void sendMessage(String message) {
-		this.getVelocityPlayer().sendMessage(net.kyori.adventure.text.Component.text(message));
+		this.getVelocityPlayer().sendMessage(Component.text(message));
 	}
 
 	@Override

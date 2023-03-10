@@ -59,6 +59,7 @@ public class DC_ChatListener extends ListenerAdapter {
 	    	    
 	    //CORRECT CHANNEL
 		if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat)) {
+			
 		    //CHECK IF IT IS A MANAGED CHANNEL					
 		    if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat") && this.channel_id.get(FeatureType.Chat.toString()) == channelId) {
 				
@@ -99,7 +100,7 @@ public class DC_ChatListener extends ListenerAdapter {
 					
 			    }
 		    	
-		   	}else if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat) && this.instance.getUniversalServer().isProxy()){
+		   	}else if(this.instance.getUniversalServer().isProxy()){
 		   						
 			    final String mcMessage = EmojiParser.parseToAliases(this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
 			    		.replaceAll("(?i)%" + "tag" + "%", tag)
@@ -110,7 +111,7 @@ public class DC_ChatListener extends ListenerAdapter {
 			    		.replaceAll("(?i)%" + "channel" + "%", channelName));
 			    
 		   		for(String server : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat").getKeys(false)) {
-		   			String id = FeatureType.Chat.toString() + "_" + server;
+		   			String id = FeatureType.Chat.toString() + "_" + server.toLowerCase();
 		   			if(!this.channel_id.containsKey(id))
 		   				continue;
 		   			
@@ -136,15 +137,14 @@ public class DC_ChatListener extends ListenerAdapter {
 	
 						this.instance.getUniversalServer().getOnlinePlayers().forEach(all -> {
 						    	
-							if(!all.getServer().equalsIgnoreCase(server))
-						    	return;
-	
-			   				if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat")) {
-								UUID uuidAll = all.getUUID();
-								if(this.instance.getDiscordChatEnabled().containsKey(uuidAll) && this.instance.getDiscordChatEnabled().get(uuidAll))
+							if(all.getServer().equalsIgnoreCase(server)) {
+				   				if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat")) {
+									UUID uuidAll = all.getUUID();
+									if(this.instance.getDiscordChatEnabled().containsKey(uuidAll) && this.instance.getDiscordChatEnabled().get(uuidAll))
+										all.sendMessage(mcMessage);
+				   				}else
 									all.sendMessage(mcMessage);
-			   				}else
-								all.sendMessage(mcMessage);
+							}
 			   				
 						});
 		   				return;
@@ -215,7 +215,7 @@ public class DC_ChatListener extends ListenerAdapter {
     	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat) && this.instance.getConfigManager().getMessageType(FeatureType.Chat) == MessageType.WEBHOOK) {
 	    	if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat")) {
 	    		this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat").getKeys(false).forEach(servers -> {
-	    	    	String id = FeatureType.Chat.toString() + "_" + servers;
+	    	    	String id = FeatureType.Chat.toString() + "_" + servers.toLowerCase();
 	    	    	
 	    			String channelIdAsString = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat." + servers);
 	    			long channelId = this.convertId(channelIdAsString);
