@@ -61,43 +61,44 @@ public class DC_ChatListener extends ListenerAdapter {
 		if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat)) {
 			
 		    //CHECK IF IT IS A MANAGED CHANNEL					
-		    if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat") && this.channel_id.get(FeatureType.Chat.toString()) == channelId) {
+		    if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat")) {
+		    	if(this.channel_id.get(FeatureType.Chat.toString()) == channelId) {
 				
-		    	List<String> bypassList = this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Chat.toString() + ".bypassPrefix");
-				for(String prefix : bypassList) {
-			    	if(message.toLowerCase().startsWith(prefix.toLowerCase()))
-			    		return;
-			    }
-				
-				//Verfied Feature enabled but the user is not verified
-				if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".onlyVerified") && !this.instance.getVerifyManager().isVerified(e.getAuthor().getIdLong())) {
-					e.getMessage().delete().queue();
-			    	e.getMember().getUser().openPrivateChannel()
-			    		.flatMap(pchannel -> pchannel.sendMessage(this.instance.getDiscordManager().getDiscordMessage("UserNotVerified", placeholder)))
-			    		.queue(null, new ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER, (ex) -> System.out.print(""))); //prevent Error Message, so there wont be console spamming, if a user has private message enabled
-					return;
-				}
-				
-			    final String mcMessage = EmojiParser.parseToAliases(this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
-			    		.replaceAll("(?i)%" + "tag" + "%", tag)
-			    		.replaceAll("(?i)%" + "username" + "%", username)
-			    		.replaceAll("(?i)%" + "nickname" + "%", nickname)
-			    		.replaceAll("(?i)%" + "name" + "%", name)
-			    		.replaceAll("(?i)%" + "message" + "%", message)
-			    		.replaceAll("(?i)%" + "channel" + "%", channelName));
-	
-			  
-			    if(!this.instance.getUniversalServer().isProxySubServer()) {
-	
-					if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat")) {
-						this.instance.getUniversalServer().getOnlinePlayers().forEach(all -> {
-							UUID uuidAll = all.getUUID();
-							if(this.instance.getDiscordChatEnabled().containsKey(uuidAll) && this.instance.getDiscordChatEnabled().get(uuidAll))
-								all.sendMessage(mcMessage);
-						});
-					}else
-						this.instance.getUniversalServer().broadcast(mcMessage);
+			    	List<String> bypassList = this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Chat.toString() + ".bypassPrefix");
+					for(String prefix : bypassList) {
+				    	if(message.toLowerCase().startsWith(prefix.toLowerCase()))
+				    		return;
+				    }
 					
+					//Verfied Feature enabled but the user is not verified
+					if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".onlyVerified") && !this.instance.getVerifyManager().isVerified(e.getAuthor().getIdLong())) {
+						e.getMessage().delete().queue();
+				    	e.getMember().getUser().openPrivateChannel()
+				    		.flatMap(pchannel -> pchannel.sendMessage(this.instance.getDiscordManager().getDiscordMessage("UserNotVerified", placeholder)))
+				    		.queue(null, new ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER, (ex) -> System.out.print(""))); //prevent Error Message, so there wont be console spamming, if a user has private message enabled
+						return;
+					}
+					
+				    final String mcMessage = EmojiParser.parseToAliases(this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
+				    		.replaceAll("(?i)%" + "tag" + "%", tag)
+				    		.replaceAll("(?i)%" + "username" + "%", username)
+				    		.replaceAll("(?i)%" + "nickname" + "%", nickname)
+				    		.replaceAll("(?i)%" + "name" + "%", name)
+				    		.replaceAll("(?i)%" + "message" + "%", message)
+				    		.replaceAll("(?i)%" + "channel" + "%", channelName));
+		
+				  
+				    if(!this.instance.getUniversalServer().isProxySubServer()) {
+		
+						if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableSplittedChat")) {
+							this.instance.getUniversalServer().getOnlinePlayers().forEach(all -> {
+								UUID uuidAll = all.getUUID();
+								if(this.instance.getDiscordChatEnabled().containsKey(uuidAll) && this.instance.getDiscordChatEnabled().get(uuidAll))
+									all.sendMessage(mcMessage);
+							});
+						}else
+							this.instance.getUniversalServer().broadcast(mcMessage);
+				    }
 			    }
 		    	
 		   	}else if(this.instance.getUniversalServer().isProxy()){
