@@ -14,7 +14,6 @@ import me.truemb.universal.messenger.IPipelineRegistry;
 import me.truemb.universal.messenger.MessageChannelAPI;
 import me.truemb.universal.messenger.PipelineMessage;
 import me.truemb.universal.player.UniversalPlayer;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 
 public class PluginMessenger {
@@ -64,17 +63,14 @@ public class PluginMessenger {
 					DiscordBot discordBot = instance.getDiscordManager().getDiscordBot();
 					if(discordBot == null)
 						return;
-				
-					long discordServerId = instance.getConfigManager().getConfig().getLong("Options.DiscordBot.ServerID");
-					Guild guild = discordServerId <= 0 ? discordBot.getJda().getGuilds().get(0) : discordBot.getJda().getGuildById(discordServerId);
-					
+									
 					//ACCEPTING REQUEST
-					Member member = guild.getMemberById(disuuid);
+					Member member = instance.getDiscordManager().getCurrentGuild().getMemberById(disuuid);
 					if(member == null)
-						guild.retrieveMemberById(disuuid).queue(mem ->  
-							instance.getDiscordManager().checkForRolesUpdate(uuid, mem, currentGroupList));
+						instance.getDiscordManager().getCurrentGuild().retrieveMemberById(disuuid).queue(mem ->  
+							instance.getDiscordManager().syncRoles(uuid, mem, currentGroupList));
 					else
-						instance.getDiscordManager().checkForRolesUpdate(uuid, member, currentGroupList);
+						instance.getDiscordManager().syncRoles(uuid, member, currentGroupList);
 				
 				}else if (subChannel.equalsIgnoreCase("INFO_UPDATE")) {
 

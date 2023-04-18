@@ -472,33 +472,25 @@ public class DiscordManager {
 	
 	
 	//ROLE SYNC
-
-	//ROLESYNC
-	public void checkForRolesUpdate(UUID uuid, long disuuid, String[] currentGroupList) {
-		if(this.instance.getDiscordManager() == null)
-			return;
-		
-		DiscordBot discordBot = this.getDiscordBot();
-		if(discordBot == null) 
-			return;
-
-		long discordServerId = this.instance.getConfigManager().getConfig().getLong("Options.DiscordBot.ServerID");
-		Guild guild = discordServerId <= 0 ? discordBot.getJda().getGuilds().get(0) : discordBot.getJda().getGuildById(discordServerId);
-		
-		Member member = guild.getMemberById(disuuid);
-
-		if(member == null) {
-			guild.retrieveMemberById(disuuid).queue(mem -> {
-				this.checkForRolesUpdate(uuid, mem, currentGroupList);
-			});
-		}else
-			this.checkForRolesUpdate(uuid, member, currentGroupList);
+	
+	public void syncRoles(UUID uuid, Member member, String[] currentGroupList) {
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".syncDiscordToMinecraft")) {
+			this.instance.getDiscordManager().syncRolesFromDiscord(uuid, member);
+		}else {
+			this.instance.getDiscordManager().syncRolesFromMinecraft(uuid, member, currentGroupList);
+		}
+	}	
+	
+	public void resetRoles(UUID uuid, Member member) {
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".syncDiscordToMinecraft")) {
+			this.instance.getDiscordManager().resetDiscordRoles(uuid, member);
+		}else {
+			this.instance.getDiscordManager().resetMinecraftRoles(uuid, member);
+		}
 	}
 
-	//CHECK FOR UPDATES
-	public void checkForRolesUpdate(UUID uuid, Member member, String[] currentGroupList) {
-		if(this.instance.getDiscordManager() == null) 
-			return;
+	//Check for Role Updates: Discord -> Minecraft
+	public void syncRolesFromDiscord(UUID uuid, Member member) {
 		
 		DiscordBot discordBot = this.getDiscordBot();
 		if(discordBot == null) 
@@ -510,81 +502,132 @@ public class DiscordManager {
 		//NOT CORRECTLY VERIFIED
 		if(!this.instance.getVerifyManager().isVerified(uuid) || this.instance.getVerifyManager().getVerfiedWith(uuid) != member.getIdLong())
 			return;
-		
-		boolean changesWereMade = false;
 
 		List<String> rolesBackup = this.instance.getVerifyManager().getBackupRoles(uuid);
 		if(rolesBackup == null)
 			rolesBackup = new ArrayList<>();
 
-		for(String group : currentGroupList) {
-			List<Role> roles = new ArrayList<>();
-			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
-				roles = discordBot.getJda().getRolesByName(group, true);
-			else {
-				String groupConfig = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group.toLowerCase());
-				
-				if(groupConfig == null)
-					continue;
-				
-				roles = discordBot.getJda().getRolesByName(groupConfig, true);
+		List<String> groupsToAdd = new ArrayList<>();
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
+			for(Role roles : member.getRoles())
+				groupsToAdd.add(roles.getName());
+		else {
+			outer: for(Role r : member.getRoles())
+				for(String mcGroup : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
+					if(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + mcGroup).equalsIgnoreCase(r.getName())) {
+						groupsToAdd.add(mcGroup);
+						continue outer;
+					}
 			}
-			
-			if(roles.size() <= 0)
-				continue;
-			
-			Role role = roles.get(0);
-			String roleName = role.getName();
+		
+		//This is a list, that wont change for the loop
+		//It contains all added, but old groups
+		//This doesn't mean, that all groups of the player are listed here.
+		List<String> groupsToRemove = new ArrayList<>();
+		
+		for(String backupRoles : rolesBackup)
+			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
+				groupsToRemove.add(backupRoles);
+			else
+				for(String mcGroup : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
+					if(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + mcGroup).equalsIgnoreCase(backupRoles))
+						groupsToRemove.add(mcGroup);
+		
 
-			if(rolesBackup.contains(roleName))
-				continue;
-				
-			rolesBackup.add(roleName);
-			role.getGuild().addRoleToMember(member, role).queue();
-			changesWereMade = true;
+		// Add New Groups, besides the already added ones
+		outer: for(String mcgroup : groupsToAdd) {
+			for(String oldGroups: rolesBackup) {
+				if(oldGroups.equalsIgnoreCase(mcgroup))
+					continue outer;
+			}
+			rolesBackup.add(mcgroup);
+			this.instance.getPermsAPI().addGroup(uuid, mcgroup);
 		}
 		
-		List<String> allBackupRoles = new ArrayList<>(rolesBackup);
-		for(String backupRoles : allBackupRoles) {
-			boolean isInGroup = false;
-			for(String group : currentGroupList) {
-				if(backupRoles.equalsIgnoreCase(group)) {
-					isInGroup = true;
-				}
-			}
-			if(!isInGroup) {
-				List<Role> roles = new ArrayList<>();
-				if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
-					roles = discordBot.getJda().getRolesByName(backupRoles, true);
-				else {
-					String groupConfig = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + backupRoles.toLowerCase());
-					
-					if(groupConfig == null)
-						continue;
-					
-					roles = discordBot.getJda().getRolesByName(groupConfig, true);
-				}
-				if(roles.size() <= 0)
-					continue;
-				
-				Role role = roles.get(0);
-				String roleName = role.getName();
-
-				role.getGuild().removeRoleFromMember(member, role).queue();
-				rolesBackup.remove(roleName);
-				
-				changesWereMade = true;
-			}
+		// Remove Old Groups
+		for(String mcgroup : groupsToRemove) {
+			rolesBackup.remove(mcgroup);
+			this.instance.getPermsAPI().removeGroup(uuid, mcgroup);
 		}
 
 		this.instance.getVerifyManager().setBackupRoles(uuid, rolesBackup);
-		if(changesWereMade)
-			this.instance.getVerifySQL().updateRoles(uuid, rolesBackup);
+		this.instance.getVerifySQL().updateRoles(uuid, rolesBackup);
 	}
-
-	public void resetRoles(UUID uuid, Member member) {
-		if(this.instance.getDiscordManager() == null) 
+	
+	//Check for Role Updates: Minecraft -> Discord
+	public void syncRolesFromMinecraft(UUID uuid, Member member, String[] currentGroupList) {
+			
+		DiscordBot discordBot = this.getDiscordBot();
+		if(discordBot == null) 
 			return;
+
+		if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync))
+			return;
+			
+		//NOT CORRECTLY VERIFIED
+		if(!this.instance.getVerifyManager().isVerified(uuid) || this.instance.getVerifyManager().getVerfiedWith(uuid) != member.getIdLong())
+			return;
+
+		List<String> rolesBackup = this.instance.getVerifyManager().getBackupRoles(uuid);
+		if(rolesBackup == null)
+			rolesBackup = new ArrayList<>();
+
+		List<String> rolesToAdd = new ArrayList<>();
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
+			for(String mcgroups : currentGroupList)
+				rolesToAdd.add(mcgroups);
+		else {
+			outer: for(String mcgroups : currentGroupList)
+				for(String mcGroup : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
+					if(mcGroup.equalsIgnoreCase(mcgroups)) {
+						rolesToAdd.add(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + mcGroup));
+						continue outer;
+					}
+		}
+			
+		//This is a list, that wont change for the loop
+		//It contains all added, but old groups
+		//This doesn't mean, that all groups of the player are listed here.
+		List<String> newBackupRoles = new ArrayList<>(rolesBackup);
+		List<String> rolesToRemove = new ArrayList<>();
+			
+		for(String backupRoles : rolesBackup) {
+			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames")) {
+				rolesToRemove.add(backupRoles);
+				newBackupRoles.remove(backupRoles);
+			}else {
+				for(String mcGroup : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
+					if(mcGroup.equalsIgnoreCase(backupRoles)) {
+						rolesToRemove.add(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + mcGroup));
+						newBackupRoles.remove(backupRoles);
+					}
+			}
+		}
+
+		// Add New Groups, besides the already added ones
+		outer: for(String role : rolesToAdd) {
+			for(String oldGroups: rolesBackup)
+				if(oldGroups.equalsIgnoreCase(role))
+					continue outer;
+				
+			List<Role> roles = this.getCurrentGuild().getRolesByName(role, true);
+			if(roles.size() > 0)
+				this.getCurrentGuild().addRoleToMember(member, roles.get(0));
+		}
+			
+		// Remove Old Groups
+		for(String role : rolesToRemove) {
+			List<Role> roles = this.getCurrentGuild().getRolesByName(role, true);
+			if(roles.size() > 0)
+				this.getCurrentGuild().removeRoleFromMember(member, roles.get(0));
+		}
+
+		this.instance.getVerifyManager().setBackupRoles(uuid, rolesBackup);
+		this.instance.getVerifySQL().updateRoles(uuid, rolesBackup);
+	}
+	
+	// Remove all Minecraft Groups
+	public void resetMinecraftRoles(UUID uuid, Member member) {
 		
 		DiscordBot discordBot = this.getDiscordBot();
 		if(discordBot == null) 
@@ -596,26 +639,55 @@ public class DiscordManager {
 		List<String> rolesBackup = this.instance.getVerifyManager().getBackupRoles(uuid);
 		if(rolesBackup == null)
 			rolesBackup = new ArrayList<>();
-		
+
+		List<String> groupsToRemove = new ArrayList<>();
 		for(String backupRoles : rolesBackup) {
-			List<Role> roles = new ArrayList<>();
 			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
-				roles = discordBot.getJda().getRolesByName(backupRoles, true);
-			else {
-				String groupConfig = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + backupRoles.toLowerCase());
-				
-				if(groupConfig == null)
-					continue;
-				
-				roles = discordBot.getJda().getRolesByName(groupConfig, true);
-			}
-			if(roles.size() <= 0)
-				continue;
-				
-			Role role = roles.get(0);
-			role.getGuild().removeRoleFromMember(member, role).complete();
+				groupsToRemove.add(backupRoles);
+			else
+				for(String mcGroup : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
+					if(mcGroup.equalsIgnoreCase(backupRoles))
+						groupsToRemove.add(backupRoles);
 		}
 
+		// Remove Old Groups
+		for(String groups : groupsToRemove)
+			this.instance.getPermsAPI().removeGroup(uuid, groups);
+		
+		this.instance.getVerifyManager().removeBackupRoles(uuid);
+	}
+	
+	// Remove all Discord Roles
+	public void resetDiscordRoles(UUID uuid, Member member) {
+		
+		DiscordBot discordBot = this.getDiscordBot();
+		if(discordBot == null) 
+			return;
+		
+		if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync))
+			return;
+
+		List<String> rolesBackup = this.instance.getVerifyManager().getBackupRoles(uuid);
+		if(rolesBackup == null)
+			rolesBackup = new ArrayList<>();
+
+		List<String> rolesToRemove = new ArrayList<>();
+		for(String backupRoles : rolesBackup) {
+			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
+				rolesToRemove.add(backupRoles);
+			else
+				for(String mcGroup : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
+					if(mcGroup.equalsIgnoreCase(backupRoles))
+						rolesToRemove.add(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + mcGroup));
+		}
+
+		// Remove Old Groups
+		for(String roles : rolesToRemove) {
+			List<Role> roleResult = this.getCurrentGuild().getRolesByName(roles, true);
+			if(roleResult.size() > 0)
+				this.getCurrentGuild().removeRoleFromMember(member, roleResult.get(0));
+		}
+		
 		this.instance.getVerifyManager().removeBackupRoles(uuid);
 	}
 	
@@ -626,7 +698,7 @@ public class DiscordManager {
 			for(String key : placeholder.keySet()) {
 				String value = placeholder.get(key);
 				if(value != null)
-					message = message.replaceAll("(?i)%" + key.toLowerCase() + "%", value); //IGNORES UPPER CASE?
+					message = message.replaceAll("(?i)%" + key.toLowerCase() + "%", value);
 			}
 		}
 		message = message.replace("%n", System.lineSeparator());

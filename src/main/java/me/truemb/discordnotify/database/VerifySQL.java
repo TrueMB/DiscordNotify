@@ -214,7 +214,11 @@ public class VerifySQL {
 							else
 								currentGroupList = instance.getPermsAPI().getGroups(uuid);
 							
-							instance.getDiscordManager().checkForRolesUpdate(uuid, member, currentGroupList);
+							if(instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".syncDiscordToMinecraft")) {
+								instance.getDiscordManager().syncRolesFromDiscord(uuid, member);
+							}else {
+								instance.getDiscordManager().syncRolesFromMinecraft(uuid, member, currentGroupList);
+							}
 						}
 						
 					}

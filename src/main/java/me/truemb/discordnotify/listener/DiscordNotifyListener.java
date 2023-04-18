@@ -129,10 +129,10 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 					Member member = this.instance.getDiscordManager().getCurrentGuild().getMemberById(disuuid);
 					if(member == null) {
 						this.instance.getDiscordManager().getCurrentGuild().retrieveMemberById(disuuid).queue(mem -> {
-							this.instance.getDiscordManager().checkForRolesUpdate(uuid, mem, currentGroupList);
+							this.instance.getDiscordManager().syncRoles(uuid, mem, currentGroupList);
 						});
 					}else
-						this.instance.getDiscordManager().checkForRolesUpdate(uuid, member, currentGroupList);
+						this.instance.getDiscordManager().syncRoles(uuid, member, currentGroupList);
 				}
 			}
 		}
