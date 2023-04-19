@@ -179,6 +179,9 @@ public class DiscordManager {
 			channelId = this.instance.getConfigManager().getConfig().getLong("Options." + FeatureType.ServerStatus.toString() + ".serverSeperatedStatus." + server);
 		else
 			channelId = this.instance.getConfigManager().getChannelID(FeatureType.ServerStatus);
+		
+		if(channelId <= 0)
+			return;
 
 		HashMap<String, String> placeholder = new HashMap<>();
 		placeholder.put("server", server);
