@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import com.vdurmont.emoji.EmojiParser;
 
 import me.truemb.discordnotify.enums.FeatureType;
-import me.truemb.discordnotify.enums.MessageType;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.discordnotify.utils.JsonReader;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -62,7 +61,7 @@ public class DC_ChatListener extends ListenerAdapter {
 			
 		    //CHECK IF IT IS A MANAGED CHANNEL					
 		    if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat")) {
-		    	if(this.channel_id.get(FeatureType.Chat.toString()) == channelId) {
+		    	if(this.channel_id.containsKey(FeatureType.Chat.toString()) && this.channel_id.get(FeatureType.Chat.toString()) == channelId) {
 				
 			    	List<String> bypassList = this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Chat.toString() + ".bypassPrefix");
 					for(String prefix : bypassList) {
@@ -148,7 +147,7 @@ public class DC_ChatListener extends ListenerAdapter {
 							}
 			   				
 						});
-		   				return;
+		   				break;
 		   			}
 		   		}
 		   	}
@@ -211,9 +210,9 @@ public class DC_ChatListener extends ListenerAdapter {
     }
     
     private void getAllChannelIds() {
-    	this.instance.getUniversalServer().getLogger().info("Loading all Chat/Staff Channel Id's from the Webhook URLs.");
+    	this.instance.getUniversalServer().getLogger().info("Loading all Chat/Staff Channel Id's.");
 
-    	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat) && this.instance.getConfigManager().getMessageType(FeatureType.Chat) == MessageType.WEBHOOK) {
+    	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat)) {
 	    	if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat")) {
 	    		this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat").getKeys(false).forEach(servers -> {
 	    	    	String id = FeatureType.Chat.toString() + "_" + servers.toLowerCase();
@@ -236,7 +235,7 @@ public class DC_ChatListener extends ListenerAdapter {
 	    	}
     	}
     	
-    	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Staff) && this.instance.getConfigManager().getMessageType(FeatureType.Staff) == MessageType.WEBHOOK) {
+    	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Staff)) {
     		String id = FeatureType.Staff.toString();
 	    	
 			String channelIdAsString = this.instance.getConfigManager().getChannel(FeatureType.Staff);
