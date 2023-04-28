@@ -44,7 +44,9 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 		//ALWAYS ON JOIN
 		this.instance.getJoinTime().put(uuid, System.currentTimeMillis());
-		this.instance.getDiscordManager().getStaticEmbedManager().updateAllEmbeds();
+		
+		if(this.instance.getDiscordManager().getStaticEmbedManager() != null)
+			this.instance.getDiscordManager().getStaticEmbedManager().updateAllEmbeds();
 		
 		//CHECK FOR NAME CHANGE
 		this.instance.getOfflineInformationsSQL().checkForNameChange(uuid, up.getIngameName());
@@ -149,11 +151,11 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 
 		UUID uuid = up.getUUID();
 		String channelId = null;
-		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave"))
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave")) {
 			for(String servers : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave").getKeys(false))
 				if(servers.equalsIgnoreCase(serverName))
 					channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + servers);
-		else
+		}else
 			channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerJoinLeave);
 
 		//Server should not send Messages
@@ -237,7 +239,9 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			
 			this.instance.getJoinTime().remove(uuid);
 		}
-		this.instance.getDiscordManager().getStaticEmbedManager().updateAllEmbeds();
+		
+		if(this.instance.getDiscordManager().getStaticEmbedManager() != null)
+			this.instance.getDiscordManager().getStaticEmbedManager().updateAllEmbeds();
 		
 		//VERIFICATION
 		this.instance.getVerifyManager().clearVerficationProgress(uuid);
@@ -269,11 +273,11 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 
 		UUID uuid = up.getUUID();
 		String channelId = null;
-		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave"))
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave")) {
 			for(String servers : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave").getKeys(false))
 				if(servers.equalsIgnoreCase(serverName))
 					channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + servers);
-		else
+		}else
 			channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerJoinLeave);
 		
 		//Server should not send Messages
@@ -424,11 +428,11 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		//DISCORD DEATH MESSAGE
 		String server = up.getServer();
 		String channelId = null;
-		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerDeath.toString() + ".enableServerSeperatedDeath"))
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerDeath.toString() + ".enableServerSeperatedDeath")) {
 			for(String servers : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerDeath.toString() + ".serverSeperatedDeath").getKeys(false))
 				if(servers.equalsIgnoreCase(server))
 					channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerDeath.toString() + ".serverSeperatedDeath." + servers);
-		else
+		}else
 			channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerDeath);
 
 		//Server should not send Messages
