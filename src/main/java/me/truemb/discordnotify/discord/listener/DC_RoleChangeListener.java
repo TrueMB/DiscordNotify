@@ -20,14 +20,15 @@ public class DC_RoleChangeListener extends ListenerAdapter {
 		this.instance = plugin;
 	}
 
-    public void onRoleAdded(GuildMemberRoleAddEvent e) {
-
+	@Override
+    public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent e) {
+    	
     	if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync))
     		return;
     	
 		if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".syncDiscordToMinecraft"))
 			return;
-		
+
 		Member mem = e.getMember();
 		List<Role> roles = e.getRoles();
     	
@@ -35,33 +36,35 @@ public class DC_RoleChangeListener extends ListenerAdapter {
 		
 		if(uuid == null)
 			return;
+
+		List<String> oldRolesBackup = this.instance.getVerifyManager().getBackupRoles(uuid);
+		List<String> rolesBackup = new ArrayList<>(oldRolesBackup);
+		List<String> groups = this.instance.getDiscordManager().getRolesToMinecraftGroup(roles);
 		
-		List<String> groups = new ArrayList<>();
-		outer: for(Role r : roles) {
-			for(String group : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false)) {
-				if(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group).equalsIgnoreCase(r.getName())) {
-					groups.add(group);
-					continue outer;
-				}
-			}
-		}
 		//TODO BUNGEECORD PLUGIN MESSAGING CHANNEL?
-		groups.forEach(group -> {
-			if(!this.instance.getPermsAPI().isPlayerInGroup(uuid, group))
-				this.instance.getPermsAPI().addGroup(uuid, group);
-		});
+		outer: for(String group : groups) {
+			for(String backupRole : oldRolesBackup)
+				if(backupRole.equalsIgnoreCase(group))
+					continue outer;
+			
+			rolesBackup.add(group);
+			this.instance.getPermsAPI().addGroup(uuid, group);
+		}
+
+		this.instance.getVerifyManager().setBackupRoles(uuid, rolesBackup);
+		this.instance.getVerifySQL().updateRoles(uuid, rolesBackup);
 		
     }
-    
 
-    public void onRoleRemoved(GuildMemberRoleRemoveEvent e) {
+	@Override
+    public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent e) {
 
     	if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.RoleSync))
     		return;
-    	
+
 		if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".syncDiscordToMinecraft"))
 			return;
-		
+
 		Member mem = e.getMember();
 		List<Role> roles = e.getRoles();
     	
@@ -69,21 +72,23 @@ public class DC_RoleChangeListener extends ListenerAdapter {
 		
 		if(uuid == null)
 			return;
+
+		List<String> oldRolesBackup = this.instance.getVerifyManager().getBackupRoles(uuid);
+		List<String> rolesBackup = new ArrayList<>(oldRolesBackup);
+		List<String> groups = this.instance.getDiscordManager().getRolesToMinecraftGroup(roles);
 		
-		List<String> groups = new ArrayList<>();
-		outer: for(Role r : roles) {
-			for(String group : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false)) {
-				if(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group).equalsIgnoreCase(r.getName())) {
-					groups.add(group);
-					continue outer;
-				}
-			}
-		}
 		//TODO BUNGEECORD PLUGIN MESSAGING CHANNEL?
-		groups.forEach(group -> {
-			if(!this.instance.getPermsAPI().isPlayerInGroup(uuid, group))
-				this.instance.getPermsAPI().addGroup(uuid, group);
-		});
+		outer: for(String backupRole : oldRolesBackup)
+			for(String group : groups) {
+				if(backupRole.equalsIgnoreCase(group))
+					continue outer;
+
+			rolesBackup.remove(group);
+			this.instance.getPermsAPI().removeGroup(uuid, group);
+		}
+
+		this.instance.getVerifyManager().setBackupRoles(uuid, rolesBackup);
+		this.instance.getVerifySQL().updateRoles(uuid, rolesBackup);
 		
     }
 }

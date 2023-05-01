@@ -78,6 +78,18 @@ public class PermissionsAPI {
 		return null;
 	}
 	
+	public boolean doesGroupExists(String groupS) {
+		if(this.getPerms() != null && this.getPerms().hasGroupSupport()) {
+			for(String group : this.getPerms().getGroups()) {
+				if(group.equalsIgnoreCase(groupS))
+					return true;
+			}
+		}else if(this.getLuckPermsAPI() != null) {
+			return this.getLuckPermsAPI().doesGroupExists(groupS);
+		}
+		return false;
+	}
+	
 	public void addGroup(UUID uuid, String groupS) {
 		if(this.getPerms() != null && this.getPerms().hasGroupSupport()) {
 			this.getPerms().playerAddGroup(null, org.bukkit.Bukkit.getOfflinePlayer(uuid), groupS);

@@ -82,6 +82,10 @@ public class LuckPermsAPI {
 		return user.getCachedData().getMetaData().getPrefix();
 	}
 	
+	public boolean doesGroupExists(String groupS) {
+		Group group = this.getLuckPerms().getGroupManager().getGroup(groupS);
+		return group != null;
+	}
 	public void addGroup(UUID uuid, String groupS) {
 		Group group = this.getLuckPerms().getGroupManager().getGroup(groupS);
 		

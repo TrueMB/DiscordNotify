@@ -39,7 +39,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 import net.dv8tion.jda.api.utils.FileUpload;
 import okhttp3.OkHttpClient;
@@ -511,41 +510,46 @@ public class DiscordManager {
 		if(rolesBackup == null)
 			rolesBackup = new ArrayList<>();
 
+		List<String> oldRolesBackup = new ArrayList<>(rolesBackup);
+		List<String> currentDiscordGroups = this.getRolesToMinecraftGroup(member.getRoles());
 		List<String> groupsToAdd = new ArrayList<>();
-		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
-			for(Role roles : member.getRoles())
-				groupsToAdd.add(roles.getName());
-		else {
-			outer: for(Role r : member.getRoles())
-				for(String mcGroup : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
-					if(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + mcGroup).equalsIgnoreCase(r.getName())) {
-						groupsToAdd.add(mcGroup);
-						continue outer;
-					}
-			}
 		
 		//This is a list, that wont change for the loop
 		//It contains all added, but old groups
 		//This doesn't mean, that all groups of the player are listed here.
 		List<String> groupsToRemove = new ArrayList<>();
 		
-		for(String backupRoles : rolesBackup)
-			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
+		outer: for(String backupRoles : oldRolesBackup) {
+			for(String discordGroups : currentDiscordGroups) //Doesn't remove groups, that the player is still in
+				if(backupRoles.equalsIgnoreCase(discordGroups))
+					continue outer;
+			
+			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames")) {
 				groupsToRemove.add(backupRoles);
-			else
+				rolesBackup.remove(backupRoles);
+			}else {
 				for(String mcGroup : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
-					if(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + mcGroup).equalsIgnoreCase(backupRoles))
-						groupsToRemove.add(mcGroup);
+					if(mcGroup.equalsIgnoreCase(backupRoles)) {
+						groupsToRemove.add(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + mcGroup));
+						rolesBackup.remove(backupRoles);
+					}
+			}
+		}
 		
+		outer: for(String discordGroups : currentDiscordGroups) {
+			for(String backupRoles : oldRolesBackup)
+				if(backupRoles.equalsIgnoreCase(discordGroups))
+					continue outer;
+			
+			groupsToAdd.add(discordGroups);
+		}
 
 		// Add New Groups, besides the already added ones
-		outer: for(String mcgroup : groupsToAdd) {
-			for(String oldGroups: rolesBackup) {
-				if(oldGroups.equalsIgnoreCase(mcgroup))
-					continue outer;
+		for(String mcgroup : groupsToAdd) {
+			if(this.instance.getPermsAPI().doesGroupExists(mcgroup)) {
+				rolesBackup.add(mcgroup);
+				this.instance.getPermsAPI().addGroup(uuid, mcgroup);
 			}
-			rolesBackup.add(mcgroup);
-			this.instance.getPermsAPI().addGroup(uuid, mcgroup);
 		}
 		
 		// Remove Old Groups
@@ -711,6 +715,25 @@ public class DiscordManager {
 		
 		this.instance.getVerifyManager().removeBackupRoles(uuid);
 	}
+    
+    public List<String> getRolesToMinecraftGroup(List<Role> roles){
+    	List<String> groups = new ArrayList<>();
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames")) {
+			for(Role r : roles) {
+				groups.add(r.getName());
+			}
+		}else {
+			outer: for(Role r : roles) {
+				for(String group : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false)) {
+					if(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group).equalsIgnoreCase(r.getName())) {
+						groups.add(group);
+						continue outer;
+					}
+				}
+			}
+		}
+		return groups;
+    }
 	
 	//PLACEHOLDERS
 	public String getPlaceholderString(String message, HashMap<String, String> placeholder) {

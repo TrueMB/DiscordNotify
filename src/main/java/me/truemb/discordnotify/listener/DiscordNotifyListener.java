@@ -16,7 +16,6 @@ import me.truemb.universal.listener.UniversalEventhandler;
 import me.truemb.universal.player.UniversalLocation;
 import me.truemb.universal.player.UniversalPlayer;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 
 public class DiscordNotifyListener extends UniversalEventhandler{
 	
@@ -92,20 +91,10 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 				Member member = this.instance.getDiscordManager().getCurrentGuild().getMemberById(disuuid);
 				if(member == null) {
 					this.instance.getDiscordManager().getCurrentGuild().retrieveMemberById(disuuid).queue(mem -> {
-						outer: for(Role r : mem.getRoles())
-							for(String group : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
-								if(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group).equalsIgnoreCase(r.getName())) {
-									groups.add(group);
-									continue outer;
-								}
+						this.instance.getDiscordManager().syncRoles(uuid, mem, null);
 					});
 				}else {
-					outer: for(Role r : member.getRoles())
-						for(String group : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
-							if(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + group).equalsIgnoreCase(r.getName())) {
-								groups.add(group);
-								continue outer;
-							}
+					this.instance.getDiscordManager().syncRoles(uuid, member, null);
 				}
 				
 				//TODO BUNGEECORD PLUGIN MESSAGING CHANNEL?
