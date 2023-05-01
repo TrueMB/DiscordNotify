@@ -47,8 +47,10 @@ public class DC_RoleChangeListener extends ListenerAdapter {
 				if(backupRole.equalsIgnoreCase(group))
 					continue outer;
 			
-			rolesBackup.add(group);
-			this.instance.getPermsAPI().addGroup(uuid, group);
+			if(this.instance.getPermsAPI().doesGroupExists(group)) {
+				rolesBackup.add(group);
+				this.instance.getPermsAPI().addGroup(uuid, group);
+			}
 		}
 
 		this.instance.getVerifyManager().setBackupRoles(uuid, rolesBackup);
@@ -83,8 +85,10 @@ public class DC_RoleChangeListener extends ListenerAdapter {
 				if(backupRole.equalsIgnoreCase(group))
 					continue outer;
 
-			rolesBackup.remove(group);
-			this.instance.getPermsAPI().removeGroup(uuid, group);
+			if(this.instance.getPermsAPI().doesGroupExists(group)) {
+				rolesBackup.remove(group);
+				this.instance.getPermsAPI().removeGroup(uuid, group);
+			}
 		}
 
 		this.instance.getVerifyManager().setBackupRoles(uuid, rolesBackup);
