@@ -40,6 +40,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 import net.dv8tion.jda.api.utils.FileUpload;
 import okhttp3.OkHttpClient;
 
@@ -284,8 +285,8 @@ public class DiscordManager {
 		}
 
 		new Thread(() -> {
-			
-			TextChannel channel = this.getDiscordBot().getJda().getTextChannelById(channelId);
+
+			StandardGuildMessageChannel channel = this.getCurrentGuild().getNewsChannelById(channelId) == null ? this.getCurrentGuild().getTextChannelById(channelId) : this.getCurrentGuild().getNewsChannelById(channelId);
 
 			if(channel == null) {
 				this.instance.getUniversalServer().getLogger().warning("Couldn't send Message to channel: " + channelId);
@@ -346,7 +347,7 @@ public class DiscordManager {
 			return;
 		}
 
-		TextChannel channel = this.getDiscordBot().getJda().getTextChannelById(channelId);
+		StandardGuildMessageChannel channel = this.getCurrentGuild().getNewsChannelById(channelId) == null ? this.getCurrentGuild().getTextChannelById(channelId) : this.getCurrentGuild().getNewsChannelById(channelId);
 
 		if(channel == null) {
 			this.instance.getUniversalServer().getLogger().warning("Couldn't send Message to channel: " + channelId);
@@ -434,14 +435,14 @@ public class DiscordManager {
 			return;
 		}
 
-	    TextChannel tc = this.getDiscordBot().getJda().getTextChannelById(channelId);
+		StandardGuildMessageChannel channel = this.getCurrentGuild().getNewsChannelById(channelId) == null ? this.getCurrentGuild().getTextChannelById(channelId) : this.getCurrentGuild().getNewsChannelById(channelId);
 	    
-	    if(tc == null) {
+	    if(channel == null) {
 			this.instance.getUniversalServer().getLogger().warning("Couldn't find Channel with the ID: " + channelId);
 	    	return;
 	    }
 	    
-	    tc.sendMessage(this.getDiscordMessage(path, placeholder)).complete();
+	    channel.sendMessage(this.getDiscordMessage(path, placeholder)).complete();
     }
 	
 	public void sendDiscordMessage(long channelId, String path, HashMap<String, String> placeholder) {
@@ -451,14 +452,14 @@ public class DiscordManager {
 			return;
 		}
 
-	    TextChannel tc = this.getDiscordBot().getJda().getTextChannelById(channelId);
+		StandardGuildMessageChannel channel = this.getCurrentGuild().getNewsChannelById(channelId) == null ? this.getCurrentGuild().getTextChannelById(channelId) : this.getCurrentGuild().getNewsChannelById(channelId);
 	    
-	    if(tc == null) {
+	    if(channel == null) {
 			this.instance.getUniversalServer().getLogger().warning("Couldn't find Channel with the ID: " + channelId);
 	    	return;
 	    }
 	    
-	    tc.sendMessage(this.getDiscordMessage(path, placeholder)).queue();
+	    channel.sendMessage(this.getDiscordMessage(path, placeholder)).queue();
     }
 	
 	public void sendPrivateDiscordMessage(User user, String message) {
@@ -559,7 +560,6 @@ public class DiscordManager {
 	
 	//Check for Role Updates: Minecraft -> Discord
 	public void syncRolesFromMinecraft(UUID uuid, Member member, String[] currentGroupList) {
-			
 		DiscordBot discordBot = this.getDiscordBot();
 		if(discordBot == null) 
 			return;
@@ -570,61 +570,79 @@ public class DiscordManager {
 		//NOT CORRECTLY VERIFIED
 		if(!this.instance.getVerifyManager().isVerified(uuid) || this.instance.getVerifyManager().getVerfiedWith(uuid) != member.getIdLong())
 			return;
-
+		
 		List<String> rolesBackup = this.instance.getVerifyManager().getBackupRoles(uuid);
 		if(rolesBackup == null)
 			rolesBackup = new ArrayList<>();
-
-		List<String> rolesToAdd = new ArrayList<>();
-		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames"))
-			for(String mcgroups : currentGroupList)
-				rolesToAdd.add(mcgroups);
-		else {
-			outer: for(String mcgroups : currentGroupList)
-				for(String mcGroup : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
-					if(mcGroup.equalsIgnoreCase(mcgroups)) {
-						rolesToAdd.add(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + mcGroup));
-						continue outer;
-					}
-		}
-			
+		
 		//This is a list, that wont change for the loop
 		//It contains all added, but old groups
 		//This doesn't mean, that all groups of the player are listed here.
-		List<String> newBackupRoles = new ArrayList<>(rolesBackup);
+		List<String> oldBackupRoles = new ArrayList<>(rolesBackup);
 		List<String> rolesToRemove = new ArrayList<>();
 			
-		for(String backupRoles : rolesBackup) {
+		outer: for(String backupRoles : oldBackupRoles) {
+			for(String mcgroups : currentGroupList) //Doesn't remove groups, that the player is still in
+				if(backupRoles.equalsIgnoreCase(mcgroups))
+					continue outer;
+			
 			if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames")) {
 				rolesToRemove.add(backupRoles);
-				newBackupRoles.remove(backupRoles);
+				rolesBackup.remove(backupRoles);
 			}else {
 				for(String mcGroup : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false))
 					if(mcGroup.equalsIgnoreCase(backupRoles)) {
 						rolesToRemove.add(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + mcGroup));
-						newBackupRoles.remove(backupRoles);
+						rolesBackup.remove(backupRoles);
 					}
+			}
+		}
+
+		List<String> rolesToAdd = new ArrayList<>();
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.RoleSync.toString() + ".useIngameGroupNames")) {
+			outer: for(String mcgroups : currentGroupList) {
+				for(String oldGroup : oldBackupRoles) //Doesn't add groups, that the player is already in
+					if(oldGroup.equalsIgnoreCase(mcgroups))
+						continue outer;
+				
+				rolesToAdd.add(mcgroups);
+				rolesBackup.add(mcgroups);
+			}
+		}else {
+			outer: for(String mcgroups : currentGroupList) {
+				for(String oldGroup : oldBackupRoles) //Doesn't add groups, that the player is already in
+					if(oldGroup.equalsIgnoreCase(mcgroups))
+						continue outer;
+			
+				for(String mcGroup : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.RoleSync.toString() + ".customGroupSync").getKeys(false)) {
+					if(mcGroup.equalsIgnoreCase(mcgroups)) {
+						String g = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.RoleSync.toString() + ".customGroupSync." + mcGroup);
+						rolesToAdd.add(g);
+						rolesBackup.add(mcGroup);
+						continue outer;
+					}
+				}
 			}
 		}
 
 		// Add New Groups, besides the already added ones
 		outer: for(String role : rolesToAdd) {
-			for(String oldGroups: rolesBackup)
+			for(String oldGroups : oldBackupRoles)
 				if(oldGroups.equalsIgnoreCase(role))
 					continue outer;
-				
+			
 			List<Role> roles = this.getCurrentGuild().getRolesByName(role, true);
 			if(roles.size() > 0)
-				this.getCurrentGuild().addRoleToMember(member, roles.get(0));
+				this.getCurrentGuild().addRoleToMember(member, roles.get(0)).queue();
 		}
 			
 		// Remove Old Groups
 		for(String role : rolesToRemove) {
 			List<Role> roles = this.getCurrentGuild().getRolesByName(role, true);
 			if(roles.size() > 0)
-				this.getCurrentGuild().removeRoleFromMember(member, roles.get(0));
+				this.getCurrentGuild().removeRoleFromMember(member, roles.get(0)).queue();
 		}
-
+		
 		this.instance.getVerifyManager().setBackupRoles(uuid, rolesBackup);
 		this.instance.getVerifySQL().updateRoles(uuid, rolesBackup);
 	}
@@ -688,7 +706,7 @@ public class DiscordManager {
 		for(String roles : rolesToRemove) {
 			List<Role> roleResult = this.getCurrentGuild().getRolesByName(roles, true);
 			if(roleResult.size() > 0)
-				this.getCurrentGuild().removeRoleFromMember(member, roleResult.get(0));
+				this.getCurrentGuild().removeRoleFromMember(member, roleResult.get(0)).queue();
 		}
 		
 		this.instance.getVerifyManager().removeBackupRoles(uuid);

@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 
 public class StaticEmbedManager {
 	
@@ -46,8 +47,9 @@ public class StaticEmbedManager {
     		this.instance.getUniversalServer().getLogger().warning("Discord BOT is not ready.");
 			return;
 		}
-		
-		TextChannel channel = bot.getJda().getTextChannelById(channelId);
+
+		StandardGuildMessageChannel channel = this.instance.getDiscordManager().getCurrentGuild().getNewsChannelById(channelId) == null ? 
+				this.instance.getDiscordManager().getCurrentGuild().getTextChannelById(channelId) : this.instance.getDiscordManager().getCurrentGuild().getNewsChannelById(channelId);
 
 		if(channel == null) {
 			this.instance.getUniversalServer().getLogger().warning("Couldn't send Static Embed Message to Channel: " + channelId);
@@ -81,7 +83,8 @@ public class StaticEmbedManager {
 		}
 
 		MessageEmbed embed = this.getEmbed(embedPath);
-		TextChannel channel = bot.getJda().getTextChannelById(channelId);
+		StandardGuildMessageChannel channel = this.instance.getDiscordManager().getCurrentGuild().getNewsChannelById(channelId) == null ? 
+				this.instance.getDiscordManager().getCurrentGuild().getTextChannelById(channelId) : this.instance.getDiscordManager().getCurrentGuild().getNewsChannelById(channelId);
 		
 		channel.retrieveMessageById(messageId).queue(message -> {
 			message.editMessageEmbeds(embed).queue();
@@ -110,7 +113,8 @@ public class StaticEmbedManager {
 			if(channelId <= 0 || messageId <= 0)
 				continue;
 
-			TextChannel channel = bot.getJda().getTextChannelById(channelId);
+			StandardGuildMessageChannel channel = this.instance.getDiscordManager().getCurrentGuild().getNewsChannelById(channelId) == null ? 
+					this.instance.getDiscordManager().getCurrentGuild().getTextChannelById(channelId) : this.instance.getDiscordManager().getCurrentGuild().getNewsChannelById(channelId);
 			
 			Message message = channel.retrieveMessageById(messageId).complete();
 			message.delete().complete();
