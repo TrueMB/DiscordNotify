@@ -135,7 +135,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 	 * Will only trigger, if the JoinLeaveFeature is Active
 	 */
 	private void onPlayerJoinFeature(UniversalPlayer up, String serverName) {
-		if(up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Join")))
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options.activateBypassPermission") && up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Join")))
 			return;
 
 		UUID uuid = up.getUUID();
@@ -257,7 +257,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 	 */
 	private void onPlayerQuitFeature(UniversalPlayer up, String serverName) {
 
-		if(up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Leave")))
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options.activateBypassPermission") && up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Leave")))
 			return;
 
 		UUID uuid = up.getUUID();
@@ -325,7 +325,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 	private void onPlayerMessageFeature(UniversalPlayer up, String message) {
 		UUID uuid = up.getUUID();
 		
-		if(up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Chat")))
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options.activateBypassPermission") && up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Chat")))
 			return;
 		
 		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".onlyVerified") && !this.instance.getVerifyManager().isVerified(up.getUUID()))
@@ -411,7 +411,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		UUID uuid = up.getUUID();
 		String ingameName = up.getIngameName();
 
-		if(up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Death")))
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options.activateBypassPermission") && up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Death")))
 			return;
 		
 		//DISCORD DEATH MESSAGE
@@ -484,7 +484,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		
 		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerJoinLeave.toString() + ".enableServerSeperatedJoinLeave")) {
 			//SEND A MESSAGE TO THE OLD SERVER
-			if(!up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Leave"))) {
+			if(!this.instance.getConfigManager().getConfig().getBoolean("Options.activateBypassPermission") || !up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Leave"))) {
 				for(String server : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave").getKeys(false)){
 					if(server.equalsIgnoreCase(oldServerName)) {
 						String channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + server);
@@ -530,7 +530,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 			}
 			
 			//SEND A MESSAGE TO THE NEW SERVER
-			if(!up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Join"))) {
+			if(!this.instance.getConfigManager().getConfig().getBoolean("Options.activateBypassPermission") || !up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Join"))) {
 				for(String server : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave").getKeys(false)){
 					if(server.equalsIgnoreCase(newServerName)) {
 						String channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerJoinLeave.toString() + ".serverSeperatedJoinLeave." + server);
@@ -577,7 +577,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 
 		} else {
 
-			if(up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Join")))
+			if(this.instance.getConfigManager().getConfig().getBoolean("Options.activateBypassPermission") && up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Join")))
 				return;
 			
 			String channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerJoinLeave);

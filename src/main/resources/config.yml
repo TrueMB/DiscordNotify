@@ -23,6 +23,8 @@ FeaturesEnabled:
   ServerStatus: false
 Options:
   useMetrics: true
+  #This Setting enables the bypass permission. REMEMBER, players with this permission won't send discord messages for the feature
+  activateBypassPermission: false
   DiscordBot:
     #Please enter the Name of the Bot, that you defined in the config.toml of Spicord
     Name: 'default'
