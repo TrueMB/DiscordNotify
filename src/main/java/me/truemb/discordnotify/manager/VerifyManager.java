@@ -1,28 +1,15 @@
 package me.truemb.discordnotify.manager;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import org.spicord.bot.DiscordBot;
-
-import me.truemb.discordnotify.enums.FeatureType;
-import me.truemb.discordnotify.main.DiscordNotifyMain;
-
 public class VerifyManager {
-	
-	private DiscordNotifyMain instance;
 
     private HashMap<UUID, Long> verifyCache = new HashMap<>(); //CACHES THE AUTHENTICATION PROCESS
 
     private HashMap<UUID, Long> verifications = new HashMap<>(); //PLAYERS, THAT ARE VERFICATED
     private HashMap<UUID, List<String>> rolesBackup = new HashMap<>(); //ROLES, THAT THE PLAYER HAS
-	
-	public VerifyManager(DiscordNotifyMain plugin) {
-		this.instance = plugin;
-	}
-
 	
 	//PLAYER BACKUP ROLES -> To Reset the roles after unlinking
 	public void setBackupRoles(UUID uuid, List<String> list) {

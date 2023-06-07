@@ -123,7 +123,7 @@ public class DiscordNotifyMain {
 
 		//MANAGER
 		this.delayManager = new DelayManager();
-		this.verifyManager = new VerifyManager(this);
+		this.verifyManager = new VerifyManager();
 		this.offlineInformationManager = new OfflineInformationManager();
 		
 		//PERMISSIONS API

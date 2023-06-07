@@ -24,7 +24,6 @@ import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.discordnotify.utils.PlayerManager;
 import me.truemb.discordnotify.utils.TimeFormatter;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.StandardGuildMessageChannel;
 import net.dv8tion.jda.api.utils.FileUpload;
 
