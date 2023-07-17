@@ -10,8 +10,8 @@ plugins {
     
     id "io.freefair.lombok" version "6.6.1"
     
-    id 'net.minecrell.plugin-yml.bukkit' version '0.5.2'
-    id 'net.minecrell.plugin-yml.bungee' version '0.5.2'
+    id 'net.minecrell.plugin-yml.bukkit' version '0.6.0'
+    id 'net.minecrell.plugin-yml.bungee' version '0.6.0'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
@@ -148,6 +148,7 @@ bukkit {
     author = 'TrueMB'
     main = 'me.truemb.universal.minecraft.main.BukkitMain'
     
+    foliaSupported = true
     apiVersion = '1.16'
     
     softDepend = ['Vault', 'Spicord']
