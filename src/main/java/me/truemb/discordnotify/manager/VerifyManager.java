@@ -47,7 +47,7 @@ public class VerifyManager {
 	}
 	
 	public Long getVerfiedWith(UUID uuid) {
-		return this.verifications.get(uuid);
+		return this.verifications.get(uuid) != null ? this.verifications.get(uuid) : -1;
 	}
 	
 	public UUID getVerfiedWith(long uuid) {
