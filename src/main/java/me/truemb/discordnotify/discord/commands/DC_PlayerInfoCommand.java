@@ -135,13 +135,14 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 						String server = up != null && up.getServer() != null ? up.getServer() : instance.getOfflineInformationManager().getInformationString(uuid, InformationType.Bungee_Server);
 						if(server == null) server = "";
 						
-						Member member = command.getGuild().retrieveMemberById(instance.getVerifyManager().getVerfiedWith(uuid)).complete();
+						long disUUID = instance.getVerifyManager().getVerfiedWith(uuid);
+						Member targetMember = disUUID > 0 ? command.getGuild().retrieveMemberById(disUUID).complete() : null;
 						
 						placeholder.put("Player", username != null ? username : "");
 						placeholder.put("UUID", uuid.toString());
 						placeholder.put("Server", server);
 						placeholder.put("Location", location);
-						placeholder.put("Discordname", member != null ? member.getUser().getAsTag() : instance.getConfigManager().getConfig().getString("Options.DefaultValues.NotOnline"));
+						placeholder.put("Discordname", targetMember != null ? targetMember.getUser().getAsTag() : instance.getConfigManager().getConfig().getString("Options.DefaultValues.NotOnline"));
 						placeholder.put("IP", ip);
 						
 						if(lastplayed > 0) {
