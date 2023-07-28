@@ -37,6 +37,14 @@ public abstract class UniversalServer {
 		
 		return players.size() > 0 ? players.get(0) : null;
 	}
+
+	public UniversalPlayer getPlayer(String username) {
+		List<UniversalPlayer> players = this.onlinePlayers.stream()
+											.filter(up -> up.getIngameName().equals(username))
+											.collect(Collectors.toList());
+		
+		return players.size() > 0 ? players.get(0) : null;
+	}
 	
 	public abstract int getMaxPlayers();
 	

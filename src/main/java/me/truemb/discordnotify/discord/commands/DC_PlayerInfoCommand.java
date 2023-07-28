@@ -77,7 +77,24 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 					
 					@Override
 					public void run() {
-						UUID uuid = ingameNameOrUUID.length() <= 16 ? PlayerManager.getUUIDOffline(ingameNameOrUUID) : UUID.fromString(ingameNameOrUUID); //NEEDS TIME TO LOAD
+						UUID uuid = null;
+						String username = null;
+						
+						//Input is a playername
+						if(ingameNameOrUUID.length() <= 16) {
+							username = ingameNameOrUUID;
+							//Server is running in OnlineMode true
+							if(instance.getUniversalServer().isOnlineMode()) {
+								uuid = instance.getUniversalServer().getPlayer(username) == null ? PlayerManager.getUUIDOffline(username) : instance.getUniversalServer().getPlayer(username).getUUID();  //Online Check needs some time
+								
+							//Server runs in Offline Mode
+							}else{
+								uuid = PlayerManager.generateOfflineUUID(username);
+							}
+						//Input is a UUID
+						}else {
+							uuid = UUID.fromString(ingameNameOrUUID);
+						}
 						
 						if(uuid == null) {
 							command.getMessage().addReaction(Emoji.fromFormatted("❌")).queue();
@@ -86,9 +103,8 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 
 						SimpleDateFormat sdf = new SimpleDateFormat(instance.getConfigManager().getConfig().getString("Options.DateFormat.Date") + " " + instance.getConfigManager().getConfig().getString("Options.DateFormat.Time"));
 
-						String username = ingameNameOrUUID.length() <= 16 ? ingameNameOrUUID : null;
 						if(username == null)
-							username = PlayerManager.getName(uuid.toString());
+							username = instance.getUniversalServer().getPlayer(uuid) != null ? instance.getUniversalServer().getPlayer(uuid).getIngameName() : PlayerManager.getName(uuid.toString());
 						
 						UniversalPlayer up = instance.getUniversalServer().getPlayer(uuid);
 						//GETTING THE CURRENT LOCATION OF AN ONLINE PLAYER
@@ -121,7 +137,7 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 						
 						Member member = command.getGuild().retrieveMemberById(instance.getVerifyManager().getVerfiedWith(uuid)).complete();
 						
-						placeholder.put("Player", username);
+						placeholder.put("Player", username != null ? username : "");
 						placeholder.put("UUID", uuid.toString());
 						placeholder.put("Server", server);
 						placeholder.put("Location", location);
