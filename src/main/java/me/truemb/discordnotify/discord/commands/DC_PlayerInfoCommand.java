@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.spicord.api.addon.SimpleAddon;
 import org.spicord.bot.DiscordBot;
 import org.spicord.bot.command.DiscordBotCommand;
@@ -83,6 +85,15 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 						//Input is a playername
 						if(ingameNameOrUUID.length() <= 16) {
 							username = ingameNameOrUUID;
+							
+							for(OfflinePlayer op : Bukkit.getOfflinePlayers()) {
+								if(op.getName().equalsIgnoreCase(username)) {
+									uuid = op.getUniqueId();
+									break;
+								}
+							}
+							
+							/* OLD TRY
 							//Server is running in OnlineMode true
 							if(instance.getUniversalServer().isOnlineMode()) {
 								uuid = instance.getUniversalServer().getPlayer(username) == null ? PlayerManager.getUUIDOffline(username) : instance.getUniversalServer().getPlayer(username).getUUID();  //Online Check needs some time
@@ -91,6 +102,7 @@ public class DC_PlayerInfoCommand extends SimpleAddon {
 							}else{
 								uuid = PlayerManager.generateOfflineUUID(username);
 							}
+							*/
 						//Input is a UUID
 						}else {
 							uuid = UUID.fromString(ingameNameOrUUID);
