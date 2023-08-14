@@ -1,7 +1,5 @@
-package me.truemb.discordnotify.database;
+package me.truemb.discordnotify.database.connector;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,15 +12,20 @@ import me.truemb.discordnotify.manager.ConfigManager;
 
 public class AsyncMySQL {
 	
-	//https://www.youtube.com/watch?v=dHjp0pRhGhk
-	
 	private ExecutorService executor;
-	private MySQL sql;
+	private DatabaseConnector sql;
 	
 	private String databaseName;
 
 	public AsyncMySQL(Logger logger, ConfigManager configManager) throws Exception {
-				
+
+		String type = configManager.getConfig().getString("Database.type");
+		DatabaseStorage storage = DatabaseStorage.getStorageFromString(type);
+		
+		if(storage == null)
+			throw new Exception("The Database Storage Type is invalid! '" + type + "'");
+			
+		
 		String host = configManager.getConfig().getString("Database.host");
 		int port = configManager.getConfig().getInt("Database.port");
 		boolean useSSL = configManager.getConfig().getBoolean("Database.useSSL");
@@ -39,7 +42,7 @@ public class AsyncMySQL {
 			throw new Exception("No Database connected.");
 		} else {
 		
-			this.sql = new MySQL(host, port, user, password, this.databaseName, useSSL);
+			this.sql = new DatabaseConnector(storage, host, port, user, password, this.databaseName, useSSL);
 			this.executor = Executors.newCachedThreadPool();
 		}
 	}
@@ -95,112 +98,7 @@ public class AsyncMySQL {
 		return null;
 	}
 
-	public MySQL getMySQL() {
+	public DatabaseConnector getMySQL() {
 		return this.sql;
-	}
-
-	public static class MySQL {
-
-		private String host, user, password, database;
-		private int port;
-		private boolean useSSL;
-
-		private Connection conn;
-
-		public MySQL(String host, int port, String user, String password, String database, boolean useSSL) throws Exception {
-			this.host = host;
-			this.port = port;
-			this.user = user;
-			this.password = password;
-			this.database = database;
-			this.useSSL = useSSL;
-
-			this.openConnection();
-		}
-
-		public void queryUpdate(String query) {
-			checkConnection();
-			try (PreparedStatement statement = conn.prepareStatement(query)) {
-				queryUpdate(statement);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		public void queryUpdate(PreparedStatement statement) {
-			checkConnection();
-			try {
-				statement.executeUpdate();
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					statement.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-
-		public ResultSet query(String query) {
-			checkConnection();
-			try {
-				return query(conn.prepareStatement(query));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return null;
-		}
-
-		public ResultSet query(PreparedStatement statement) {
-			checkConnection();
-			try {
-				return statement.executeQuery();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			return null;
-		}
-
-		public Connection getConnection() {
-			return this.conn;
-		}
-
-		public void checkConnection() {
-			try {
-				if (this.conn == null || !this.conn.isValid(10) || this.conn.isClosed())
-					openConnection();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		public Connection openConnection() throws Exception {
-	        Class.forName("com.mysql.cj.jdbc.Driver");
-			return this.conn = DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + this.database + "?autoReconnect=true&failOverReadOnly=false&maxReconnects=10&useSSL=" + String.valueOf(this.useSSL), this.user, this.password);
-		}
-		
-		public void closeRessources(ResultSet rs, PreparedStatement st){
-			if(rs != null){
-				try {
-					rs.close();
-				} catch (SQLException e) {}
-			}
-			if(st != null){
-				try {
-					st.close();
-				} catch (SQLException e) {}
-			}
-		}
-
-		public void closeConnection() {
-			try {
-				this.conn.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} finally {
-				this.conn = null;
-			}
-		}
 	}
 }

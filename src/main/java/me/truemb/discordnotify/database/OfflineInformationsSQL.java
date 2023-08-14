@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import me.truemb.discordnotify.database.connector.AsyncMySQL;
 import me.truemb.discordnotify.enums.InformationType;
 import me.truemb.discordnotify.manager.OfflineInformationManager;
 

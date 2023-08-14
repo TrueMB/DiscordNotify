@@ -5,10 +5,12 @@
 #
 #Your MySQL Connection Settings
 #If you got problems to establish a Connection, try disabling the "useSSL".
+#Databases Types: MARIADB, MYSQL
 Database:
+  type: 'MARIADB'
   host: 'ipaddress'
   port: 3306
-  useSSL: true
+  useSSL: false
   user: 'admin'
   password: 'S€CR3T'
   database: 'Database'

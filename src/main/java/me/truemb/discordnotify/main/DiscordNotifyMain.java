@@ -14,9 +14,9 @@ import java.util.concurrent.TimeUnit;
 import org.bukkit.OfflinePlayer;
 
 import lombok.Getter;
-import me.truemb.discordnotify.database.AsyncMySQL;
 import me.truemb.discordnotify.database.OfflineInformationsSQL;
 import me.truemb.discordnotify.database.VerifySQL;
+import me.truemb.discordnotify.database.connector.AsyncMySQL;
 import me.truemb.discordnotify.enums.FeatureType;
 import me.truemb.discordnotify.enums.InformationType;
 import me.truemb.discordnotify.listener.DiscordNotifyListener;
@@ -255,6 +255,7 @@ public class DiscordNotifyMain {
 			
 			this.getUniversalServer().getLogger().info("{MySQL}  successfully connected to Database.");
 		} catch (Exception e) {
+			e.printStackTrace();
 			this.getUniversalServer().getLogger().warning("{MySQL}  Failed to start MySql (" + e.getMessage() + ")");
 		}
 	}
