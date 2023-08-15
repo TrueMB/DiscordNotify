@@ -91,6 +91,10 @@ public class ConfigManager {
 	public String getMinecraftMessage(String path, boolean prefix) {
 		return (prefix ? this.translateHexColorCodes(this.getConfig().getString("Messages.prefix")) + " " : "") + this.translateHexColorCodes(this.getConfig().getString("Messages." + path));
 	}
+	
+	public String getPlaceholder(String path) {
+		return this.translateHexColorCodes(this.getConfig().getString("PlaceholderAPI." + path));
+	}
 		
 	private String translateHexColorCodes(String message){
 		

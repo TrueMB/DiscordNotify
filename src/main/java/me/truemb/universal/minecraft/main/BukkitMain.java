@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
 import lombok.Getter;
+import me.truemb.discordnotify.api.PlaceholderAPI;
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.discordnotify.main.PluginDescription;
 import me.truemb.universal.enums.ServerType;
@@ -42,6 +43,8 @@ public class BukkitMain extends JavaPlugin implements IRelay {
 	public void onEnable() {
 		this.instance = new DiscordNotifyMain(this.getDataFolder(), ServerType.BUKKIT, new PluginDescription(this.getDescription().getName(), this.getDescription().getAuthors().get(0), this.getDescription().getVersion()));
 	    this.adventure = BukkitAudiences.create(this);
+	    
+	    this.setupPlaceholderAPI();
 		
 		//MESSAGING CHANNEL
         this.getServer().getMessenger().registerOutgoingPluginChannel(this, "messagechannel:proxy");
@@ -119,6 +122,18 @@ public class BukkitMain extends JavaPlugin implements IRelay {
             exception.printStackTrace();
         }
     }
+    
+	private void setupPlaceholderAPI() {
+		
+		//PLUGIN WAS FOUND
+	    if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null){
+	        new PlaceholderAPI(this.instance).register();
+			this.getLogger().info("PlacerHolderAPI was found and registered!");
+	    }else {
+			this.getLogger().info("PlacerHolderAPI was not found. (It's not needed, but supported)");
+	    }
+		
+	}
 
     @Override
     public boolean send(PipelineMessage message, byte[] data) {

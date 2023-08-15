@@ -445,7 +445,14 @@ StaticEmbeds:
       - 'Motd : %motd%'
     Author: 'STATIC EMBED'
     Color: 'WHITE'
-    DisableTimestamp: false
+    DisableTimestamp: 
+    
+# Placeholder default values;
+PlaceholderAPI:
+  # Placeholder Results
+  isVerified:
+    true: 'true'
+    false: 'false'
 
   #Do NOT touch
 ConfigVersion: 24
