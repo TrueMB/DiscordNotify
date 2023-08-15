@@ -455,4 +455,4 @@ PlaceholderAPI:
     false: 'false'
 
   #Do NOT touch
-ConfigVersion: 24
+ConfigVersion: 25
