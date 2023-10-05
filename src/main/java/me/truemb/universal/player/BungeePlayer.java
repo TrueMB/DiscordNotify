@@ -3,6 +3,7 @@ package me.truemb.universal.player;
 import me.truemb.universal.enums.ServerType;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class BungeePlayer extends UniversalPlayer{
@@ -28,7 +29,7 @@ public class BungeePlayer extends UniversalPlayer{
 
 	@Override
 	public void sendMessage(String message) {
-		this.getBungeePlayer().sendMessage(new net.md_5.bungee.api.chat.TextComponent(message));
+		this.getBungeePlayer().sendMessage(TextComponent.fromLegacyText(message));
 	}
 
 	@Override

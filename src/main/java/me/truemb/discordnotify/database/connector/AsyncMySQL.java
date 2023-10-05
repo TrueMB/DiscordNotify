@@ -32,6 +32,8 @@ public class AsyncMySQL {
 		String user = configManager.getConfig().getString("Database.user");
 		String password = configManager.getConfig().getString("Database.password");
 		this.databaseName = configManager.getConfig().getString("Database.database");
+
+		logger.info("{SQL} Connecting to " + type + " Database...");
 		
 		if (host.equalsIgnoreCase("ipaddress")) {
 			

@@ -237,7 +237,7 @@ public class DiscordNotifyMain {
 	
 	//MySQL
 	private void startMySql() {
-		this.getUniversalServer().getLogger().info("{MySQL}  starting MySQL . . .");
+		this.getUniversalServer().getLogger().info("{SQL} starting SQL . . .");
 		
 		try {
 			this.asyncMySql = new AsyncMySQL(this.getUniversalServer().getLogger(), this.getConfigManager());
@@ -253,10 +253,10 @@ public class DiscordNotifyMain {
 				}
 			}, 2, TimeUnit.SECONDS);
 			
-			this.getUniversalServer().getLogger().info("{MySQL}  successfully connected to Database.");
+			this.getUniversalServer().getLogger().info("{SQL} successfully connected to Database.");
 		} catch (Exception e) {
 			e.printStackTrace();
-			this.getUniversalServer().getLogger().warning("{MySQL}  Failed to start MySql (" + e.getMessage() + ")");
+			this.getUniversalServer().getLogger().warning("{SQL} Failed to start SQL (" + e.getMessage() + ")");
 		}
 	}
 }
