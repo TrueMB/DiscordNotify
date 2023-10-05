@@ -4,6 +4,7 @@ import com.velocitypowered.api.proxy.Player;
 
 import me.truemb.universal.enums.ServerType;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class VelocityPlayer extends UniversalPlayer{
 	
@@ -26,7 +27,7 @@ public class VelocityPlayer extends UniversalPlayer{
 
 	@Override
 	public void sendMessage(String message) {
-		this.getVelocityPlayer().sendMessage(Component.text(message));
+		this.getVelocityPlayer().sendMessage(LegacyComponentSerializer.builder().hexColors().build().deserialize(message));
 	}
 
 	@Override
