@@ -72,6 +72,12 @@ Options:
     serverSeperatedDeath:
       lobby: -1
       freebuild: -1
+  PlayerAdvancement:
+    MessageType: MESSAGE
+    enableServerSeperatedAdvancement: false
+    serverSeperatedAdvancement:
+      lobby: -1
+      freebuild: -1
   Broadcast:
     #Sends the Message in the specified discord Channel to all named minecraft servers.
     # * = all servers; otherwise the exact configurated name of the server
@@ -173,11 +179,13 @@ Permissions:
     Join: 'dn.bypass.join'
     Leave: 'dn.bypass.leave'
     Death: 'dn.bypass.death'
+    Advancement: 'dn.bypass.advancement'
 #Channel Ids: https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-
 Channel:
   Inactivity: -1
   PlayerJoinLeave: -1
   PlayerDeath: -1
+  PlayerAdvancement: -1
   Chat: -1
   #Should be a seperated Channel from the chat, because players can send message back to the server,
   #but the system wouldnt know, if it is a chat or staff 
@@ -230,6 +238,7 @@ DiscordMessages:
   PlayerServerChangeJoinMessage: '**%Player%** joined the server from %old%.'
   PlayerServerChangeLeaveMessage: '**%Player%** left the server and went to %target%.'
   PlayerDeathMessage: '%DeathMessage%'
+  PlayerAdvancementMessage: 'Player %Player% received the Advancement: %AdvancementName%'
   UserNotVerified: 'Your are not Verified. Your Message got deleted.'
   ChatMessage: '%Player%: %Message%'
   StaffMessage: '%Player%: %Message%'
@@ -342,6 +351,16 @@ DiscordEmbedMessages:
     WithPicture: true
     PictureType: BUST
     PictureSize: 100
+  AdvancementEmbed:
+    Title: '**%Player%** received an Advancement.'
+    Description: '%AdvancementName%'
+    Fields: {}
+    Author: 'Advancement'
+    #https://docs.oracle.com/javase/7/docs/api/java/awt/Color.html
+    Color: 'WHITE'
+    DisableTimestamp: false
+    WithAuthorPicture: false
+    WithPicture: false
   ChatEmbed:
     Title: '**%Player%** wrote:'
     Description: '%Message%'
@@ -426,6 +445,9 @@ DiscordWebhookMessages:
   Death:
     Description: '%DeathMessage%'
     PictureType: HELM
+  Advancement:
+    Description: 'Player %Player% received the Advancement: %AdvancementName%'
+    PictureType: HELM
   Chat:
     Description: '%Message%'
     PictureType: HELM
@@ -455,4 +477,4 @@ PlaceholderAPI:
     false: 'false'
 
   #Do NOT touch
-ConfigVersion: 25
+ConfigVersion: 26

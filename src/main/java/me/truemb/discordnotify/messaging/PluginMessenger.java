@@ -52,6 +52,14 @@ public class PluginMessenger {
 					
 					instance.getListener().onPlayerDeath(up, deathMessage);
 					
+				}else if (subChannel.equalsIgnoreCase("ADVANCEMENT")) {
+					
+					UUID uuid = message.getTarget();
+					UniversalPlayer up = instance.getUniversalServer().getPlayer(uuid);
+					String advancementKey = (String) rows.get(1);
+					
+					instance.getListener().onPlayerAdvancement(up, advancementKey);
+					
 				}else if (subChannel.equalsIgnoreCase("GET_GROUPS_ANSWER")) {
 					
 					UUID uuid = message.getTarget();
@@ -186,6 +194,16 @@ public class PluginMessenger {
 		
 		message.write("DEATH");
 		message.write(deathMessage);
+		
+		this.pipeline.send(message);
+	}
+	
+	public void sendPlayerAdvancement(UUID uuid, String advancementKey) {
+
+		PipelineMessage message = new PipelineMessage(uuid);
+		
+		message.write("ADVANCEMENT");
+		message.write(advancementKey);
 		
 		this.pipeline.send(message);
 	}

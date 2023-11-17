@@ -5,6 +5,7 @@ public enum FeatureType {
 	Inactivity(false),
 	PlayerJoinLeave(false),
 	PlayerDeath(false),
+	PlayerAdvancement(false),
 	Chat(false),
 	Staff(false),
 	RoleSync(false),

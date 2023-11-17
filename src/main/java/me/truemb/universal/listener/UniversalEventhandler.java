@@ -17,5 +17,7 @@ public abstract class UniversalEventhandler {
 	public abstract void onPlayerMessage(UniversalPlayer up, String message);
 	
 	public abstract void onPlayerDeath(UniversalPlayer up, String message);
+	
+	public abstract void onPlayerAdvancement(UniversalPlayer up, String message);
 
 }

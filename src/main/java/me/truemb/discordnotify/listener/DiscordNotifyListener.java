@@ -617,4 +617,75 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		}
 	}
 
+	@Override
+	public void onPlayerAdvancement(UniversalPlayer up, String advancementKey) {
+
+		//IF FEATURE ENABLED
+		if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.PlayerAdvancement))
+			return;
+		
+		if(this.instance.getUniversalServer().isProxySubServer()){
+			this.instance.getPluginMessenger().sendPlayerAdvancement(up.getUUID(), advancementKey);
+			return;
+		}
+		
+		UUID uuid = up.getUUID();
+		String ingameName = up.getIngameName();
+
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options.activateBypassPermission") && up.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.Bypass.Advancement")))
+			return;
+		
+		//DISCORD DEATH MESSAGE
+		String server = up.getServer();
+		String channelId = null;
+		if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.PlayerAdvancement.toString() + ".enableServerSeperatedAdvancement")) {
+			for(String servers : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.PlayerAdvancement.toString() + ".serverSeperatedAdvancement").getKeys(false))
+				if(servers.equalsIgnoreCase(server))
+					channelId = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.PlayerAdvancement.toString() + ".serverSeperatedAdvancement." + servers);
+		}else
+			channelId = this.instance.getConfigManager().getChannel(FeatureType.PlayerAdvancement);
+
+		//Server should not send Messages
+		if(channelId == null || channelId.equals("") || channelId.equals("-1"))
+			return;
+		
+		HashMap<String, String> placeholder = new HashMap<>();
+		placeholder.put("Player", ingameName);
+		placeholder.put("UUID", uuid.toString());
+		placeholder.put("AdvancementName", advancementKey);
+		
+		switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerAdvancement)) {
+			case MESSAGE: {
+				try {
+					this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "PlayerAdvancementMessage", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerAdvancement.toString() + " couldn't parse the Channel ID.");
+				}
+				break;
+			}
+			case EMBED: {
+				try {
+					this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "AdvancementEmbed", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.PlayerAdvancement.toString() + " couldn't parse the Channel ID.");
+				}
+				break;
+			}
+			case WEBHOOK: {
+	
+				WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.PlayerAdvancement, server, channelId);
+				
+				String minotarTypeS = instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Advancement.PictureType");
+				MinotarTypes minotarType = MinotarTypes.BUST;
+				try {
+					minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+				}catch(Exception ex) { /* NOTING */ }
+				
+				String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Advancement.Description");
+				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description, placeholder);
+				break;
+			}
+		}
+	}
+
 }

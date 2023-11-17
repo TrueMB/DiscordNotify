@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.advancement.AdvancementEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.message.PlayerChatEvent;
@@ -80,6 +81,20 @@ public class SpongeEventsListener {
 		String deathMessage = PlainTextComponentSerializer.plainText().serialize(e.message());
 		
 		this.plugin.getListener().onPlayerDeath(up, deathMessage);
+	}
+	
+
+	@Listener
+	public void onAdvancement(AdvancementEvent.Grant e) {
+		
+		ServerPlayer p = e.player();
+		
+		UUID uuid = p.uniqueId();
+		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
+		e.advancement().displayInfo().ifPresent(info -> {
+			this.plugin.getListener().onPlayerAdvancement(up, PlainTextComponentSerializer.plainText().serialize(info.title()));
+		});
+		
 	}
 	
 }

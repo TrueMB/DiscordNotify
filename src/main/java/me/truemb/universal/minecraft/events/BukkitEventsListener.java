@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -86,6 +87,18 @@ public class BukkitEventsListener implements Listener {
 		String deathMessage = e.getDeathMessage();
 		
 		this.plugin.getListener().onPlayerDeath(up, deathMessage);
+	}
+	
+	@EventHandler
+	public void onAdvancement(PlayerAdvancementDoneEvent e) {
+		
+		Player p = e.getPlayer();
+		
+		UUID uuid = p.getUniqueId();
+		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
+		String advancementKey = e.getAdvancement().getKey().getNamespace();
+		
+		this.plugin.getListener().onPlayerAdvancement(up, advancementKey);
 	}
 	
 }
