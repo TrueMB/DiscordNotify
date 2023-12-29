@@ -31,18 +31,21 @@ public class OfflineInformationsSQL {
 	}
 	
 	public void checkForNameChange(UUID uuid, String ingameName) {
-		this.asyncMysql.queryUpdate("INSERT INTO " + OfflineInformationsSQL.table + " (uuid, ingamename) VALUES ('" + uuid.toString() + "', '" + ingameName + "') "
-				+ "ON DUPLICATE KEY UPDATE ingamename='" + ingameName + "';");
+		this.asyncMysql.queryUpdate("INSERT INTO " + OfflineInformationsSQL.table + " (uuid, ingamename) VALUES (?, ?) "
+				+ "ON DUPLICATE KEY UPDATE ingamename=?;",
+			uuid.toString(), ingameName, ingameName);
 	}
 	
 	public void updateInformation(UUID uuid, InformationType type, String value){
-		this.asyncMysql.queryUpdate("INSERT INTO " + OfflineInformationsSQL.table + " (uuid, " + type.toString() + ") VALUES ('" + uuid.toString() + "', '" + value + "') "
-				+ "ON DUPLICATE KEY UPDATE " + type.toString() + "='" + value + "';");
+		this.asyncMysql.queryUpdate("INSERT INTO " + OfflineInformationsSQL.table + " (uuid, " + type.toString() + ") VALUES (?,?) "
+				+ "ON DUPLICATE KEY UPDATE " + type.toString() + "=?;",
+			uuid.toString(), value, value);
 	}
 	
 	public void updateInformation(UUID uuid, InformationType type, long value){
-		this.asyncMysql.queryUpdate("INSERT INTO " + OfflineInformationsSQL.table + " (uuid, " + type.toString() + ") VALUES ('" + uuid.toString() + "', '" + value + "') "
-				+ "ON DUPLICATE KEY UPDATE " + type.toString() + "='" + value + "';");
+		this.asyncMysql.queryUpdate("INSERT INTO " + OfflineInformationsSQL.table + " (uuid, " + type.toString() + ") VALUES (?,?) "
+				+ "ON DUPLICATE KEY UPDATE " + type.toString() + "=?;",
+			uuid.toString(), String.valueOf(value), String.valueOf(value));
 	}
 	
 	/**
@@ -53,8 +56,9 @@ public class OfflineInformationsSQL {
 	 * @param value - Value of the Type
 	 */
 	public void addToInformation(UUID uuid, InformationType type, long value){
-		this.asyncMysql.queryUpdate("INSERT INTO " + OfflineInformationsSQL.table + " (uuid, " + type.toString() + ") VALUES ('" + uuid.toString() + "', '" + value + "') "
-				+ "ON DUPLICATE KEY UPDATE " + type.toString() + "=IFNULL(" + type.toString() + ", 0) + '" + value + "';");
+		this.asyncMysql.queryUpdate("INSERT INTO " + OfflineInformationsSQL.table + " (uuid, " + type.toString() + ") VALUES (?,?) "
+				+ "ON DUPLICATE KEY UPDATE " + type.toString() + "=IFNULL(" + type.toString() + ", 0) + ?;",
+			uuid.toString(), String.valueOf(value), String.valueOf(value));
 	}
 	
 	public void setup() {

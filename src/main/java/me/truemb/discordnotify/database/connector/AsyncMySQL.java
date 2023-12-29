@@ -73,8 +73,8 @@ public class AsyncMySQL {
 		this.executor.execute(() -> this.sql.queryUpdate(statement));
 	}
 
-	public void queryUpdate(String statement) {
-		this.executor.execute(() -> sql.queryUpdate(statement));
+	public void queryUpdate(String statement, String... args) {
+		this.executor.execute(() -> sql.queryUpdate(statement, args));
 	}
 	
 	public void prepareStatement(PreparedStatement statement, Consumer<ResultSet> consumer) {
