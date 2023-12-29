@@ -36,9 +36,12 @@ public class DatabaseConnector {
 		this.openConnection();
 	}
 
-	public void queryUpdate(String query) {
+	public void queryUpdate(String query, String... args) {
 		checkConnection();
 		try (PreparedStatement statement = conn.prepareStatement(query)) {
+			for (int i = 0; i < args.length; i++) {
+				statement.setString(i + 1, args[i]);
+			}
 			queryUpdate(statement);
 		} catch (Exception e) {
 			e.printStackTrace();
