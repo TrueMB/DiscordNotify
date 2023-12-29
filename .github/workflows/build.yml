@@ -1,0 +1,28 @@
+name: Build DiscordNotify JAR
+on: [ push, pull_request ]
+jobs:
+  build:
+    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          cache: 'gradle'
+          java-version: '17'
+          distribution: 'adopt'
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Build
+        run: |
+          ./gradlew build
+          ./gradlew shadowJar
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: DiscordNotify
+          path: "build/libs/*-all.jar"

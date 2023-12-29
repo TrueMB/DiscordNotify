@@ -97,7 +97,7 @@ dependencies {
 group = 'DiscordNotify'
 version = '3.3.4'
 description = 'DiscordNotify'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 sourceSets {
     main { 
