@@ -119,6 +119,7 @@ public class DC_VerifyCommand extends SimpleAddon {
     						
     	    				this.instance.getVerifyManager().removeVerified(mcuuid);
     	    				this.instance.getVerifySQL().deleteVerification(disUUID);
+    	    				this.instance.getPluginMessenger().sendPlayerUnverified(mcuuid);
     	    	    		command.reply(this.instance.getDiscordManager().getDiscordMessage("verification.unlinked", placeholder));
     	    	    		return;
     	    			}

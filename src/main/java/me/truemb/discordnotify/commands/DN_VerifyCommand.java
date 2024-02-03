@@ -93,6 +93,7 @@ public class DN_VerifyCommand {
 				
 				this.instance.getVerifyManager().removeVerified(uuid);
 				this.instance.getVerifySQL().deleteVerification(uuid);
+				this.instance.getPluginMessenger().sendPlayerUnverified(uuid);
 				up.sendMessage(this.instance.getConfigManager().getMinecraftMessage("verification.unlinked", true));
 				return;
 				

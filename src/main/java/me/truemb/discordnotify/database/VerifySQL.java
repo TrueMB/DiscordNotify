@@ -136,6 +136,7 @@ public class VerifySQL {
 					setVerfied(uuid, ingameName, disuuid);
 					instance.getVerifyManager().setVerified(uuid, disuuid);
 					instance.getVerifyManager().clearVerficationProgress(uuid);
+					instance.getPluginMessenger().sendPlayerVerified(uuid, disuuid);
 					
 					Member member = guild.getMemberById(disuuid);
 					if(member == null)

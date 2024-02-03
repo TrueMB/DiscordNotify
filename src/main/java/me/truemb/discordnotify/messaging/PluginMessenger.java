@@ -132,6 +132,18 @@ public class PluginMessenger {
 						else if(action == GroupAction.REMOVE)
 							instance.getPermsAPI().removeGroup(targetUUID, group);
 					}
+				}else if (subChannel.equalsIgnoreCase("VERIFIED")) {
+					
+					UUID targetUUID = message.getTarget();
+					long disuuid = (long) rows.get(1);
+					
+					instance.getVerifyManager().setVerified(targetUUID, disuuid);
+				
+				}else if (subChannel.equalsIgnoreCase("UNVERIFY")) {
+					
+					UUID targetUUID = message.getTarget();
+					
+					instance.getVerifyManager().removeVerified(targetUUID);
 				
 				}
 			}
@@ -219,6 +231,25 @@ public class PluginMessenger {
 		
 		message.write("GET_GROUPS_ANSWER");
 		message.write(groupS);
+		
+		this.pipeline.send(message);
+	}
+	
+	public void sendPlayerVerified(UUID uuid, long disuuid) {
+
+		PipelineMessage message = new PipelineMessage(uuid);
+		
+		message.write("VERIFIED");
+		message.write(disuuid);
+		
+		this.pipeline.send(message);
+	}
+	
+	public void sendPlayerUnverified(UUID uuid) {
+
+		PipelineMessage message = new PipelineMessage(uuid);
+		
+		message.write("UNVERIFY");
 		
 		this.pipeline.send(message);
 	}
