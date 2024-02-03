@@ -80,6 +80,7 @@ public class DN_StaffCommand {
 		placeholder.put("Player", up.getIngameName());
 		placeholder.put("Message", message);
 		placeholder.put("UUID", uuid.toString());
+		placeholder.put("server", up.getServer() != null ? up.getServer() : "");
 		
 		switch (this.instance.getConfigManager().getMessageType(FeatureType.Staff)) {
 			case MESSAGE: {

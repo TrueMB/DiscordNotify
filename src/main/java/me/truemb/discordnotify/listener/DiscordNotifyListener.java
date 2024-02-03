@@ -355,6 +355,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		placeholder.put("Player", up.getIngameName());
 		placeholder.put("Message", message);
 		placeholder.put("UUID", uuid.toString());
+		placeholder.put("server", up.getServer() != null ? up.getServer() : "");
 				
 		switch (this.instance.getConfigManager().getMessageType(FeatureType.Staff)) {
 			case MESSAGE: {
@@ -501,6 +502,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		placeholder.put("Player", ingameName);
 		placeholder.put("UUID", uuid.toString());
 		placeholder.put("DeathMessage", deathMessage);
+		placeholder.put("server", up.getServer() != null ? up.getServer() : "");
 		
 		switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerDeath)) {
 			case MESSAGE: {
@@ -722,6 +724,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 		placeholder.put("Player", ingameName);
 		placeholder.put("UUID", uuid.toString());
 		placeholder.put("AdvancementName", advancementKey);
+		placeholder.put("server", up.getServer() != null ? up.getServer() : "");
 		
 		switch (this.instance.getConfigManager().getMessageType(FeatureType.PlayerAdvancement)) {
 			case MESSAGE: {
