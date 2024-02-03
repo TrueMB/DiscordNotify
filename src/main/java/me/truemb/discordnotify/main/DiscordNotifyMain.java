@@ -48,6 +48,7 @@ public class DiscordNotifyMain {
 	
 	//COMMANDS
     private HashMap<UUID, Boolean> staffChatDisabled = new HashMap<>();
+    private HashMap<UUID, Boolean> staffChatToggle = new HashMap<>();
     private HashMap<UUID, Boolean> discordChatEnabled = new HashMap<>();
 	
 	//MySQL

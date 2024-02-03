@@ -30,8 +30,19 @@ public class DN_StaffCommand {
 			up.sendMessage(this.instance.getConfigManager().getMinecraftMessage("perm", false));
 			return;
 		}
-		
-		if(args.length == 1) {
+
+		if(args.length == 0) {
+			if(this.instance.getStaffChatToggle().get(uuid)) {
+				this.instance.getStaffChatToggle().put(uuid, false);
+				up.sendMessage(this.instance.getConfigManager().getMinecraftMessage("staffToggleDisable", true));
+				return;
+				
+			}else{
+				this.instance.getStaffChatToggle().put(uuid, true);
+				up.sendMessage(this.instance.getConfigManager().getMinecraftMessage("staffToggleEnable", true));
+				return;
+			}
+		}else if(args.length == 1) {
 			if(args[0].equalsIgnoreCase("on")) {
 				this.instance.getStaffChatDisabled().put(uuid, false);
 				up.sendMessage(this.instance.getConfigManager().getMinecraftMessage("staffEnable", true));
@@ -42,9 +53,6 @@ public class DN_StaffCommand {
 				up.sendMessage(this.instance.getConfigManager().getMinecraftMessage("staffDisable", true));
 				return;
 			}
-		}else if(args.length < 1) {
-			up.sendMessage(this.instance.getConfigManager().getMinecraftMessage("staffHelp", true));
-			return;
 		}
 		
 		String message = "";

@@ -41,7 +41,9 @@ public class BukkitEventsListener implements Listener {
 		if(message.startsWith("/"))
 			return;
 		
-		this.plugin.getListener().onPlayerMessage(up, message);
+		boolean b = this.plugin.getListener().onPlayerMessage(up, message);
+		if(b)
+			e.setCancelled(true);
 	}
 
 	@EventHandler

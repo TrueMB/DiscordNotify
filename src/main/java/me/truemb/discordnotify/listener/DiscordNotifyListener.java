@@ -315,10 +315,79 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 
 
 	@Override
-	public void onPlayerMessage(UniversalPlayer up, String message) {
+	public boolean onPlayerMessage(UniversalPlayer up, String message) {
+		
 		//IF FEATURE ENABLED
+		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.Staff))
+			if(this.onPlayerStaffMessageFeature(up, message))
+				return true;
+		
 		if(!this.instance.getUniversalServer().isProxySubServer() && this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat))
 			this.onPlayerMessageFeature(up, message);
+		
+		return false;
+	}
+	
+	private boolean onPlayerStaffMessageFeature(UniversalPlayer up, String message) {
+		UUID uuid = up.getUUID();
+		
+		if(!this.instance.getStaffChatToggle().get(uuid))
+			return false;
+		
+		//Staff Message
+		
+		//ALL PLAYERS INGAME
+		for(UniversalPlayer all : this.instance.getUniversalServer().getOnlinePlayers()) {
+			UUID uuidAll = all.getUUID();
+			if(all.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.StaffChat"))) {
+				if(up.equals(all) || !this.instance.getStaffChatDisabled().containsKey(uuidAll) || !this.instance.getStaffChatDisabled().get(uuidAll)) {
+					all.sendMessage(this.instance.getConfigManager().getMinecraftMessage("minecraftStaffMessage", true)
+							.replaceAll("(?i)%" + "message" + "%", message)
+							.replaceAll("(?i)%" + "player" + "%", up.getIngameName())
+							.replaceAll("(?i)%" + "server" + "%", up.getServer() != null ? up.getServer() : ""));
+				}
+			}
+		}
+				
+		//DISCORD STAFF MESSAGE
+		String channelId = this.instance.getConfigManager().getChannel(FeatureType.Staff);
+		HashMap<String, String> placeholder = new HashMap<>();
+		placeholder.put("Player", up.getIngameName());
+		placeholder.put("Message", message);
+		placeholder.put("UUID", uuid.toString());
+				
+		switch (this.instance.getConfigManager().getMessageType(FeatureType.Staff)) {
+			case MESSAGE: {
+				try {
+					this.instance.getDiscordManager().sendDiscordMessage(Long.parseLong(channelId), "StaffMessage", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.Staff.toString() + " couldn't parse the Channel ID.");
+				}
+				break;
+			}
+			case EMBED: {
+				try {
+					this.instance.getDiscordManager().sendEmbedMessage(Long.parseLong(channelId), uuid, "StaffEmbed", placeholder);
+				}catch (NumberFormatException ex) {
+					this.instance.getUniversalServer().getLogger().warning("The Feature: " + FeatureType.Staff.toString() + " couldn't parse the Channel ID.");
+				}
+				break;
+			}
+			case WEBHOOK: {
+				WebhookClient webhookClient = this.instance.getDiscordManager().createOrLoadWebhook(FeatureType.Staff, channelId);
+				String minotarTypeS = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Staff.PictureType");
+				MinotarTypes minotarType = MinotarTypes.BUST;
+				try {
+					minotarType = MinotarTypes.valueOf(minotarTypeS.toUpperCase());
+				}catch(Exception ex) { /* NOTING */ }
+				
+				String description = this.instance.getConfigManager().getConfig().getString("DiscordWebhookMessages.Staff.Description");
+				this.instance.getDiscordManager().sendWebhookMessage(webhookClient, up.getIngameName(), "https://minotar.net/" + minotarType.toString().toLowerCase() + "/" + uuid.toString(), description, placeholder);
+				break;
+			}
+		}
+		
+		return true; //Cancel Event
 		
 	}
 

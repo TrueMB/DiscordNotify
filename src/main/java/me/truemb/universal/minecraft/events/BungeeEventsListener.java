@@ -42,7 +42,9 @@ public class BungeeEventsListener implements Listener {
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
 		String message = e.getMessage();
 		
-		this.plugin.getListener().onPlayerMessage(up, message);
+		boolean b = this.plugin.getListener().onPlayerMessage(up, message);
+		if(b)
+			e.setCancelled(true);
 	}
 	
 	@EventHandler

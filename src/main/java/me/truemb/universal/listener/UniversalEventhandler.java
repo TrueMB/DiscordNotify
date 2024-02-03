@@ -14,7 +14,7 @@ public abstract class UniversalEventhandler {
 	
 	public abstract void onPlayerServerChange(UniversalPlayer up, String oldServerName, String newServerName);
 	
-	public abstract void onPlayerMessage(UniversalPlayer up, String message);
+	public abstract boolean onPlayerMessage(UniversalPlayer up, String message);
 	
 	public abstract void onPlayerDeath(UniversalPlayer up, String message);
 	
