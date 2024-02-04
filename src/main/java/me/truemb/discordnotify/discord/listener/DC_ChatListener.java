@@ -78,13 +78,13 @@ public class DC_ChatListener extends ListenerAdapter {
 						return;
 					}
 					
-				    final String mcMessage = EmojiParser.parseToAliases(this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
+				    final String mcMessage = this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
 				    		.replaceAll("(?i)%" + "tag" + "%", tag)
 				    		.replaceAll("(?i)%" + "username" + "%", username)
 				    		.replaceAll("(?i)%" + "nickname" + "%", nickname)
 				    		.replaceAll("(?i)%" + "name" + "%", name)
-				    		.replaceAll("(?i)%" + "message" + "%", message)
-				    		.replaceAll("(?i)%" + "channel" + "%", channelName));
+				    		.replaceAll("(?i)%" + "message" + "%", EmojiParser.parseToAliases(message))
+				    		.replaceAll("(?i)%" + "channel" + "%", channelName);
 		
 				  
 				    if(!this.instance.getUniversalServer().isProxySubServer()) {
@@ -102,13 +102,13 @@ public class DC_ChatListener extends ListenerAdapter {
 		    	
 		   	}else if(this.instance.getUniversalServer().isProxy()){
 		   						
-			    final String mcMessage = EmojiParser.parseToAliases(this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
+			    final String mcMessage = this.instance.getConfigManager().getMinecraftMessage("discordChatMessage", true)
 			    		.replaceAll("(?i)%" + "tag" + "%", tag)
 			    		.replaceAll("(?i)%" + "username" + "%", username)
 			    		.replaceAll("(?i)%" + "nickname" + "%", nickname)
 			    		.replaceAll("(?i)%" + "name" + "%", name)
-			    		.replaceAll("(?i)%" + "message" + "%", message)
-			    		.replaceAll("(?i)%" + "channel" + "%", channelName));
+			    		.replaceAll("(?i)%" + "message" + "%", EmojiParser.parseToAliases(message))
+			    		.replaceAll("(?i)%" + "channel" + "%", channelName);
 			    
 		   		for(String server : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat").getKeys(false)) {
 		   			String id = FeatureType.Chat.toString() + "_" + server.toLowerCase();
@@ -165,13 +165,13 @@ public class DC_ChatListener extends ListenerAdapter {
 		    		return;
 		    }
 
-		    final String mcMessage = EmojiParser.parseToAliases(this.instance.getConfigManager().getMinecraftMessage("discordStaffMessage", true)
+		    final String mcMessage = this.instance.getConfigManager().getMinecraftMessage("discordStaffMessage", true)
 		    		.replaceAll("(?i)%" + "tag" + "%", tag)
 		    		.replaceAll("(?i)%" + "username" + "%", username)
 		    		.replaceAll("(?i)%" + "nickname" + "%", nickname)
 		    		.replaceAll("(?i)%" + "name" + "%", name)
-		    		.replaceAll("(?i)%" + "message" + "%", message)
-		    		.replaceAll("(?i)%" + "channel" + "%", channelName));
+		    		.replaceAll("(?i)%" + "message" + "%", EmojiParser.parseToAliases(message))
+		    		.replaceAll("(?i)%" + "channel" + "%", channelName);
 		    
 			  
 		    if(!this.instance.getUniversalServer().isProxySubServer()) {
