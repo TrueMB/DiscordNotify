@@ -1,7 +1,10 @@
 package me.truemb.universal.minecraft.events;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,6 +14,7 @@ import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.simpleyaml.configuration.file.YamlConfiguration;
 
 import me.truemb.discordnotify.main.DiscordNotifyMain;
 import me.truemb.universal.player.BukkitPlayer;
@@ -98,9 +102,26 @@ public class BukkitEventsListener implements Listener {
 		
 		UUID uuid = p.getUniqueId();
 		UniversalPlayer up = this.plugin.getUniversalServer().getPlayer(uuid);
-		String advancementKey = e.getAdvancement().getKey().getNamespace();
 		
-		this.plugin.getListener().onPlayerAdvancement(up, advancementKey);
+		NamespacedKey key = e.getAdvancement().getKey();
+		if(key.getNamespace() != NamespacedKey.MINECRAFT)
+			return;
+
+        InputStream configInputStream = getClass().getClassLoader().getResourceAsStream("advancements.yml");
+		System.out.println(key.getKey().toString());
+        
+		try {
+	        @SuppressWarnings("deprecation")
+	        YamlConfiguration conf = YamlConfiguration.loadConfiguration(configInputStream);
+			String advancement = conf.getString(key.getKey().toString());
+			
+			if(advancement == null)
+				return;
+			
+			this.plugin.getListener().onPlayerAdvancement(up, advancement);
+			
+		} catch (IOException ex) {} //Couldn't find the advancement
+        
 	}
 	
 }
