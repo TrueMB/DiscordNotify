@@ -32,7 +32,7 @@ public class DN_StaffCommand {
 		}
 
 		if(args.length == 0) {
-			if(this.instance.getStaffChatToggle().get(uuid)) {
+			if(this.instance.getStaffChatToggle().containsKey(uuid) && this.instance.getStaffChatToggle().get(uuid)) {
 				this.instance.getStaffChatToggle().put(uuid, false);
 				up.sendMessage(this.instance.getConfigManager().getMinecraftMessage("staffToggleDisable", true));
 				return;

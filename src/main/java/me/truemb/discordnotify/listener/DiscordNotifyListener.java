@@ -331,7 +331,7 @@ public class DiscordNotifyListener extends UniversalEventhandler{
 	private boolean onPlayerStaffMessageFeature(UniversalPlayer up, String message) {
 		UUID uuid = up.getUUID();
 		
-		if(!this.instance.getStaffChatToggle().get(uuid))
+		if(!this.instance.getStaffChatToggle().containsKey(uuid) || !this.instance.getStaffChatToggle().get(uuid))
 			return false;
 		
 		//Staff Message
