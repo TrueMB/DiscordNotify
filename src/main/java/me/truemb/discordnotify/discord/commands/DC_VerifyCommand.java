@@ -160,9 +160,6 @@ public class DC_VerifyCommand extends SimpleAddon {
 				return;
 			}
 			
-			int delaySec = this.instance.getConfigManager().getConfig().getInt("Options." + FeatureType.Verification.toString() + ".delayForNewRequest");
-			
-			this.instance.getDelayManager().setDelay(disUUID, DelayType.VERIFY, System.currentTimeMillis() + delaySec * 1000);
 			this.instance.getVerifySQL().checkIfAlreadyVerified(instance.getDiscordManager(), command, member, uuid);
 			
     	}).start();

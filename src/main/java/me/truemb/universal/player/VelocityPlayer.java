@@ -3,7 +3,7 @@ package me.truemb.universal.player;
 import com.velocitypowered.api.proxy.Player;
 
 import me.truemb.universal.enums.ServerType;
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public class VelocityPlayer extends UniversalPlayer{
@@ -31,7 +31,7 @@ public class VelocityPlayer extends UniversalPlayer{
 	}
 
 	@Override
-	public void sendMessage(Component message) {
+	public void sendMessage(ComponentLike message) {
 		this.getVelocityPlayer().sendMessage(message);
 	}
 

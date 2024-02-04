@@ -156,10 +156,10 @@ bukkit {
 }
 
 shadowJar {
-  //relocate 'net.kyori', 'me.truemb.discordnotify.kyori'
   relocate 'com.jeff_media.updatechecker', 'me.truemb.discordnotify.updater'
   relocate 'me.carleslc.Simple-YAML', 'me.truemb.discordnotify.simple-yaml'
   relocate 'org.bstats', 'me.truemb.discordnotify.bstats'
   relocate 'com.vdurmont', 'me.truemb.discordnotify.emoji'
-  relocate 'com.google.gson', 'me.truemb.discordnotify.gson'
+  //relocate 'com.google.gson', 'me.truemb.discordnotify.gson' //relocating breaks kyori
+  relocate 'net.kyori', 'me.truemb.discordnotify.kyori'
 }

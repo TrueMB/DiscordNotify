@@ -45,7 +45,7 @@ public class BungeeMain extends Plugin implements IRelay, Listener {
 	public void onEnable() {
 		this.instance = new DiscordNotifyMain(this.getDataFolder(), ServerType.BUNGEECORD, new PluginDescription(this.getDescription().getName(), this.getDescription().getAuthor(), this.getDescription().getVersion()));
 	    this.adventure = BungeeAudiences.create(this);
-		
+	    
 		//MESSAGING CHANNEL
         this.getProxy().registerChannel("messagechannel:proxy");
         this.getProxy().registerChannel("messagechannel:server");

@@ -102,6 +102,7 @@ public class VerifySQL {
 				    				.clickEvent(ClickEvent.runCommand("/verify deny"))
 				    				.hoverEvent(HoverEvent.showText(Component.text(instance.getConfigManager().getMinecraftMessage("verification.requestClickMessage.denyHover", false))))
 				    			);
+			    	
 			    	instance.getUniversalServer().getPlayer(mcuuid).sendMessage(textComponent);
 					return;
 				} catch (SQLException e) {
