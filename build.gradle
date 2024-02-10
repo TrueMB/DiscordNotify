@@ -94,7 +94,7 @@ dependencies {
 }
 
 group = 'DiscordNotify'
-version = '3.3.4'
+version = '3.3.5'
 description = 'DiscordNotify'
 java.sourceCompatibility = JavaVersion.VERSION_17
 

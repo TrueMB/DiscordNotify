@@ -83,7 +83,7 @@ public class DC_ChatListener extends ListenerAdapter {
 				    		.replaceAll("(?i)%" + "username" + "%", username)
 				    		.replaceAll("(?i)%" + "nickname" + "%", nickname)
 				    		.replaceAll("(?i)%" + "name" + "%", name)
-				    		.replaceAll("(?i)%" + "message" + "%", EmojiParser.parseToAliases(message))
+				    		.replaceAll("(?i)%" + "message" + "%", EmojiParser.parseToAliases(message).replace("$", "\\$"))
 				    		.replaceAll("(?i)%" + "channel" + "%", channelName);
 		
 				  
@@ -107,7 +107,7 @@ public class DC_ChatListener extends ListenerAdapter {
 			    		.replaceAll("(?i)%" + "username" + "%", username)
 			    		.replaceAll("(?i)%" + "nickname" + "%", nickname)
 			    		.replaceAll("(?i)%" + "name" + "%", name)
-			    		.replaceAll("(?i)%" + "message" + "%", EmojiParser.parseToAliases(message))
+			    		.replaceAll("(?i)%" + "message" + "%", EmojiParser.parseToAliases(message).replace("$", "\\$"))
 			    		.replaceAll("(?i)%" + "channel" + "%", channelName);
 			    
 		   		for(String server : this.instance.getConfigManager().getConfig().getConfigurationSection("Options." + FeatureType.Chat.toString() + ".serverSeperatedChat").getKeys(false)) {
@@ -170,7 +170,7 @@ public class DC_ChatListener extends ListenerAdapter {
 		    		.replaceAll("(?i)%" + "username" + "%", username)
 		    		.replaceAll("(?i)%" + "nickname" + "%", nickname)
 		    		.replaceAll("(?i)%" + "name" + "%", name)
-		    		.replaceAll("(?i)%" + "message" + "%", EmojiParser.parseToAliases(message))
+		    		.replaceAll("(?i)%" + "message" + "%", EmojiParser.parseToAliases(message).replace("$", "\\$"))
 		    		.replaceAll("(?i)%" + "channel" + "%", channelName);
 		    
 			  
