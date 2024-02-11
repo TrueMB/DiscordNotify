@@ -70,6 +70,7 @@ public class DiscordManager {
 	
 	public DiscordManager(DiscordNotifyMain plugin) {
 		this.instance = plugin;
+	    this.staticEmbedManager = new StaticEmbedManager(this.instance);
 	}
 
 	//DISCORD
@@ -161,7 +162,7 @@ public class DiscordManager {
 	    this.getDiscordBot().getJda().addEventListener(this.broadcastListener);
 	    this.getDiscordBot().getJda().addEventListener(this.roleChangeListener);
 	    
-	    this.staticEmbedManager = new StaticEmbedManager(this.instance);
+	    this.staticEmbedManager.load();
 
     	//SEND START MESSAGE TO DISCORD
     	if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.ServerStatus))

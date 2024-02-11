@@ -22,8 +22,14 @@ public class StaticEmbedManager {
 	//EmbedPath - Message ID
 	private HashMap<String, Long> embeds = new HashMap<>();
 	
+	private boolean loaded = false;
+	
 	public StaticEmbedManager(DiscordNotifyMain plugin) {
 		this.instance = plugin;
+	}
+	
+	public void load() {
+		this.loaded = true;
 		
 		//Load Embeds		
 		for(String embedPath : this.instance.getConfigManager().getConfig().getConfigurationSection("StaticEmbeds").getKeys(false))
@@ -66,6 +72,9 @@ public class StaticEmbedManager {
 	}
 	
 	public void updateEmbed(String embedPath) {
+		if(!this.loaded)
+			return;
+		
 		String path = "StaticEmbeds." + embedPath + ".";
 		
 		long channelId = this.instance.getConfigManager().getConfig().getLong(path + "Channel");
