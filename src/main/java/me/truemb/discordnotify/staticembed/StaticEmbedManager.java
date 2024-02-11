@@ -104,6 +104,9 @@ public class StaticEmbedManager {
 	 * if the plugin shuts down
 	 */
 	public void shutdown() {
+		
+		if(!this.loaded)
+			return;
 
 		DiscordBot bot = this.instance.getDiscordManager().getDiscordBot();
 		

@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import me.truemb.universal.enums.ServerType;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
-import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.Component;
 
 public class BukkitPlayer extends UniversalPlayer{
 	
@@ -35,7 +35,7 @@ public class BukkitPlayer extends UniversalPlayer{
 	}
 
 	@Override
-	public void sendMessage(ComponentLike message) {
+	public void sendMessage(Component message) {
 		this.adventure.player(this.getBukkitPlayer()).sendMessage(message);
 	}
 

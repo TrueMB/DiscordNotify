@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import lombok.Getter;
 import me.truemb.universal.enums.ServerType;
-import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.Component;
 
 @Getter
 public abstract class UniversalPlayer {
@@ -49,7 +49,7 @@ public abstract class UniversalPlayer {
     
     public abstract void sendMessage(String message);
     
-    public abstract void sendMessage(ComponentLike message);
+    public abstract void sendMessage(Component message);
 
     public boolean hasPermission(String permission) {
         if (permission == null || permission.isEmpty()) return true;

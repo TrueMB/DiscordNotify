@@ -6,7 +6,6 @@ import org.spongepowered.math.vector.Vector3d;
 
 import me.truemb.universal.enums.ServerType;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentLike;
 
 public class SpongePlayer extends UniversalPlayer{
 	
@@ -35,7 +34,7 @@ public class SpongePlayer extends UniversalPlayer{
 	}
 
 	@Override
-	public void sendMessage(ComponentLike message) {
+	public void sendMessage(Component message) {
 		this.getSpongePlayer().sendMessage(message);
 	}
 
