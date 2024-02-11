@@ -44,7 +44,7 @@ import me.truemb.universal.minecraft.events.VelocityEventsListener;
 import me.truemb.universal.player.UniversalPlayer;
 import me.truemb.universal.player.VelocityPlayer;
 
-@Plugin(id = "discordnotify", name = "DiscordNotify", version = "3.3.3", authors = {"TrueMB"}, dependencies = { @Dependency(id = "spicord")} )
+@Plugin(id = "discordnotify", name = "DiscordNotify", version = "3.3.5", authors = {"TrueMB"}, dependencies = { @Dependency(id = "spicord")} )
 public class VelocityMain implements IRelay {
 
     private final Metrics.Factory metricsFactory;
