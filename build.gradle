@@ -161,5 +161,5 @@ shadowJar {
   relocate 'org.bstats', 'me.truemb.discordnotify.bstats'
   relocate 'com.vdurmont', 'me.truemb.discordnotify.emoji'
   //relocate 'com.google.gson', 'me.truemb.discordnotify.gson' //relocating breaks kyori
-  relocate 'net.kyori', 'me.truemb.discordnotify.kyori'
+  //relocate 'net.kyori', 'me.truemb.discordnotify.kyori' //relocating breaks velocity
 }
