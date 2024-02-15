@@ -144,12 +144,23 @@ public class VerifySQL {
 						member = guild.retrieveMemberById(disuuid).complete();
 
 					String verfiedGroupS = instance.getConfigManager().getConfig().getString("Options." + FeatureType.Verification.toString() +  ".discordRole");
-					List<Role> verifyRoles = discordBot.getJda().getRolesByName(verfiedGroupS, true);
-					if(verifyRoles.size() <= 0)
-						return;
+					Role verifyRole = null;
 					
-					Role verifyRole = verifyRoles.get(0);
-					verifyRole.getGuild().addRoleToMember(member, verifyRole).complete();
+					if (verfiedGroupS.matches("[0-9]+")) {
+						Long verifiedGroupId = Long.parseLong(verfiedGroupS);
+						verifyRole = discordBot.getJda().getRoleById(verifiedGroupId);
+					}else {
+						List<Role> verifyRoles = discordBot.getJda().getRolesByName(verfiedGroupS, true);
+						if(verifyRoles.size() > 0)
+							verifyRole = verifyRoles.get(0);
+					}
+					
+					if(verifyRole == null) {
+						instance.getUniversalServer().getLogger().warning("Verify Role couldn't be found. Config Value: '" + verfiedGroupS + "'");
+						return;
+					}
+					
+					verifyRole.getGuild().addRoleToMember(member, verifyRole).queue();
 
 					//NICKNAME
 					if(instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Verification.toString() +  ".changeNickname")) {

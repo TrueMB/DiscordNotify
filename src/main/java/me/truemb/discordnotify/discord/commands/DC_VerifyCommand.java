@@ -67,9 +67,26 @@ public class DC_VerifyCommand extends SimpleAddon {
     		command.reply(this.instance.getDiscordManager().getDiscordMessage("verification.wrongCommand", placeholder));
     		return;
     	}
-
+    	
+    	String verfiedGroupS = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.Verification.toString() + ".discordRole");
+		Role verifyRole = null;
+		
+		if (verfiedGroupS.matches("[0-9]+")) {
+			Long verifiedGroupId = Long.parseLong(verfiedGroupS);
+			verifyRole = this.instance.getDiscordManager().getDiscordBot().getJda().getRoleById(verifiedGroupId);
+		}else {
+			List<Role> verifyRoles = this.instance.getDiscordManager().getDiscordBot().getJda().getRolesByName(verfiedGroupS, true);
+			if(verifyRoles.size() > 0)
+				verifyRole = verifyRoles.get(0);
+		}
+		
+		if(verifyRole == null) {
+			this.instance.getUniversalServer().getLogger().warning("Verify Role couldn't be found. Config Value: '" + verfiedGroupS + "'");
+			return;
+		}
+		
     	for(Role role : member.getRoles()){
-    		if(role.getName().equalsIgnoreCase(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.Verification.toString() + ".discordRole"))) {
+    		if(role.equals(verifyRole)) {
     			
     	    	if(args[0].equalsIgnoreCase("unlink")) {
     	    		//UNLINK FROM DISCORD
@@ -79,16 +96,12 @@ public class DC_VerifyCommand extends SimpleAddon {
     	    			if(mcuuid != null) {
 
     	    				//REMOVE VERIFY ROLE
-    	    				List<Role> verifyRoles = this.instance.getDiscordManager().getDiscordBot().getJda().getRolesByName(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.Verification.toString() + ".discordRole"), true);
-    	    				if(verifyRoles.size() > 0) {
-	    	    				Role verifyRole = verifyRoles.get(0);
-	    	    				verifyRole.getGuild().removeRoleFromMember(member, verifyRole).complete();
-    	    				}
+	    	    			verifyRole.getGuild().removeRoleFromMember(member, verifyRole).queue();
     	    				
     	    				//NICKNAME
     	    				if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Verification.toString() + ".changeNickname")) {
     	    					try {
-    	    						member.modifyNickname(null).complete();
+    	    						member.modifyNickname(null).queue();
     	    					}catch(HierarchyException ex) {
     	    						this.instance.getUniversalServer().getLogger().warning("User " + member.getUser().getAsTag() + " has higher rights, than the BOT! Cant reset the Nickname.");
     	    					}

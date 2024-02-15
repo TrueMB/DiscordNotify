@@ -120,7 +120,7 @@ Options:
     #-1 to enable the command for every channel. Otherwise the channel ID
     discordCommandOnlyInChannel: -1
   Verification:
-    #This Role is needed on the Discord Server, to identify already authenticated Users
+    #This Role is needed on the Discord Server, to identify already authenticated Users; It's recommended to use the role id here
     discordRole: 'verified'
     #This Rank is for authenticated Users after the verification. Its not needed. (leave it blank or enter the name of the group)
     #Use "s:groupname" for Spigot Server Groups or "b:groupname" for bungeecord

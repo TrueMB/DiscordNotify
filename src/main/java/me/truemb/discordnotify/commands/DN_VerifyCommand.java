@@ -52,16 +52,29 @@ public class DN_VerifyCommand {
 					member = this.instance.getDiscordManager().getDiscordBot().getJda().getGuilds().get(0).retrieveMemberById(disuuid).complete();
 				
 				//REMOVE VERIFY ROLE
-				List<Role> verifyRoles = this.instance.getDiscordManager().getDiscordBot().getJda().getRolesByName(this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.Verification.toString() + ".discordRole"), true);
-				if(verifyRoles.size() > 0) {
-    				Role verifyRole = verifyRoles.get(0);
-    				verifyRole.getGuild().removeRoleFromMember(member, verifyRole).complete();
+				String verfiedGroupS = this.instance.getConfigManager().getConfig().getString("Options." + FeatureType.Verification.toString() + ".discordRole");
+				Role verifyRole = null;
+				
+				if (verfiedGroupS.matches("[0-9]+")) {
+					Long verifiedGroupId = Long.parseLong(verfiedGroupS);
+					verifyRole = this.instance.getDiscordManager().getDiscordBot().getJda().getRoleById(verifiedGroupId);
+				}else {
+					List<Role> verifyRoles = this.instance.getDiscordManager().getDiscordBot().getJda().getRolesByName(verfiedGroupS, true);
+					if(verifyRoles.size() > 0)
+						verifyRole = verifyRoles.get(0);
 				}
+				
+				if(verifyRole == null) {
+					this.instance.getUniversalServer().getLogger().warning("Verify Role couldn't be found. Config Value: '" + verfiedGroupS + "'");
+					return;
+				}
+				
+    			verifyRole.getGuild().removeRoleFromMember(member, verifyRole).queue();
 				
 				//NICKNAME
 				if(this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Verification.toString() + ".changeNickname")) {
 					try {
-						member.modifyNickname(null).complete();
+						member.modifyNickname(null).queue();
 					}catch(HierarchyException ex) {
 						this.instance.getUniversalServer().getLogger().info("User " + member.getUser().getAsTag() + " has higher rights, than the BOT! Cant change the Nickname.");
 					}
