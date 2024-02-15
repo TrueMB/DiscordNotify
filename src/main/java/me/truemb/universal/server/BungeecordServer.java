@@ -20,13 +20,14 @@ public class BungeecordServer extends UniversalServer {
 
 	@Override
 	public void broadcast(String message) {
-		ProxyServer.getInstance().broadcast(new TextComponent(message));
+		ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(message));
 	}
 
 	@Override
 	public void broadcast(String message, String permission) {
 		ProxyServer.getInstance().getPlayers().forEach(player -> {
-			if(player.hasPermission(permission)) player.sendMessage(new TextComponent(message));
+			if(player.hasPermission(permission)) 
+				player.sendMessage(TextComponent.fromLegacyText(message));
 		});
 	}
 

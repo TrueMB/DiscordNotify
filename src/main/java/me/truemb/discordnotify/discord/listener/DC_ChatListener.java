@@ -131,7 +131,7 @@ public class DC_ChatListener extends ListenerAdapter {
 							e.getMessage().delete().queue();
 					    	e.getMember().getUser().openPrivateChannel()
 					    		.flatMap(pchannel -> pchannel.sendMessage(this.instance.getDiscordManager().getDiscordMessage("UserNotVerified", placeholder)))
-					    		.queue(null, new ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER, (ex) -> System.out.print(""))); //prevent Error Message, so there wont be console spamming, if a user has private message enabled
+					    		.queue(null, new ErrorHandler().handle(ErrorResponse.CANNOT_SEND_TO_USER, (ex) -> System.out.print(""))); //prevent Error Message, so there wont be console spamming, if a user has private message disabled
 							return;
 						}
 	
