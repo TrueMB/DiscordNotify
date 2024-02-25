@@ -1,6 +1,7 @@
 package me.truemb.discordnotify.discord.listener;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import com.vdurmont.emoji.EmojiParser;
@@ -29,6 +30,10 @@ public class DC_BroadcastListener extends ListenerAdapter {
         long channelId = e.getChannel().getIdLong();
 	    String message = EmojiParser.parseToAliases(e.getMessage().getContentDisplay());
 	    
+	    String username = e.getAuthor().getName();
+	    String nickname = e.getMember().getNickname();
+	    if(nickname == null) nickname = "";
+	    
 	    //IS CHANNEL A BROADCASTER?
 	    if(this.instance.getConfigManager().getConfig().isSet("Options.Broadcast." + channelId)) {
 	    	
@@ -47,7 +52,11 @@ public class DC_BroadcastListener extends ListenerAdapter {
 	    				break;
 	    			}
 	    	//FORMAT MESSAGE
-	    	message = ChatColor.translateAlternateColorCodes('&', format.replaceAll("(?i)%message%", message));
+	    	message = ChatColor.translateAlternateColorCodes('&', format
+		    		.replaceAll("(?i)%" + "message" + "%", message)
+		    		.replaceAll("(?i)%" + "username" + "%", username)
+		    		.replaceAll("(?i)%" + "nickname" + "%", nickname));
+	    	
 	    	if(prefix)
 	    		message = ChatColor.translateAlternateColorCodes('&', this.instance.getConfigManager().getConfig().getString("Messages.prefix")) + " " + message;
 
