@@ -94,7 +94,7 @@ Options:
         - 'lobby'
         - 'freebuild'
   Chat:
-    MessageType: WEBHOOK
+    MessageType: MESSAGE
     #Should the Discord Message send to the Minecraft Server?
     syncDiscord: true
     #Only Verified Accounts can Sync their Chat. Needs the Verification Feature
@@ -110,7 +110,7 @@ Options:
     bypassPrefix:
       - '?'
   Staff:
-    MessageType: WEBHOOK
+    MessageType: MESSAGE
     #Should the Discord Message send to the Minecraft Server?
     syncDiscord: true
     bypassPrefix:
