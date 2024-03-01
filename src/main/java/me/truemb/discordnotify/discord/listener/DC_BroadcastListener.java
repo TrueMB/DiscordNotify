@@ -1,7 +1,6 @@
 package me.truemb.discordnotify.discord.listener;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import com.vdurmont.emoji.EmojiParser;

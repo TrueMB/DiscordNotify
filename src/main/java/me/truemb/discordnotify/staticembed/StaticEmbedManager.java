@@ -145,7 +145,7 @@ public class StaticEmbedManager {
 		String playerWithServerFormat = this.instance.getConfigManager().getConfig().getString("Options.OtherFormats.PlayerWithInfo");
 		String playersWithServer = "";
 		for(UniversalPlayer player : this.instance.getUniversalServer().getOnlinePlayers())
-			playersWithServer += ", " + playerWithServerFormat.replaceAll("(?i)%" + "player" + "%", player.getIngameName()).replaceAll("(?i)%" + "server" + "%", player.getServer());
+			playersWithServer += ", " + playerWithServerFormat.replaceAll("(?i)%" + "player" + "%", player.getIngameName()).replaceAll("(?i)%" + "server" + "%", player.getServer() != null ? player.getServer() : "");
 		if(playersWithServer.length() >= 2)
 			playersWithServer = playersWithServer.substring(2);
 		
