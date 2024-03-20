@@ -47,9 +47,8 @@ public class DC_ChatListener extends ListenerAdapter {
 	    HashMap<String, String> placeholder = new HashMap<>();
 	    String tag = e.getAuthor().getAsTag();
 	    String username = e.getAuthor().getName();
-	    String nickname = e.getMember().getNickname();
-	    if(nickname == null) nickname = "";
-	    String name = e.getMember().getEffectiveName();
+	    String nickname = e.getMember() != null && e.getMember().getNickname() != null ? e.getMember().getNickname() : "";
+	    String name = e.getMember() != null && e.getMember().getEffectiveName() != null ? e.getMember().getEffectiveName() : "";
 	    
 	    placeholder.put("tag", tag);
 	    placeholder.put("username", username);
@@ -58,8 +57,11 @@ public class DC_ChatListener extends ListenerAdapter {
 	    	    
 	    //CORRECT CHANNEL
 		if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Chat)) {
+		    
+		    if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".syncDiscord"))
+		    	return;
 			
-		    //CHECK IF IT IS A MANAGED CHANNEL					
+		    //CHECK IF IT IS A MANAGED CHANNEL
 		    if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Chat.toString() + ".enableServerSeperatedChat")) {
 		    	if(this.channel_id.containsKey(FeatureType.Chat.toString()) && this.channel_id.get(FeatureType.Chat.toString()) == channelId) {
 				
@@ -152,36 +154,39 @@ public class DC_ChatListener extends ListenerAdapter {
 		   		}
 		   	}
 		}
-	    
-		//STAFF CHAT
-	    if(this.channel_id.containsKey(FeatureType.Staff.toString()) && this.channel_id.get(FeatureType.Staff.toString()) == channelId) {
-	    	
-			if(!this.instance.getConfigManager().isFeatureEnabled(FeatureType.Staff))
-				return;
-		    
-			List<String> bypassList = this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Staff.toString() + ".bypassPrefix");
-			for(String prefix : bypassList) {
-		    	if(message.toLowerCase().startsWith(prefix.toLowerCase()))
-		    		return;
-		    }
 
-		    final String mcMessage = this.instance.getConfigManager().getMinecraftMessage("discordStaffMessage", true)
-		    		.replaceAll("(?i)%" + "tag" + "%", tag)
-		    		.replaceAll("(?i)%" + "username" + "%", username)
-		    		.replaceAll("(?i)%" + "nickname" + "%", nickname)
-		    		.replaceAll("(?i)%" + "name" + "%", name)
-		    		.replaceAll("(?i)%" + "message" + "%", EmojiParser.parseToAliases(message).replace("$", "\\$"))
-		    		.replaceAll("(?i)%" + "channel" + "%", channelName);
-		    
-			  
-		    if(!this.instance.getUniversalServer().isProxySubServer()) {
-		    	//ALL PLAYERS INGAME
-				this.instance.getUniversalServer().getOnlinePlayers().forEach(all -> {
-					UUID uuidAll = all.getUUID();
-					if(all.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.StaffChat")))
-						if(!this.instance.getStaffChatDisabled().containsKey(uuidAll) || !this.instance.getStaffChatDisabled().get(uuidAll))
-							all.sendMessage(mcMessage);
-				});
+		//STAFF CHAT
+		if(this.instance.getConfigManager().isFeatureEnabled(FeatureType.Staff)) {
+			
+		    if(this.channel_id.containsKey(FeatureType.Staff.toString()) && this.channel_id.get(FeatureType.Staff.toString()) == channelId) {
+		    			    
+			    if(!this.instance.getConfigManager().getConfig().getBoolean("Options." + FeatureType.Staff.toString() + ".syncDiscord"))
+			    	return;
+			    
+				List<String> bypassList = this.instance.getConfigManager().getConfig().getStringList("Options." + FeatureType.Staff.toString() + ".bypassPrefix");
+				for(String prefix : bypassList) {
+			    	if(message.toLowerCase().startsWith(prefix.toLowerCase()))
+			    		return;
+			    }
+	
+			    final String mcMessage = this.instance.getConfigManager().getMinecraftMessage("discordStaffMessage", true)
+			    		.replaceAll("(?i)%" + "tag" + "%", tag)
+			    		.replaceAll("(?i)%" + "username" + "%", username)
+			    		.replaceAll("(?i)%" + "nickname" + "%", nickname)
+			    		.replaceAll("(?i)%" + "name" + "%", name)
+			    		.replaceAll("(?i)%" + "message" + "%", EmojiParser.parseToAliases(message).replace("$", "\\$"))
+			    		.replaceAll("(?i)%" + "channel" + "%", channelName);
+			    
+				  
+			    if(!this.instance.getUniversalServer().isProxySubServer()) {
+			    	//ALL PLAYERS INGAME
+					this.instance.getUniversalServer().getOnlinePlayers().forEach(all -> {
+						UUID uuidAll = all.getUUID();
+						if(all.hasPermission(this.instance.getConfigManager().getConfig().getString("Permissions.StaffChat")))
+							if(!this.instance.getStaffChatDisabled().containsKey(uuidAll) || !this.instance.getStaffChatDisabled().get(uuidAll))
+								all.sendMessage(mcMessage);
+					});
+			    }
 		    }
 		}
     }
