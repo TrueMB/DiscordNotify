@@ -30,8 +30,7 @@ public class DC_BroadcastListener extends ListenerAdapter {
 	    String message = EmojiParser.parseToAliases(e.getMessage().getContentDisplay());
 	    
 	    String username = e.getAuthor().getName();
-	    String nickname = e.getMember().getNickname();
-	    if(nickname == null) nickname = "";
+	    String nickname = e.getMember() != null && e.getMember().getNickname() != null ? e.getMember().getNickname() : "";
 	    
 	    //IS CHANNEL A BROADCASTER?
 	    if(this.instance.getConfigManager().getConfig().isSet("Options.Broadcast." + channelId)) {
