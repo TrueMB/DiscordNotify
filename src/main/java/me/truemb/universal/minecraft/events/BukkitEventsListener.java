@@ -108,7 +108,6 @@ public class BukkitEventsListener implements Listener {
 			return;
 
         InputStream configInputStream = getClass().getClassLoader().getResourceAsStream("advancements.yml");
-		System.out.println(key.getKey().toString());
         
 		try {
 	        @SuppressWarnings("deprecation")
