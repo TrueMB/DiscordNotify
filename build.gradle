@@ -22,6 +22,11 @@ repositories {
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
     
+    //Spicord
+    maven {
+        url = uri('https://repo.spicord.org/spicord-repo')
+    }
+    
     maven {
         url = uri('https://oss.sonatype.org/content/repositories/snapshots')
     }
